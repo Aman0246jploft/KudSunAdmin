@@ -1,10 +1,18 @@
 import React, { useState } from "react";
 import Button from "../Atoms/Button/Button";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
+import {
+  addSubCategory,
+  subCategory,
+} from "../../features/slices/categorySlice";
+import { useDispatch } from "react-redux";
+import { useParams } from "react-router";
+import { toast } from "react-toastify";
 
-export default function AddCategoryForm({ onClose }) {
+export default function AddCategoryForm({ onClose, pagination }) {
   const { theme } = useTheme();
-
+  const dispatch = useDispatch();
+  const param = useParams();
   const [formData, setFormData] = useState({
     name: "",
     image: null,
@@ -20,13 +28,53 @@ export default function AddCategoryForm({ onClose }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    const payload = new FormData();
-    payload.append("name", formData.name);
-    if (formData.image) {
-      payload.append("image", formData.image);
+    if (!formData.name.trim()) {
+      alert("Category name is required");
+      return;
     }
+    const payload = new FormData();
+    if (formData._id) {
+      payload.append("_id", formData._id);
+    }
+    if (formData.name) {
+      payload.append("name", formData.name.trim());
+    }
+    if (formData.image) {
+      payload.append("file", formData.image); // note: backend expects 'file' as multer field
+    }
+
+    dispatch(addSubCategory({ categoryId: param?.id, formData: payload }))
+      .then((result) => {
+        if (addSubCategory.fulfilled.match(result)) {
+          toast.success("SubCategory Created");
+
+          return dispatch(
+            subCategory({ categoryId: param?.id, pagination })
+          ).then((result) => {
+            if (subCategory.fulfilled.match(result)) {
+              onClose();
+            } else {
+              const { message, code } = result.payload || {};
+              console.error(`Fetch failed [${code}]: ${message}`);
+            }
+          });
+        } else {
+          const { message, code } = result.payload || {};
+          console.error(`SubCategory failed [${code}]: ${message}`);
+        }
+      })
+      .catch((error) => {
+        console.error("Unexpected error:", error);
+        toast.error("Unexpected error occurred");
+      });
+
+    // Here you'd call your API with the payload, e.g.:
+    // dispatch(saveCategory(payload))
+    //   .then(...)
+    //   .catch(...)
+
     console.log("Submitting category:", formData);
+
     onClose();
   };
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { mainCategory } from "../../features/slices/categorySlice";
+import { mainCategory, subCategory } from "../../features/slices/categorySlice";
 import DataTable from "../Table/DataTable";
 import Pagination from "../Atoms/Pagination/Pagination";
 import Modal from "./Modal";
@@ -8,31 +8,32 @@ import AddCategoryForm from "./AddCategoryForm";
 import Button from "../Atoms/Button/Button";
 import { FiEdit, FiTrash2 } from "react-icons/fi"; // From Feather Icons
 import { useTheme } from "../../contexts/theme/hook/useTheme";
+import { useParams } from "react-router";
 
 export default function SubCategory() {
   const dispatch = useDispatch();
   const { theme } = useTheme();
-
   const [pagination, setPagination] = useState({ pageNo: 1, size: 10 });
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const { categoryList, loading, error } = useSelector(
+  const param = useParams();
+  const { subCategoryList, loading, error } = useSelector(
     (state) => state.category || {}
   );
-  let { data = [], total = 0 } = categoryList || {};
+  let { data = [], total = 0 } = subCategoryList || {};
 
   useEffect(() => {
-    dispatch(mainCategory(pagination))
-      .then((result) => {
-        if (!mainCategory.fulfilled.match(result)) {
-          const { message, code } = result.payload || {};
-          console.error(`Fetch failed [${code}]: ${message}`);
-        }
-      })
-      .catch((error) => {
-        console.error("Unexpected error:", error);
-      });
-  }, [dispatch, pagination]);
+    if (param?.id)
+      dispatch(subCategory({ categoryId: param?.id, pagination }))
+        .then((result) => {
+          if (!subCategory.fulfilled.match(result)) {
+            const { message, code } = result.payload || {};
+            console.error(`Fetch failed [${code}]: ${message}`);
+          }
+        })
+        .catch((error) => {
+          console.error("Unexpected error:", error);
+        });
+  }, [dispatch, pagination, param?.id]);
 
   const columns = [
     {
@@ -186,7 +187,10 @@ export default function SubCategory() {
       </div>
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <AddCategoryForm onClose={() => setIsModalOpen(false)} />
+        <AddCategoryForm
+          onClose={() => setIsModalOpen(false)}
+          pagination={pagination}
+        />
       </Modal>
     </div>
   );

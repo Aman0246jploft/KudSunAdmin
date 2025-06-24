@@ -1,15 +1,40 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "../Atoms/Button/Button";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
+import { useDispatch } from "react-redux";
+import {
+  createCategory,
+  mainCategory,
+} from "../../features/slices/categorySlice";
+import { toast } from "react-toastify";
 
-
-export default function AddCategoryForm({ onClose }) {
+export default function AddCategoryForm({ onClose, initialData, pagination }) {
   const { theme } = useTheme();
+  const dispatch = useDispatch();
 
   const [formData, setFormData] = useState({
     name: "",
     image: null,
   });
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        _id: initialData._id || null,
+        name: initialData.name || "",
+        image: null, // new file not uploaded yet
+        imagePreviewUrl: initialData.image || null, // existing image url to preview
+      });
+    } else {
+      // reset when no initialData (add mode)
+      setFormData({
+        _id: null,
+        name: "",
+        image: null,
+        imagePreviewUrl: null,
+      });
+    }
+  }, [initialData]);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -21,16 +46,53 @@ export default function AddCategoryForm({ onClose }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!formData.name.trim()) {
+      alert("Category name is required");
+      return;
+    }
 
     const payload = new FormData();
-    payload.append("name", formData.name);
-    if (formData.image) {
-      payload.append("image", formData.image);
+    if (formData._id) {
+      payload.append("_id", formData._id);
     }
+    payload.append("name", formData.name.trim());
+    if (formData.image) {
+      payload.append("file", formData.image); // note: backend expects 'file' as multer field
+    }
+
+    dispatch(createCategory(payload))
+      .then((result) => {
+        if (createCategory.fulfilled.match(result)) {
+          toast.success("Category Created");
+          dispatch(mainCategory(pagination))
+            .then((result) => {
+              if (!mainCategory.fulfilled.match(result)) {
+                const { message, code } = result.payload || {};
+                console.error(`Fetch failed [${code}]: ${message}`);
+              }
+            })
+            .catch((error) => {
+              console.error("Unexpected error:", error);
+            });
+        } else {
+          const { message, code } = result.payload || {};
+          console.error(`createCategory failed [${code}]: ${message}`);
+        }
+      })
+      .catch((error) => {
+        console.error("Unexpected error:", error);
+        toast.error("Unexpected error occurred");
+      });
+
+    // Here you'd call your API with the payload, e.g.:
+    // dispatch(saveCategory(payload))
+    //   .then(...)
+    //   .catch(...)
+
     console.log("Submitting category:", formData);
+
     onClose();
   };
-
 
   return (
     <form
@@ -45,7 +107,7 @@ export default function AddCategoryForm({ onClose }) {
         className="text-lg font-bold"
         style={{ color: theme.colors.textPrimary }}
       >
-        Add New Category
+        {formData._id ? "Edit Category" : "Add New Category"}
       </h3>
 
       <div>
@@ -77,6 +139,17 @@ export default function AddCategoryForm({ onClose }) {
         >
           Image
         </label>
+
+        {formData.imagePreviewUrl ? (
+          <img
+            src={formData.imagePreviewUrl}
+            alt="preview"
+            className="w-24 h-16 object-cover mb-2 rounded"
+          />
+        ) : (
+          <span className="text-gray-400 block mb-2">No image selected</span>
+        )}
+
         <input
           type="file"
           name="image"
@@ -109,7 +182,7 @@ export default function AddCategoryForm({ onClose }) {
             color: theme.colors.buttonText,
           }}
         >
-          Submit
+          {formData._id ? "Update" : "Submit"}
         </Button>
       </div>
     </form>

@@ -57,7 +57,7 @@ export const productList = createAsyncThunk(
 
 
 const ProductSlice = createSlice({
-    name: 'user',
+    name: 'product',
     initialState: {
     },
     reducers: {},

@@ -2,6 +2,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import authAxiosClient from '../../api/authAxiosClient';
 import { toast } from 'react-toastify';
+import axiosClient from '../../api/axiosClient';
 
 export function capitalizeFirstLetter(str) {
     if (!str) return '';
@@ -13,7 +14,7 @@ export const mainCategory = createAsyncThunk(
     'category/listCategoryNames',
     async (queryParams = {}, thunkAPI) => {
         try {
-            const res = await authAxiosClient.get('/category/listCategoryNames', { params: queryParams });
+            const res = await axiosClient.get('/category/listCategoryNames', { params: queryParams });
             return res.data;
         } catch (err) {
             console.error(`Category List [${err.responseCode || 500}]: ${err.message}`);
@@ -69,10 +70,59 @@ export const subCategoryParameter = createAsyncThunk(
 );
 
 
+export const createCategory = createAsyncThunk(
+    'category/createCategory',
+    async (payload = {}, thunkAPI) => {
+        try {
+            const res = await authAxiosClient.post(`/category/createCategory`, payload, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            return res.data;
+        } catch (err) {
+            console.error(`Category List [${err.responseCode || 500}]: ${err.message}`);
+            let message = capitalizeFirstLetter(err.message)
+            toast.error(message)
+            return thunkAPI.rejectWithValue({
+                message: err.message,
+                code: err.responseCode || 500,
+            });
+        }
+    }
+);
+
+
+
+export const addSubCategory = createAsyncThunk(
+    'category/addSubCategory',
+    async ({ categoryId, formData } = {}, thunkAPI) => {
+    
+        try {
+            const res = await authAxiosClient.post(`/category/addSubCategory/${categoryId}`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            return res.data;
+        } catch (err) {
+            console.error(`Category List [${err.responseCode || 500}]: ${err.message}`);
+            let message = capitalizeFirstLetter(err.message)
+            toast.error(message)
+            return thunkAPI.rejectWithValue({
+                message: err.message,
+                code: err.responseCode || 500,
+            });
+        }
+    }
+);
+
+
+
 
 
 const CategorySlice = createSlice({
-    name: 'user',
+    name: 'category',
     initialState: {
     },
     reducers: {},
@@ -87,6 +137,18 @@ const CategorySlice = createSlice({
                 state.categoryList = action.payload.data;
             })
             .addCase(mainCategory.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(subCategory.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(subCategory.fulfilled, (state, action) => {
+                state.loading = false;
+                state.subCategoryList = action.payload.data;
+            })
+            .addCase(subCategory.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })

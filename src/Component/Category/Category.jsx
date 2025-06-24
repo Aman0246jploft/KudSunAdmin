@@ -6,15 +6,18 @@ import Pagination from "../Atoms/Pagination/Pagination";
 import Modal from "./Modal";
 import AddCategoryForm from "./AddCategoryForm";
 import Button from "../Atoms/Button/Button";
+import { FaEye } from "react-icons/fa";
 import { FiEdit, FiTrash2 } from "react-icons/fi"; // From Feather Icons
 import { useTheme } from "../../contexts/theme/hook/useTheme";
+import { useNavigate } from "react-router";
 
 export default function Category() {
   const dispatch = useDispatch();
   const { theme } = useTheme();
-
+  const navigate = useNavigate();
   const [pagination, setPagination] = useState({ pageNo: 1, size: 10 });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
 
   const { categoryList, loading, error } = useSelector(
     (state) => state.category || {}
@@ -62,6 +65,23 @@ export default function Category() {
           <span className="text-gray-400">No image</span>
         ),
     },
+
+    {
+      key: "subCategory",
+      label: "Subcategory",
+      width: "25%",
+      render: (_, row) => {
+        return (
+          <button
+            onClick={() => navigate(`/subCategory/${row?._id}`)}
+            className="p-1 rounded hover:bg-gray-200 "
+            style={{ color: theme.colors.textPrimary }}
+          >
+            <FaEye size={18} />
+          </button>
+        );
+      },
+    },
     {
       key: "actions",
       label: "Actions",
@@ -90,6 +110,16 @@ export default function Category() {
 
   const handlePageChange = (newPage) => {
     setPagination((prev) => ({ ...prev, pageNo: newPage }));
+  };
+
+  const handleEdit = (category) => {
+    setEditingCategory(category);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setEditingCategory(null);
+    setIsModalOpen(false);
   };
 
   // Fixed height calculations to prevent UI deflection
@@ -186,7 +216,11 @@ export default function Category() {
       </div>
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <AddCategoryForm onClose={() => setIsModalOpen(false)} />
+        <AddCategoryForm
+          onClose={() => setIsModalOpen(false)}
+          initialData={editingCategory}
+          pagination={pagination}
+        />
       </Modal>
     </div>
   );

@@ -8,6 +8,7 @@ import LayoutWrapper from "./Component/Layout/LayoutWrapper";
 import Loader from "./Component/Common/Loader";
 import SellProduct from "./Component/SellProduct/SellProduct";
 import Category from "./Component/Category/Category";
+import SubCategory from "./Component/SubCategory/SubCategory";
 
 // Lazy-loaded pages
 const Login = lazy(() => import("./Pages/Auth/Login"));
@@ -33,6 +34,7 @@ function App() {
               <Route path="/user" element={<User />} />
               <Route path="/sellProduct" element={<SellProduct />} />
               <Route path="/category" element={<Category />} />
+              <Route path="/subcategory/:id" element={<SubCategory />} />
             </Route>
           </Route>
         </Routes>
