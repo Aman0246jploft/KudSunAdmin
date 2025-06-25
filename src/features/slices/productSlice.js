@@ -53,6 +53,23 @@ export const productList = createAsyncThunk(
 
 
 
+export const productListAuction = createAsyncThunk(
+    'product/showAuctionProducts',
+    async (queryParams, thunkAPI) => {
+        try {
+            const res = await authAxiosClient.get('/product/showAuctionProducts', { params: { ...queryParams, includeSold: true } });
+            return res.data;
+        } catch (err) {
+            console.error(`Add Product [${err.response?.status || 500}]: ${err.message}`);
+            let message = capitalizeFirstLetter(err.response?.data?.message || err.message);
+            toast.error(message);
+            return thunkAPI.rejectWithValue({
+                message: err.response?.data?.message || err.message,
+                code: err.response?.status || 500,
+            });
+        }
+    }
+);
 
 
 
@@ -87,6 +104,21 @@ const ProductSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
+
+            .addCase(productListAuction.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(productListAuction.fulfilled, (state, action) => {
+                state.loading = false;
+                state.productsListAuction = action.payload?.data;
+            })
+            .addCase(productListAuction.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
+
 
 
     },

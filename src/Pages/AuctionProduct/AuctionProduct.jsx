@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { productList } from "../../features/slices/productSlice";
+import { productList, productListAuction } from "../../features/slices/productSlice";
 import Modal from "./Modal";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
@@ -16,16 +16,16 @@ export default function AuctionProduct() {
   const [pagination, setPagination] = useState({ pageNo: 1, size: 10 });
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { productsList, loading, error } = useSelector(
+  const { productsListAuction, loading, error } = useSelector(
     (state) => state.product || {}
   );
 
-  const { products = [], total = 0 } = productsList || {};
+  const { products = [], total = 0 } = productsListAuction || {};
 
   useEffect(() => {
-    dispatch(productList(pagination))
+    dispatch(productListAuction(pagination))
       .then((result) => {
-        if (!productList.fulfilled.match(result)) {
+        if (!productListAuction.fulfilled.match(result)) {
           const { message, code } = result.payload || {};
           console.error(`Fetch failed [${code}]: ${message}`);
         }

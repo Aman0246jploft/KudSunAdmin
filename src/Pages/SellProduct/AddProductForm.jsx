@@ -7,6 +7,7 @@ import {
 } from "../../features/slices/categorySlice";
 import { Upload, X, Plus, Tag, DollarSign, Truck, MapPin } from "lucide-react";
 import { addProduct } from "../../features/slices/productSlice";
+import { toast } from "react-toastify";
 
 const MAX_IMAGES = 5;
 const MAX_DESCRIPTION_LENGTH = 1200;
@@ -120,6 +121,9 @@ const AddProductForm = () => {
       newErrors.images = "At least one image is required";
     if (!formData.condition) newErrors.condition = "Please select condition";
     if (!formData.fixedPrice) newErrors.fixedPrice = "Fixed price is required";
+    if (specifics.length > 0 && selectedSpecifics.length === 0) {
+      newErrors.specifics = "At least one product specification is required";
+    }
     if (
       formData.shippingOption === "charge_shipping" &&
       !formData.shippingCharge
@@ -189,7 +193,20 @@ const AddProductForm = () => {
         newForm.append("files", file);
       });
     }
-    dispatch(addProduct(newForm));
+
+    dispatch(addProduct(newForm))
+      .then((result) => {
+        if (addProduct.fulfilled.match(result)) {
+          toast.success("Auction Product Added");
+        } else {
+          const { message, code } = result.payload || {};
+          console.error(`Auction Product failed [${code}]: ${message}`);
+        }
+      })
+      .catch((error) => {
+        console.error("Unexpected error:", error);
+        toast.error("Unexpected error occurred");
+      });
   };
 
   const conditionOptions = [
@@ -445,6 +462,12 @@ const AddProductForm = () => {
                         </button>
                       </div>
                     ))}
+
+                    {errors.specifics && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.specifics}
+                      </p>
+                    )}
                   </div>
                 )}
               </div>

@@ -17,6 +17,7 @@ import {
   Gavel,
 } from "lucide-react";
 import { addProduct } from "../../features/slices/productSlice";
+import { toast } from "react-toastify";
 
 const MAX_IMAGES = 5;
 const MAX_DESCRIPTION_LENGTH = 1200;
@@ -131,13 +132,13 @@ const AddProductForm = () => {
   };
 
   const handleAuctionSettingChange = (field, value) => {
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       auctionSettings: {
-        ...formData.auctionSettings,
+        ...prev.auctionSettings,
         [field]: value,
       },
-    });
+    }));
   };
 
   const handleDurationChange = (duration) => {
@@ -146,7 +147,7 @@ const AddProductForm = () => {
       handleAuctionSettingChange("duration", "");
     } else {
       setShowCustomDuration(false);
-      handleAuctionSettingChange("duration", duration);
+      handleAuctionSettingChange("duration", String(duration));
       // Clear custom date/time when selecting predefined duration
       handleAuctionSettingChange("endDate", "");
       handleAuctionSettingChange("endTime", "");
@@ -166,6 +167,11 @@ const AddProductForm = () => {
       newErrors.images = "At least one image is required";
     if (!formData.condition) newErrors.condition = "Please select condition";
 
+    // ✅ Validate specifics
+    if (specifics.length > 0 && selectedSpecifics.length === 0) {
+      newErrors.specifics = "At least one product specification is required";
+    }
+
     // Auction settings validation
     const auction = formData.auctionSettings;
     if (!auction.startingPrice)
@@ -179,7 +185,8 @@ const AddProductForm = () => {
       if (!auction.endDate) newErrors.endDate = "End date is required";
       if (!auction.endTime) newErrors.endTime = "End time is required";
     } else {
-      if (!auction.duration) newErrors.duration = "Duration is required";
+      if (!auction.duration && !showCustomDuration)
+        newErrors.duration = "Duration is required";
     }
 
     if (
@@ -188,7 +195,7 @@ const AddProductForm = () => {
     ) {
       newErrors.shippingCharge = "Shipping charge is required";
     }
-
+    console.log(newErrors);
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -244,7 +251,19 @@ const AddProductForm = () => {
       });
     }
 
-    dispatch(addProduct(newForm));
+    dispatch(addProduct(newForm))
+      .then((result) => {
+        if (addProduct.fulfilled.match(result)) {
+          toast.success("Auction Product Added");
+        } else {
+          const { message, code } = result.payload || {};
+          console.error(`Auction Product failed [${code}]: ${message}`);
+        }
+      })
+      .catch((error) => {
+        console.error("Unexpected error:", error);
+        toast.error("Unexpected error occurred");
+      });
   };
 
   const conditionOptions = [
@@ -494,6 +513,12 @@ const AddProductForm = () => {
                       </div>
                     ))}
                   </div>
+                )}
+
+                {errors.specifics && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.specifics}
+                  </p>
                 )}
               </div>
             )}
