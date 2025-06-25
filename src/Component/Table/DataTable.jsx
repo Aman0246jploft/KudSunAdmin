@@ -75,7 +75,9 @@ const DataTable = ({ columns, data }) => {
                     <td
                       key={col.key}
                       className="p-2 max-w-[200px] truncate align-top"
-                      onMouseEnter={(e) => handleMouseEnter(e, value)}
+                      onMouseEnter={(e) => {
+                        if (!col.disableTooltip) handleMouseEnter(e, value);
+                      }}
                       onMouseLeave={handleMouseLeave}
                     >
                       <div className="truncate">{content}</div>

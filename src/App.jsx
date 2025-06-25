@@ -9,6 +9,7 @@ import Loader from "./Component/Common/Loader";
 import Category from "./Component/Category/Category";
 import SubCategory from "./Component/SubCategory/SubCategory";
 import AuctionProduct from "./Pages/AuctionProduct/AuctionProduct";
+import SubCategoryParemeter from "./Component/SubCategoryParemeter/SubCategoryParemeter";
 
 // Lazy-loaded pages
 const Login = lazy(() => import("./Pages/Auth/Login"));
@@ -39,6 +40,10 @@ function App() {
 
               <Route path="/category" element={<Category />} />
               <Route path="/subcategory/:id" element={<SubCategory />} />
+              <Route
+                path="/subcategoryParameter/:id"
+                element={<SubCategoryParemeter />}
+              />
             </Route>
           </Route>
         </Routes>

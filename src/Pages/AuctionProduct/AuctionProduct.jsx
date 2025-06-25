@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { productList, productListAuction } from "../../features/slices/productSlice";
+import {
+  productList,
+  productListAuction,
+} from "../../features/slices/productSlice";
 import Modal from "./Modal";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
@@ -59,16 +62,9 @@ export default function AuctionProduct() {
       width: "25%",
     },
     {
-      key: "isSold",
-      label: "Sold status",
+      key: "timeRemaining",
+      label: "Time Remaining ",
       width: "25%",
-      render: (_, row) => {
-        return row.isSold ? (
-          <span>Sold</span>
-        ) : (
-          <span className="text-gray-400">not sold</span>
-        );
-      },
     },
     {
       key: "description",
