@@ -6,14 +6,16 @@ import PrivateRoute from "./routes/PrivateRoute";
 import PublicRoute from "./routes/PublicRoute";
 import LayoutWrapper from "./Component/Layout/LayoutWrapper";
 import Loader from "./Component/Common/Loader";
-import SellProduct from "./Component/SellProduct/SellProduct";
 import Category from "./Component/Category/Category";
 import SubCategory from "./Component/SubCategory/SubCategory";
+import AuctionProduct from "./Pages/AuctionProduct/AuctionProduct";
 
 // Lazy-loaded pages
 const Login = lazy(() => import("./Pages/Auth/Login"));
 const Dashboard = lazy(() => import("./Pages/Dashboard/Dashboard"));
 const Home = lazy(() => import("./Pages/Home/Home"));
+
+const SellProduct = lazy(() => import("./Pages/SellProduct/SellProduct"));
 const User = lazy(() => import("./Pages/User/User"));
 
 function App() {
@@ -33,6 +35,8 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/user" element={<User />} />
               <Route path="/sellProduct" element={<SellProduct />} />
+              <Route path="/auctionProduct" element={<AuctionProduct />} />
+
               <Route path="/category" element={<Category />} />
               <Route path="/subcategory/:id" element={<SubCategory />} />
             </Route>

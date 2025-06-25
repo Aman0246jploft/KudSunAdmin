@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { productList } from "../../features/slices/productSlice";
-import DataTable from "../Table/DataTable";
-import Pagination from "../Atoms/Pagination/Pagination";
 import Modal from "./Modal";
-import Button from "../Atoms/Button/Button";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
 import AddProductForm from "./AddProductForm";
+import DataTable from "../../Component/Table/DataTable";
+import Pagination from "../../Component/Atoms/Pagination/Pagination";
+import Button from "../../Component/Atoms/Button/Button";
 
 export default function SellProduct() {
   const dispatch = useDispatch();
