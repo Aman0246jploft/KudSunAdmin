@@ -211,7 +211,7 @@ export default function SubCategoryParemeter() {
             className="font-semibold text-xl"
             style={{ color: theme.colors.textPrimary }}
           >
-            SubCategory
+            SubCategory Parameters
           </div>
 
           <Button

@@ -13,6 +13,9 @@ import {
   MapPin,
   Eye,
 } from "lucide-react";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router";
 import { getProducts } from "../../features/slices/productSlice";
@@ -23,6 +26,7 @@ import Modal from "./Modal";
 import CommentModal from "./CommentModal";
 
 const ProductInfo = () => {
+  dayjs.extend(relativeTime);
   const dispatch = useDispatch();
   const selector = useSelector((state) => state);
   const params = useParams();
@@ -258,16 +262,6 @@ const ProductInfo = () => {
                     </p>
                   </div>
                 </div>
-                <button
-                  onClick={() => setIsFollowing(!isFollowing)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    isFollowing
-                      ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                      : "bg-blue-600 text-white hover:bg-blue-700"
-                  }`}
-                >
-                  {isFollowing ? "Following" : "Follow"}
-                </button>
               </div>
             </div>
 
@@ -372,7 +366,9 @@ const ProductInfo = () => {
                         <span className="font-medium text-sm">
                           {comment.author.userName}
                         </span>
-                        <span className="text-xs text-gray-500">2h ago</span>
+                        <span className="text-xs text-gray-500">
+                          {dayjs(comment.createdAt).fromNow()}
+                        </span>
                       </div>
                       <p className="text-sm text-gray-700">{comment.content}</p>
                       {comment?.replies && comment?.replies?.length > 0 && (

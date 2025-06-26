@@ -10,13 +10,17 @@ import { FiEdit, FiTrash2 } from "react-icons/fi"; // From Feather Icons
 import { useTheme } from "../../contexts/theme/hook/useTheme";
 import { useNavigate, useParams } from "react-router";
 import { FaEye } from "react-icons/fa";
+import UpdateCategoryForm from "./UpdateCategoryForm";
 
 export default function SubCategory() {
   const dispatch = useDispatch();
   const { theme } = useTheme();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [pagination, setPagination] = useState({ pageNo: 1, size: 10 });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedSubCategory, setSelectedSubCategory] = useState(null);
+
   const param = useParams();
   const { subCategoryList, loading, error } = useSelector(
     (state) => state.category || {}
@@ -36,6 +40,15 @@ export default function SubCategory() {
           console.error("Unexpected error:", error);
         });
   }, [dispatch, pagination, param?.id]);
+
+  const handleEdit = (subCat) => {
+    try {
+      setSelectedSubCategory(subCat); // set selected data
+      setIsEditModalOpen(true); // open modal
+    } catch (error) {
+      console.error("Edit error:", error);
+    }
+  };
 
   const columns = [
     {
@@ -208,6 +221,17 @@ export default function SubCategory() {
         <AddCategoryForm
           onClose={() => setIsModalOpen(false)}
           pagination={pagination}
+        />
+      </Modal>
+
+      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)}>
+        <UpdateCategoryForm
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setSelectedSubCategory(null);
+          }}
+          pagination={pagination}
+          subCategoryInfo={selectedSubCategory}
         />
       </Modal>
     </div>

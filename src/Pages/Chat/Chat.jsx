@@ -21,7 +21,6 @@ export default function Chat() {
     socket.emit("getChatRooms", {});
 
     socket.on("chatRoomsList", (data) => {
-      console.log("✅ Received chatRoomsList:", data);
       setChatRooms(data.chatRooms);
     });
 
