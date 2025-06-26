@@ -11,11 +11,13 @@ import AddProductForm from "./AddProductForm";
 import DataTable from "../../Component/Table/DataTable";
 import Pagination from "../../Component/Atoms/Pagination/Pagination";
 import Button from "../../Component/Atoms/Button/Button";
+import { MdInfo } from "react-icons/md";
+import { useNavigate } from "react-router";
 
 export default function AuctionProduct() {
   const dispatch = useDispatch();
   const { theme } = useTheme();
-
+  const navigate = useNavigate();
   const [pagination, setPagination] = useState({ pageNo: 1, size: 10 });
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -88,6 +90,23 @@ export default function AuctionProduct() {
         );
       },
     },
+    {
+      key: "Info",
+      label: "Info",
+      width: "10%",
+      render: (_, row) => (
+        <div className="flex gap-2">
+          <button
+            onClick={() => navigate(`/productInfo/${row?._id}`)}
+            className="p-1 rounded hover:bg-gray-200"
+            style={{ color: theme.colors.textPrimary }}
+          >
+            <MdInfo size={18} />
+          </button>
+        </div>
+      ),
+    },
+
     {
       key: "actions",
       label: "Actions",

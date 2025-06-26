@@ -74,6 +74,28 @@ export const productListAuction = createAsyncThunk(
 
 
 
+
+export const getProducts = createAsyncThunk(
+    'product/getProducts',
+    async ({ productId, queryParams }, thunkAPI) => {
+        try {
+            const res = await authAxiosClient.get(`/product/getProducts/${productId}`, { params: { ...queryParams } });
+            return res.data;
+        } catch (err) {
+            console.error(`Add Product [${err.response?.status || 500}]: ${err.message}`);
+            let message = capitalizeFirstLetter(err.response?.data?.message || err.message);
+            toast.error(message);
+            return thunkAPI.rejectWithValue({
+                message: err.response?.data?.message || err.message,
+                code: err.response?.status || 500,
+            });
+        }
+    }
+);
+
+
+
+
 const ProductSlice = createSlice({
     name: 'product',
     initialState: {
@@ -117,6 +139,22 @@ const ProductSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
+
+
+            .addCase(getProducts.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getProducts.fulfilled, (state, action) => {
+                state.loading = false;
+                state.productInfo = action.payload?.data;
+            })
+            .addCase(getProducts.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
+        
 
 
 
