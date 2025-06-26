@@ -10,6 +10,7 @@ import Category from "./Component/Category/Category";
 import SubCategory from "./Component/SubCategory/SubCategory";
 import AuctionProduct from "./Pages/AuctionProduct/AuctionProduct";
 import SubCategoryParemeter from "./Component/SubCategoryParemeter/SubCategoryParemeter";
+import Chat from "./Pages/Chat/Chat";
 
 // Lazy-loaded pages
 const Login = lazy(() => import("./Pages/Auth/Login"));
@@ -40,6 +41,9 @@ function App() {
 
               <Route path="/category" element={<Category />} />
               <Route path="/subcategory/:id" element={<SubCategory />} />
+              <Route path="/chat" element={<Chat />} />
+
+              
               <Route
                 path="/subcategoryParameter/:id"
                 element={<SubCategoryParemeter />}

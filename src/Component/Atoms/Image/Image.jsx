@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import classNames from "classnames";
 
 const Image = ({
@@ -12,18 +12,24 @@ const Image = ({
   shadow = false,
   ...props
 }) => {
-  const [hasError, setHasError] = useState(false);
+  const [currentSrc, setCurrentSrc] = useState(src || fallback);
 
-  const handleError = (e) => {
-    if (!hasError) {
-      setHasError(true);
-      e.target.src = fallback;
+  useEffect(() => {
+    // Update the image source if the passed src changes
+    if (src) {
+      setCurrentSrc(src);
+    } else {
+      setCurrentSrc(fallback);
     }
+  }, [src, fallback]);
+
+  const handleError = () => {
+    setCurrentSrc(fallback);
   };
 
   return (
     <img
-      src={hasError ? fallback : src}
+      src={currentSrc}
       alt={alt}
       width={width}
       height={height}
