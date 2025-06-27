@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import Button from "../../Component/Atoms/Button/Button";
 import Input from "../../Component/Atoms/InputFields/Inputfield";
 import Image from "../../Component/Atoms/Image/Image";
-
 import { useDispatch, useSelector } from "react-redux";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
 import { login } from "../../features/slices/userSlice";
@@ -38,7 +37,7 @@ export default function Login() {
       .then((result) => {
         if (login.fulfilled.match(result)) {
           toast.success("Login Successful");
-          navigate("/dashboard")
+          navigate("/dashboard");
         } else {
           const { message, code } = result.payload || {};
           console.error(`Login failed [${code}]: ${message}`);
@@ -109,14 +108,14 @@ export default function Login() {
           className="mt-4 text-sm text-center"
           style={{ color: theme.colors.textSecondary }}
         >
-          Don't have an account?{" "}
-          <a
-            href="/register"
+          <button
+            type="button"
+            onClick={() => navigate("/forgot-password")}
             className="font-medium hover:underline"
             style={{ color: theme.colors.textSecondary }}
           >
-            Register
-          </a>
+            Forgot Password?
+          </button>
         </p>
       </div>
     </div>

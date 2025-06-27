@@ -1,0 +1,151 @@
+import React, { useState } from "react";
+import Input from "../../Component/Atoms/InputFields/Inputfield";
+import Button from "../../Component/Atoms/Button/Button";
+import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { useTheme } from "../../contexts/theme/hook/useTheme";
+import { resetPassword } from "../../features/slices/userSlice";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+
+export default function ResetPassword() {
+  const { theme } = useTheme();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { state } = useLocation();
+  const phoneNumber = state?.phoneNumber;
+
+  const [form, setForm] = useState({ newPassword: "", confirmPassword: "" });
+  const [errors, setErrors] = useState({ newPassword: "", confirmPassword: "" });
+  const [loading, setLoading] = useState(false);
+
+  // State to toggle password visibility
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const validateField = (name, value) => {
+    let error = "";
+    if (!value) {
+      error = "This field is required";
+    } else {
+      if (name === "newPassword") {
+        if (value.length < 6) error = "Password must be at least 6 characters";
+      }
+      if (name === "confirmPassword" && value !== form.newPassword) {
+        error = "Passwords do not match";
+      }
+    }
+    setErrors((prev) => ({ ...prev, [name]: error }));
+    return error === "";
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+    validateField(name, value);
+
+    if (name === "newPassword" && form.confirmPassword) {
+      // Re-validate confirmPassword if newPassword changes
+      validateField("confirmPassword", form.confirmPassword);
+    }
+  };
+
+  const handleReset = (e) => {
+    e.preventDefault();
+
+    const isNewPasswordValid = validateField("newPassword", form.newPassword);
+    const isConfirmPasswordValid = validateField("confirmPassword", form.confirmPassword);
+
+    if (!isNewPasswordValid || !isConfirmPasswordValid) return;
+
+    setLoading(true);
+    dispatch(resetPassword({ phoneNumber, newPassword: form.newPassword, confirmPassword: form.confirmPassword }))
+      .then((result) => {
+        if (resetPassword.fulfilled.match(result)) {
+          toast.success("Password reset successful");
+          navigate("/login");
+        } else {
+          toast.error(result.payload?.message || "Failed to reset password");
+        }
+      })
+      .catch((err) => {
+        console.error("Reset password error:", err);
+        toast.error("Unexpected error occurred");
+      })
+      .finally(() => setLoading(false));
+  };
+
+  const isFormValid = !errors.newPassword && !errors.confirmPassword && form.newPassword && form.confirmPassword;
+
+  return (
+    <div
+      className="min-h-screen flex items-center justify-center px-4"
+      style={{ backgroundColor: theme.colors.background }}
+    >
+      <div
+        className="w-full max-w-md p-8 shadow-xl"
+        style={{
+          backgroundColor: theme.colors.card,
+          color: theme.colors.textPrimary,
+          borderRadius: theme.borderRadius.lg,
+          border: `1px solid ${theme.colors.borderLight}`,
+        }}
+      >
+        <h2 className="text-2xl font-bold mb-6 text-center">Reset Password</h2>
+        <form onSubmit={handleReset} className="space-y-4" noValidate>
+          <Input
+            label="New Password"
+            type={showNewPassword ? "text" : "password"}
+            name="newPassword"
+            value={form.newPassword}
+            onChange={handleChange}
+            fullWidth
+            error={errors.newPassword}
+            endAdornment={
+              <button
+                type="button"
+                onClick={() => setShowNewPassword((show) => !show)}
+                className="text-xl text-black-500"
+                tabIndex={-1}
+                aria-label={showNewPassword ? "Hide password" : "Show password"}
+              >
+                {showNewPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+              </button>
+            }
+          />
+          <Input
+            label="Confirm Password"
+            type={showConfirmPassword ? "text" : "password"}
+            name="confirmPassword"
+            value={form.confirmPassword}
+            onChange={handleChange}
+            fullWidth
+            error={errors.confirmPassword}
+            endAdornment={
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword((show) => !show)}
+                className="text-xl text-black-500"
+                tabIndex={-1}
+                aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+              >
+                {showConfirmPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+              </button>
+            }
+          />
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            fullWidth
+            loading={loading}
+            loaderText="Resetting..."
+            disabled={!isFormValid || loading}
+          >
+            Reset Password
+          </Button>
+        </form>
+      </div>
+    </div>
+  );
+}

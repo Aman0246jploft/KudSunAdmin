@@ -18,19 +18,18 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   const location = useLocation();
 
   const menuItems = [
-    { name: "Home", href: "/", icon: AiOutlineHome },
     { name: "Dashboard", href: "/dashboard", icon: AiOutlineDashboard },
     { name: "Users", href: "/user", icon: AiOutlineTeam },
     { name: "Reports", href: "/#", icon: AiOutlineFileText },
-    { name: "Notifications", href: "/#", icon: AiOutlineBell },
-    { name: "Settings", href: "/#", icon: AiOutlineSetting },
+    // { name: "Notifications", href: "/#", icon: AiOutlineBell },
+    { name: "Settings", href: "/Setting", icon: AiOutlineSetting },
+    { name: "FAQ", href: "/faq", icon: AiOutlineSetting },
+
     { name: "Products", href: "/sellProduct", icon: AiOutlineSetting },
     { name: "Auctions", href: "/auctionProduct", icon: AiOutlineSetting },
-    { name: "Threads", href: "/#", icon: AiOutlineSetting },
-
+    // { name: "Threads", href: "/#", icon: AiOutlineSetting },
     { name: "Category", href: "/category", icon: AiOutlineSetting },
     // { name: "Chat", href: "/chat", icon: AiOutlineSetting },
-
   ];
 
   return (
@@ -52,7 +51,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           "fixed left-0 top-0 h-full border-r z-40 transition-all duration-300 ease-in-out",
           // Desktop behavior (unchanged)
           "md:translate-x-0",
-          isOpen ? "md:w-60 " : "md:w-16",
+          isOpen ? "md:w-48 " : "md:w-16",
           // Mobile behavior (new)
           "w-64 md:w-auto",
           isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"

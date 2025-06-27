@@ -125,10 +125,9 @@ export default function User() {
 
   return (
     <div className="p-4 space-y-4">
-      <Button variant="primary" size="md" loading={false}>
+      {/* <Button variant="primary" size="md" loading={false}>
         Submit
-      </Button>
-
+      </Button> */}
       <DataTable columns={columns} data={data} />
     </div>
   );

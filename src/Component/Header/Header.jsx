@@ -10,6 +10,7 @@ import {
 } from "react-icons/ai";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
 import Image from "../Atoms/Image/Image";
+import { useNavigate } from "react-router-dom";
 
 const Header = ({ toggleSidebar }) => {
   const { currentTheme, changeTheme, theme } = useTheme();
@@ -18,6 +19,10 @@ const Header = ({ toggleSidebar }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const profileDropdownRef = useRef(null);
+  let userInfo = JSON.parse(localStorage.getItem("kadSunInfo"));
+
+  const navigate = useNavigate();
+
   const themeDropdownRef = useRef(null);
 
   // Check if screen is mobile
@@ -27,9 +32,9 @@ const Header = ({ toggleSidebar }) => {
     };
 
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   // Theme options with their display info
@@ -105,26 +110,11 @@ const Header = ({ toggleSidebar }) => {
       },
     },
     {
-      icon: AiOutlineSetting,
-      label: "Settings",
-      onClick: () => {
-        console.log("Settings clicked");
-        setShowProfileDropdown(false);
-      },
-    },
-    {
-      icon: AiOutlineQuestionCircle,
-      label: "Help & Support",
-      onClick: () => {
-        console.log("Help & Support clicked");
-        setShowProfileDropdown(false);
-      },
-    },
-    {
       icon: AiOutlineLogout,
       label: "Sign Out",
       onClick: () => {
-        console.log("Sign Out clicked");
+        localStorage.removeItem("kadSunInfo");
+        navigate("/login");
         setShowProfileDropdown(false);
       },
       isDestructive: true,
@@ -178,33 +168,8 @@ const Header = ({ toggleSidebar }) => {
 
         {/* Right section */}
         <div className="flex items-center space-x-2 md:space-x-4">
-          {/* Notifications */}
-          <button
-            onClick={() => setShowNotifications(!showNotifications)}
-            className="p-2 rounded-lg transition-colors duration-200 relative"
-            style={{
-              backgroundColor: theme.colors.buttonSecondary,
-              color: theme.colors.buttonTextOnSecondary,
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor =
-                theme.colors.buttonSecondaryHover;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor =
-                theme.colors.buttonSecondary;
-            }}
-          >
-            <AiOutlineBell className="w-5 h-5" />
-            {/* Notification badge */}
-            <span
-              className="absolute -top-1 -right-1 w-3 h-3 rounded-full text-xs flex items-center justify-center"
-              style={{ backgroundColor: theme.colors.error }}
-            />
-          </button>
-
           {/* Theme Dropdown */}
-          <div className="relative" ref={themeDropdownRef}>
+          {/* <div className="relative" ref={themeDropdownRef}>
             <button
               onClick={() => setShowThemeDropdown(!showThemeDropdown)}
               className="flex items-center space-x-2 p-2 rounded-lg transition-colors duration-200"
@@ -238,7 +203,7 @@ const Header = ({ toggleSidebar }) => {
               />
             </button>
 
-            {/* Theme Dropdown Menu */}
+
             {showThemeDropdown && (
               <div
                 className="absolute right-0 mt-2 w-48 rounded-lg shadow-lg border z-50"
@@ -303,7 +268,7 @@ const Header = ({ toggleSidebar }) => {
                 </div>
               </div>
             )}
-          </div>
+          </div> */}
 
           {/* Profile Dropdown */}
           <div className="relative" ref={profileDropdownRef}>
@@ -337,7 +302,9 @@ const Header = ({ toggleSidebar }) => {
                 rounded={true}
                 className="w-8 h-8"
               />
-              <span className="hidden md:block font-medium">John Doe</span>
+              <span className="hidden md:block font-medium">
+                {userInfo?.userName}
+              </span>
               <AiOutlineDown
                 className={`w-4 h-4 transition-transform duration-200 ${
                   showProfileDropdown ? "rotate-180" : ""
@@ -374,13 +341,20 @@ const Header = ({ toggleSidebar }) => {
                         className="font-medium"
                         style={{ color: theme.colors.textPrimary }}
                       >
-                        John Doe
+                        {userInfo?.userName}
                       </p>
                       <p
                         className="text-sm"
-                        style={{ color: theme.colors.textSecondary }}
+                        style={{
+                          color: theme.colors.textSecondary,
+                          maxWidth: "160px", // limit max width as per your dropdown size
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                        title={userInfo?.email} // show full email on hover
                       >
-                        john.doe@example.com
+                        {userInfo?.email}
                       </p>
                     </div>
                   </div>

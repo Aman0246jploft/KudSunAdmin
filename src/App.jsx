@@ -12,6 +12,12 @@ import AuctionProduct from "./Pages/AuctionProduct/AuctionProduct";
 import SubCategoryParemeter from "./Component/SubCategoryParemeter/SubCategoryParemeter";
 import Chat from "./Pages/Chat/Chat";
 import ProductInfo from "./Pages/ProductInfo/ProductInfo";
+import ForgotPassword from "./Pages/ForgotPassword/ForgotPassword";
+import VerifyResetOtp from "./Pages/ForgotPassword/VerifyResetOtp";
+import ResetPassword from "./Pages/ForgotPassword/ResetPassword";
+import Setting from "./Pages/Setting/Setting";
+import FaqSettings from "./Pages/Setting/FaqSettings";
+import Faqs from "./Pages/Faqs/Faqs";
 
 // Lazy-loaded pages
 const Login = lazy(() => import("./Pages/Auth/Login"));
@@ -29,6 +35,10 @@ function App() {
           {/* Public Routes */}
           <Route element={<PublicRoute />}>
             <Route path="/login" element={<Login />} />
+
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/verify-reset-otp" element={<VerifyResetOtp />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
           </Route>
 
           {/* Private Routes */}
@@ -40,6 +50,9 @@ function App() {
               <Route path="/sellProduct" element={<SellProduct />} />
               <Route path="/auctionProduct" element={<AuctionProduct />} />
               <Route path="/productInfo/:id" element={<ProductInfo />} />
+              <Route path="/Setting" element={<Setting />} />
+              <Route path="/faq" element={<Faqs />} />
+
 
               <Route path="/category" element={<Category />} />
               <Route path="/subcategory/:id" element={<SubCategory />} />

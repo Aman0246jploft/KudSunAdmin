@@ -16,12 +16,23 @@ authAxiosClient.interceptors.request.use((config) => {
   return config;
 });
 
-// Response interceptor - handle API-level errors and HTTP errors uniformly
+// Redirect to login helper
+const redirectToLogin = () => {
+  if (window.location.pathname !== '/login') {
+    window.location.href = '/login';
+  }
+};
+
+// Response interceptor
 authAxiosClient.interceptors.response.use(
   (response) => {
     const { data } = response;
 
     if (data?.status === false) {
+      if (data.message === 'Authorization token missing' && data.responseCode === 401) {
+        redirectToLogin();
+      }
+
       const customError = new Error(data.message || 'Something went wrong');
       customError.responseCode = data.responseCode || 400;
       customError.isHandled = true;
@@ -31,11 +42,15 @@ authAxiosClient.interceptors.response.use(
     return response;
   },
   (error) => {
-    const customError = new Error(
-      error.response?.data?.message || error.message || 'Network error'
-    );
-    customError.responseCode =
-      error.response?.data?.responseCode || error.response?.status || 500;
+    const message = error?.response?.data?.message;
+    const responseCode = error?.response?.data?.responseCode || error?.response?.status;
+
+    if (message === 'Authorization token missing' && responseCode === 401) {
+      redirectToLogin();
+    }
+
+    const customError = new Error(message || error.message || 'Network error');
+    customError.responseCode = responseCode || 500;
     customError.isHandled = true;
     throw customError;
   }

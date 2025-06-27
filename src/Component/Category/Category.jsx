@@ -10,6 +10,9 @@ import { FaEye } from "react-icons/fa";
 import { FiEdit, FiTrash2 } from "react-icons/fi"; // From Feather Icons
 import { useTheme } from "../../contexts/theme/hook/useTheme";
 import { useNavigate } from "react-router";
+import { format } from "date-fns";
+import { confirmAlert } from "react-confirm-alert"; // Import
+import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 
 export default function Category() {
   const dispatch = useDispatch();
@@ -67,20 +70,16 @@ export default function Category() {
     },
 
     {
-      key: "subCategory",
-      label: "Subcategory",
+      key: "subCategoryCount",
+      label: "SubCategory count",
       width: "25%",
-      render: (_, row) => {
-        return (
-          <button
-            onClick={() => navigate(`/subCategory/${row?._id}`)}
-            className="p-1 rounded hover:bg-gray-200 "
-            style={{ color: theme.colors.textPrimary }}
-          >
-            <FaEye size={18} />
-          </button>
-        );
-      },
+    },
+    {
+      key: "createdAt",
+      label: "Created At",
+      width: "20%",
+      render: (value) =>
+        value ? format(new Date(value), "dd-MM-yyyy") : "N/A",
     },
     {
       key: "actions",
@@ -89,6 +88,15 @@ export default function Category() {
 
       render: (_, row) => (
         <div className="flex gap-2">
+          <button
+            onClick={() => navigate(`/subCategory/${row?._id}`)}
+            className="p-1 rounded hover:bg-gray-200"
+            title="View SubCategory"
+            style={{ color: theme.colors.textPrimary }}
+          >
+            <FaEye size={18} />
+          </button>
+
           <button
             onClick={() => handleEdit(row)}
             className="p-1 rounded hover:bg-gray-200 "
@@ -115,6 +123,35 @@ export default function Category() {
   const handleEdit = (category) => {
     setEditingCategory(category);
     setIsModalOpen(true);
+  };
+
+  const handleDelete = (product) => {
+    const updatedStatus = product;
+
+
+    confirmAlert({
+      title: "Confirm to submit",
+      message: "Are you sure to delete this.",  
+      buttons: [
+        {
+          label: "Yes",
+          onClick: () => {
+            // dispatch(deleteProduct({ id: product._id, formData }))
+            //   .unwrap()
+            //   .then((res) => {
+            //     dispatch(productList(pagination));
+            //   })
+            //   .catch((err) => {
+            //     console.error("Failed to update product status:", err);
+            //   });
+          },
+        },
+        {
+          label: "No",
+          onClick: () => {},
+        },
+      ],
+    });
   };
 
   const handleCloseModal = () => {

@@ -60,6 +60,74 @@ export const login = createAsyncThunk(
 );
 
 
+export const requestResetOtp = createAsyncThunk(
+    'user/requestResetOtp',
+    async (data, thunkAPI) => {
+        try {
+            const res = await axiosClient.post('/user/requestResetOtp', data);
+            return res.data;
+        } catch (err) {
+            console.error(`requestResetOtp error [${err.responseCode || 500}]: ${err.message}`);
+            let message = capitalizeFirstLetter(err.message)
+            toast.error(message)
+            return thunkAPI.rejectWithValue({
+                message: err.message,
+                code: err.responseCode || 500,
+            });
+        }
+    }
+);
+
+
+
+export const verifyResetOtps = createAsyncThunk(
+    'user/verifyResetOtps',
+    async (data, thunkAPI) => {
+        try {
+            const res = await axiosClient.post('/user/verifyResetOtp', data);
+            return res.data;
+        } catch (err) {
+            console.error(`verifyResetOtp error [${err.responseCode || 500}]: ${err.message}`);
+            let message = capitalizeFirstLetter(err.message)
+            return thunkAPI.rejectWithValue({
+                message: err.message,
+                code: err.responseCode || 500,
+            });
+        }
+    }
+);
+
+export const resendResetOtps = createAsyncThunk(
+    'user/resendResetOtps',
+    async (data, thunkAPI) => {
+        try {
+            const res = await axiosClient.post('/user/resendResetOtp', data);
+            return res.data;
+        } catch (err) {
+            let message = capitalizeFirstLetter(err.message)
+            return thunkAPI.rejectWithValue({
+                message: err.message,
+                code: err.responseCode || 500,
+            });
+        }
+    }
+);
+
+export const resetPassword = createAsyncThunk(
+    'user/resetPassword',
+    async (data, thunkAPI) => {
+        try {
+            const res = await axiosClient.post('/user/resetPassword', data);
+            return res.data;
+        } catch (err) {
+            let message = capitalizeFirstLetter(err.message)
+            return thunkAPI.rejectWithValue({
+                message: err.message,
+                code: err.responseCode || 500,
+            });
+        }
+    }
+);
 
 
 

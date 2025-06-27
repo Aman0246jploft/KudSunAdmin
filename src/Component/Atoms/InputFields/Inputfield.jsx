@@ -13,6 +13,7 @@ const Input = ({
   disabled = false,
   fullWidth = false,
   className = "",
+  endAdornment,  // new prop for icon/button on the right
   ...props
 }) => {
   return (
@@ -25,25 +26,34 @@ const Input = ({
           {label}
         </label>
       )}
-      <input
-        id={name}
-        name={name}
-        type={type}
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        disabled={disabled}
-        className={classNames(
-          "border rounded-lg px-4 py-2 w-full focus:outline-none transition",
-          {
-            "border-gray-300 focus:ring-2 focus:ring-blue-500": !error,
-            "border-red-500 focus:ring-2 focus:ring-red-300": error,
-            "bg-gray-100 cursor-not-allowed": disabled,
-          },
-          className
+      <div className="relative">
+        <input
+          id={name}
+          name={name}
+          type={type}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          disabled={disabled}
+          className={classNames(
+            "border rounded-lg px-4 py-2 w-full focus:outline-none transition",
+            {
+              "border-gray-300 focus:ring-2 focus:ring-blue-500": !error,
+              "border-red-500 focus:ring-2 focus:ring-red-300": error,
+              "bg-gray-100 cursor-not-allowed": disabled,
+              // add padding right to avoid text under icon
+              "pr-10": !!endAdornment,
+            },
+            className
+          )}
+          {...props}
+        />
+        {endAdornment && (
+          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer select-none">
+            {endAdornment}
+          </div>
         )}
-        {...props}
-      />
+      </div>
       {helperText && !error && (
         <p className="mt-1 text-sm text-gray-500">{helperText}</p>
       )}
