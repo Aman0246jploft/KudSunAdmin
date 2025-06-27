@@ -24,10 +24,12 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     { name: "Reports", href: "/#", icon: AiOutlineFileText },
     { name: "Notifications", href: "/#", icon: AiOutlineBell },
     { name: "Settings", href: "/#", icon: AiOutlineSetting },
-    { name: "Sell Product", href: "/sellProduct", icon: AiOutlineSetting },
-    { name: "Auction Product", href: "/auctionProduct", icon: AiOutlineSetting },
+    { name: "Products", href: "/sellProduct", icon: AiOutlineSetting },
+    { name: "Auctions", href: "/auctionProduct", icon: AiOutlineSetting },
+    { name: "Threads", href: "/#", icon: AiOutlineSetting },
+
     { name: "Category", href: "/category", icon: AiOutlineSetting },
-    { name: "Chat", href: "/chat", icon: AiOutlineSetting },
+    // { name: "Chat", href: "/chat", icon: AiOutlineSetting },
 
   ];
 

@@ -1,29 +1,67 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { productList } from "../../features/slices/productSlice";
+import {
+  deleteProduct,
+  productList,
+  toggleProductDisable,
+} from "../../features/slices/productSlice";
+import { confirmAlert } from "react-confirm-alert"; // Import
+import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 import Modal from "./Modal";
-import { FiEdit, FiTrash2 } from "react-icons/fi";
+import { FiCheckCircle, FiEdit, FiSlash, FiTrash2 } from "react-icons/fi";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
 import AddProductForm from "./AddProductForm";
 import DataTable from "../../Component/Table/DataTable";
 import Pagination from "../../Component/Atoms/Pagination/Pagination";
-import Button from "../../Component/Atoms/Button/Button";
+import { FaCircleInfo } from "react-icons/fa6";
+import { useNavigate } from "react-router";
+import EditProductForm from "./EditProductForm";
+import { mainCategory, subCategory } from "../../features/slices/categorySlice";
 
 export default function SellProduct() {
   const dispatch = useDispatch();
   const { theme } = useTheme();
-
   const [pagination, setPagination] = useState({ pageNo: 1, size: 10 });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedSubCategory, setSelectedSubCategory] = useState("");
+  const [subCategories, setSubCategories] = useState([]);
+  const { categoryList } = useSelector((state) => state.category);
+  const [filters, setFilters] = useState({
+    keyWord: "",
+    shippingType: "",
+    categoryId: "",
+    subCategoryId: "",
+    tags: [],
+    minPrice: null,
+    maxPrice: null,
+  });
+  const [shippingType, setShippingType] = useState("");
+  const shippingOptions = [
+    { label: "Shipping Type", value: "" },
+    { label: "Free", value: "free" },
+    { label: "Charged", value: "charged" },
+  ];
 
   const { productsList, loading, error } = useSelector(
     (state) => state.product || {}
   );
+  const navigate = useNavigate();
 
   const { products = [], total = 0 } = productsList || {};
 
   useEffect(() => {
-    dispatch(productList(pagination))
+    const payload = {
+      ...pagination,
+      ...filters,
+      deliveryFilter: shippingType,
+      minPrice: filters.minPrice || undefined,
+      maxPrice: filters.maxPrice || undefined,
+    };
+    dispatch(mainCategory({ pageNo: 1, size: 10000000 }));
+    dispatch(productList(payload))
       .then((result) => {
         if (!productList.fulfilled.match(result)) {
           const { message, code } = result.payload || {};
@@ -33,16 +71,80 @@ export default function SellProduct() {
       .catch((error) => {
         console.error("Unexpected error:", error);
       });
-  }, [dispatch, pagination]);
+  }, [dispatch, pagination, filters, shippingType]);
+
+  useEffect(() => {
+    if (selectedCategory) {
+      dispatch(
+        subCategory({ categoryId: selectedCategory, pageNo: 1, size: 10000000 })
+      ).then((res) => {
+        if (subCategory.fulfilled.match(res)) {
+          setSubCategories(res.payload?.data?.data || []);
+        }
+      });
+    } else {
+      setSubCategories([]);
+    }
+  }, [selectedCategory]);
 
   const handleEdit = (product) => {
-    console.log("Edit product:", product);
-    // Implement edit logic or open edit modal
+    setSelectedProduct(product);
+    setEditMode(true);
+    setIsModalOpen(true); // this was missing
+  };
+
+  const handleToggleStatus = (product) => {
+    const updatedStatus = !product.isDisable;
+    console.log(
+      `Toggling status for product ${product._id} to ${updatedStatus}`
+    );
+
+    // Create FormData
+    const formData = new FormData();
+    formData.append("isDisable", updatedStatus);
+
+    dispatch(toggleProductDisable({ id: product._id, formData }))
+      .unwrap()
+      .then((res) => {
+        dispatch(productList(pagination));
+      })
+      .catch((err) => {
+        console.error("Failed to update product status:", err);
+      });
   };
 
   const handleDelete = (product) => {
-    console.log("Delete product:", product);
-    // Implement delete confirmation & dispatch action
+    const updatedStatus = !product.isDisable;
+    console.log(
+      `Toggling status for product ${product._id} to ${updatedStatus}`
+    );
+
+    // Create FormData
+    const formData = new FormData();
+    formData.append("isDisable", updatedStatus);
+    confirmAlert({
+      title: "Confirm to submit",
+      message: "Are you sure to delete this.",
+      buttons: [
+        {
+          label: "Yes",
+          onClick: () => {
+            dispatch(deleteProduct({ id: product._id, formData }))
+              .unwrap()
+              .then((res) => {
+                dispatch(productList(pagination));
+              })
+              .catch((err) => {
+                console.error("Failed to update product status:", err);
+              });
+          },
+        },
+        {
+          label: "No",
+          onClick: () => {},
+        },
+      ],
+    });
   };
 
   const columns = [
@@ -59,38 +161,24 @@ export default function SellProduct() {
       width: "25%",
     },
     {
-      key: "isSold",
-      label: "Sold status",
-      width: "25%",
-      render: (_, row) => {
-        return row.isSold ? (
-          <span>Sold</span>
-        ) : (
-          <span className="text-gray-400">not sold</span>
-        );
-      },
-    },
-    {
       key: "description",
       label: "Description",
       width: "25%",
     },
     {
-      key: "image",
-      label: "Image",
+      key: "Category/SubCategory",
+      label: "Category/SubCategory",
       width: "25%",
       render: (_, row) => {
-        const firstImage = row.productImages?.[0];
-        return firstImage ? (
-          <img
-            src={firstImage}
-            alt="product"
-            className="w-20 h-12 object-cover rounded"
-          />
-        ) : (
-          <span className="text-gray-400">No image</span>
-        );
+        const cat = row?.categoryId?.name || "N/A";
+        const subCat = row?.subCategoryName || "N/A";
+        return `${cat} / ${subCat}`;
       },
+    },
+    {
+      key: "fixedPrice",
+      label: "Price",
+      width: "25%",
     },
     {
       key: "actions",
@@ -98,6 +186,13 @@ export default function SellProduct() {
       width: "10%",
       render: (_, row) => (
         <div className="flex gap-2">
+          <button
+            onClick={() => navigate(`/productInfo/${row?._id}`)}
+            className="p-1 rounded hover:bg-gray-200"
+            style={{ color: theme.colors.textPrimary }}
+          >
+            <FaCircleInfo size={18} />
+          </button>
           <button
             onClick={() => handleEdit(row)}
             className="p-1 rounded hover:bg-gray-200"
@@ -111,6 +206,19 @@ export default function SellProduct() {
             style={{ color: theme.colors.error }}
           >
             <FiTrash2 size={18} />
+          </button>
+
+          <button
+            onClick={() => handleToggleStatus(row)}
+            className="p-1 rounded hover:bg-gray-200"
+            title={row.isDisable ? "Disable Product" : "Enable Product"}
+            style={{ color: row.isDisable ? "green" : "gray" }}
+          >
+            {!row.isDisable ? (
+              <FiCheckCircle color="green" size={18} />
+            ) : (
+              <FiSlash color="gray" size={18} />
+            )}
           </button>
         </div>
       ),
@@ -146,8 +254,108 @@ export default function SellProduct() {
           >
             Product List
           </div>
+          <div className=" flex justify-center items-center gap-3">
+            <div className=" flex gap-2">
+              {/* Price Range Inputs */}
+              <input
+                type="number"
+                min="0"
+                placeholder="Min Price"
+                value={filters.minPrice}
+                onChange={(e) => {
+                  setFilters((prev) => ({ ...prev, minPrice: e.target.value }));
+                  setPagination((prev) => ({ ...prev, pageNo: 1 }));
+                }}
+                className="px-2 py-1 border rounded w-24"
+              />
+              <span className="mx-1">-</span>
+              <input
+                type="number"
+                min="0"
+                placeholder="Max Price"
+                value={filters.maxPrice}
+                onChange={(e) => {
+                  setFilters((prev) => ({ ...prev, maxPrice: e.target.value }));
+                  setPagination((prev) => ({ ...prev, pageNo: 1 }));
+                }}
+                className="px-2 py-1 border rounded w-24"
+              />
 
-          <Button
+              <select
+                value={shippingType}
+                onChange={(e) => setShippingType(e.target.value)}
+                className="border outline-none rounded px-2 py-1 text-sm"
+              >
+                {shippingOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+
+              {/* Category Dropdown */}
+              <select
+                value={selectedCategory}
+                onChange={(e) => {
+                  const categoryId = e.target.value;
+                  setSelectedCategory(categoryId);
+                  setSelectedSubCategory("");
+                  setFilters((prev) => ({
+                    ...prev,
+                    categoryId,
+                    subCategoryId: "",
+                  }));
+                  setPagination((prev) => ({ ...prev, pageNo: 1 }));
+                }}
+                className="px-3 py-2 border rounded-md"
+              >
+                <option value="">All Categories</option>
+                {categoryList &&
+                  Array.isArray(categoryList?.data) &&
+                  categoryList?.data?.map((cat) => (
+                    <option key={cat._id} value={cat._id}>
+                      {cat.name}
+                    </option>
+                  ))}
+              </select>
+
+              {/* Subcategory Dropdown */}
+              <select
+                value={selectedSubCategory}
+                onChange={(e) => {
+                  const subCategoryId = e.target.value;
+                  setSelectedSubCategory(subCategoryId);
+                  setFilters((prev) => ({
+                    ...prev,
+                    subCategoryId,
+                  }));
+                  setPagination((prev) => ({ ...prev, pageNo: 1 }));
+                }}
+                className="px-3 py-2 border rounded-md"
+                disabled={!selectedCategory}
+              >
+                <option value="">All Subcategories</option>
+                {subCategories?.map((sub) => (
+                  <option key={sub._id} value={sub._id}>
+                    {sub.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <input
+              className="p-1 outline-none border"
+              type="text"
+              placeholder="Search product title or keyword"
+              value={filters.keyWord}
+              onChange={(e) => {
+                setFilters({ ...filters, keyWord: e.target.value });
+                setPagination((prev) => ({ ...prev, pageNo: 1 }));
+              }}
+            />
+          </div>
+
+          {/* <Button
             onClick={() => setIsModalOpen(true)}
             style={{
               backgroundColor: theme.colors.buttonPrimary,
@@ -155,7 +363,7 @@ export default function SellProduct() {
             }}
           >
             Add Product
-          </Button>
+          </Button> */}
         </div>
 
         <div className="relative" style={{ minHeight: `${minTableHeight}px` }}>
@@ -212,8 +420,34 @@ export default function SellProduct() {
         </div>
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <AddProductForm closeForm={() => setIsModalOpen(false)} />
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditMode(false);
+          setSelectedProduct(null);
+        }}
+      >
+        {editMode ? (
+          <EditProductForm
+            closeForm={() => {
+              setIsModalOpen(false);
+              setEditMode(false);
+              setSelectedProduct(null);
+            }}
+            editMode={true}
+            productData={selectedProduct}
+            onProductUpdate={() => dispatch(productList(pagination))}
+          />
+        ) : (
+          <AddProductForm
+            closeForm={() => {
+              setIsModalOpen(false);
+              setEditMode(false);
+              setSelectedProduct(null);
+            }}
+          />
+        )}
       </Modal>
     </div>
   );

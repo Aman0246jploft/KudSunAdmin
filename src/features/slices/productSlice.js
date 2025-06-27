@@ -94,6 +94,75 @@ export const getProducts = createAsyncThunk(
 );
 
 
+export const updateProduct = createAsyncThunk(
+    'product/updateSellerProduct',
+    async ({ id, formData }, thunkAPI) => {
+        try {
+            const res = await authAxiosClient.post(`/product/updateSellerProduct/${id}`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            return res.data;
+        } catch (err) {
+            console.error(`Update Product [${err.response?.status || 500}]: ${err.message}`);
+            let message = capitalizeFirstLetter(err.response?.data?.message || err.message);
+            toast.error(message);
+            return thunkAPI.rejectWithValue({
+                message: err.response?.data?.message || err.message,
+                code: err.response?.status || 500,
+            });
+        }
+    }
+);
+
+
+
+export const toggleProductDisable = createAsyncThunk(
+    'product/updateSellerProduct',
+    async ({ id, formData }, thunkAPI) => {
+        try {
+            const res = await authAxiosClient.post(`/product/toggleProductDisable/${id}`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            return res.data;
+        } catch (err) {
+            console.error(`Update Product [${err.response?.status || 500}]: ${err.message}`);
+            let message = capitalizeFirstLetter(err.response?.data?.message || err.message);
+            toast.error(message);
+            return thunkAPI.rejectWithValue({
+                message: err.response?.data?.message || err.message,
+                code: err.response?.status || 500,
+            });
+        }
+    }
+);
+
+
+export const deleteProduct = createAsyncThunk(
+    'product/updateSellerProduct',
+    async ({ id, formData }, thunkAPI) => {
+        try {
+            const res = await authAxiosClient.post(`/product/deleteProduct/${id}`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            return res.data;
+        } catch (err) {
+            console.error(`Update Product [${err.response?.status || 500}]: ${err.message}`);
+            let message = capitalizeFirstLetter(err.response?.data?.message || err.message);
+            toast.error(message);
+            return thunkAPI.rejectWithValue({
+                message: err.response?.data?.message || err.message,
+                code: err.response?.status || 500,
+            });
+        }
+    }
+);
+
 
 
 const ProductSlice = createSlice({
@@ -154,7 +223,7 @@ const ProductSlice = createSlice({
                 state.error = action.payload;
             })
 
-        
+
 
 
 

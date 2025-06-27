@@ -12,6 +12,7 @@ import {
   Star,
   MapPin,
   Eye,
+  ShoppingCart,
 } from "lucide-react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -37,6 +38,7 @@ const ProductInfo = () => {
   const [newBid, setNewBid] = useState("");
   const [newComment, setNewComment] = useState("");
   const [isFollowing, setIsFollowing] = useState(false);
+  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     dispatch(getProducts({ productId: params?.id }))
@@ -53,8 +55,12 @@ const ProductInfo = () => {
   let { product, loading, error } = selector ? selector : {};
   const productData = selector?.product?.productInfo;
 
+  // Check if it's an auction or fixed price product
+  const isAuction = productData?.saleType === "auction";
+  const isFixedPrice = productData?.saleType === "fixed";
+
   useEffect(() => {
-    if (!productData?.auctionDetails?.biddingEndsAt) return;
+    if (!isAuction || !productData?.auctionDetails?.biddingEndsAt) return;
 
     const timer = setInterval(() => {
       const now = new Date().getTime();
@@ -78,13 +84,23 @@ const ProductInfo = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [productData?.auctionDetails?.biddingEndsAt]);
+  }, [productData?.auctionDetails?.biddingEndsAt, isAuction]);
 
   const handleBidSubmit = () => {
-    if (newBid && parseFloat(newBid) > productData?.currentPrice) {
+    if (newBid && parseFloat(newBid) > productData?.auctionDetails?.bidders[0]?.latestBidAmount) {
       console.log("New bid:", newBid);
       setNewBid("");
     }
+  };
+
+  const handleAddToCart = () => {
+    console.log("Add to cart:", { productId: params?.id, quantity });
+    // Add your cart logic here
+  };
+
+  const handleBuyNow = () => {
+    console.log("Buy now:", { productId: params?.id, quantity });
+    // Add your buy now logic here
   };
 
   const handleCommentSubmit = () => {
@@ -135,16 +151,19 @@ const ProductInfo = () => {
                 alt="Product"
                 className="w-full h-96 object-cover rounded-lg shadow-lg"
               />
-              <div className="absolute top-4 right-4 flex space-x-2">
-                <button className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100">
-                  <Heart className="w-5 h-5" />
-                </button>
-                <button className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100">
-                  <Share2 className="w-5 h-5" />
-                </button>
-              </div>
+
               <div className="absolute bottom-4 left-4 bg-black bg-opacity-75 text-white px-3 py-1 rounded-full text-sm">
                 {selectedImage + 1} / {productData?.productImages.length}
+              </div>
+              {/* Sale Type Badge */}
+              <div className="absolute top-4 left-4">
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  isAuction 
+                    ? 'bg-red-500 text-white' 
+                    : 'bg-green-500 text-white'
+                }`}>
+                  {isAuction ? 'Auction' : 'Fixed Price'}
+                </span>
               </div>
             </div>
 
@@ -187,56 +206,118 @@ const ProductInfo = () => {
                 </div>
               </div>
 
-              <div className="bg-gradient-to-r from-red-500 to-red-600 text-white p-4 rounded-lg mb-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-red-100 text-sm">Current Bid</p>
-                    <p className="text-3xl font-bold">
-                      ฿
-                      {productData?.auctionDetails?.bidders[0]?.latestBidAmount}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <div className="flex items-center text-red-100 mb-1">
-                      <Clock className="w-4 h-4 mr-1" />
-                      <span className="text-sm">Ends in</span>
+              {/* Price Section - Different for Auction vs Fixed */}
+              {isAuction ? (
+                <div className="bg-gradient-to-r from-red-500 to-red-600 text-white p-4 rounded-lg mb-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-red-100 text-sm">Current Bid</p>
+                      <p className="text-3xl font-bold">
+                        ฿{productData?.auctionDetails?.bidders[0]?.latestBidAmount}
+                      </p>
                     </div>
-                    <p className="text-lg font-semibold">{timeLeft}</p>
+                    <div className="text-right">
+                      <div className="flex items-center text-red-100 mb-1">
+                        <Clock className="w-4 h-4 mr-1" />
+                        <span className="text-sm">Ends in</span>
+                      </div>
+                      <p className="text-lg font-semibold">{timeLeft}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className="bg-gradient-to-r from-green-500 to-green-600 text-white p-4 rounded-lg mb-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-green-100 text-sm">Price</p>
+                      <div className="flex items-center space-x-2">
+                        <p className="text-3xl font-bold">฿{productData?.fixedPrice}</p>
+                        {productData?.originPrice && productData?.originPriceView && (
+                          <span className="text-lg line-through text-green-200">
+                            ฿{productData?.originPrice}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="flex items-center text-green-100 mb-1">
+                        <Truck className="w-4 h-4 mr-1" />
+                        <span className="text-sm">
+                          {productData?.deliveryType === 'free_shipping' ? 'Free Shipping' : 'Paid Shipping'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Auction Info */}
+            {/* Action Buttons Section */}
+            {isAuction ? (
+              <div className="space-y-3">
+                <div className="flex space-x-2">
+                  <input
+                    type="number"
+                    value={newBid}
+                    onChange={(e) => setNewBid(e.target.value)}
+                    placeholder="Enter bid amount"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                  />
+                  <button
+                    onClick={handleBidSubmit}
+                    className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center"
+                  >
+                    <Gavel className="w-4 h-4 mr-2" />
+                    Place Bid
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+              </div>
+            )}
+
+            {/* Product Info */}
             <div className="bg-white p-4 rounded-lg shadow-md">
               <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-gray-500">Starting Price</p>
-                  <p className="font-semibold">
-                    ฿{productData?.auctionDetails?.startingPrice}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Reserve Price</p>
-                  <p className="font-semibold">
-                    ฿{productData?.auctionDetails?.reservePrice}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Total Bids</p>
-                  <p className="font-semibold">
-                    {productData?.auctionDetails?.totalBids}
-                  </p>
-                </div>
+                {isAuction ? (
+                  <>
+                    <div>
+                      <p className="text-gray-500">Starting Price</p>
+                      <p className="font-semibold">
+                        ฿{productData?.auctionDetails?.startingPrice}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500">Reserve Price</p>
+                      <p className="font-semibold">
+                        ฿{productData?.auctionDetails?.reservePrice}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500">Total Bids</p>
+                      <p className="font-semibold">
+                        {productData?.auctionDetails?.totalBids}
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <div>
+                    <p className="text-gray-500">Availability</p>
+                    <p className="font-semibold text-green-600">
+                      {productData?.isSold ? 'Sold Out' : 'In Stock'}
+                    </p>
+                  </div>
+                )}
                 <div>
                   <p className="text-gray-500">Shipping</p>
                   <p className="font-semibold">
-                    ฿{productData?.shippingCharge}
+                    {productData?.deliveryType === 'free_shipping' ? 'Free' : `฿${productData?.shippingCharge || 0}`}
                   </p>
                 </div>
               </div>
 
-              {productData?.isReserveMet && (
+              {isAuction && productData?.isReserveMet && (
                 <div className="mt-3 flex items-center text-green-600">
                   <Shield className="w-4 h-4 mr-1" />
                   <span className="text-sm font-medium">Reserve met</span>
@@ -286,49 +367,51 @@ const ProductInfo = () => {
           </div>
         </div>
 
-        {/* Bottom Section - Bidders and Comments */}
+        {/* Bottom Section - Conditional rendering based on sale type */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
-          {/* Bidders */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold mb-4 flex items-center">
-              <Users className="w-5 h-5 mr-2" />
-              Recent Bidders
-            </h3>
-            <div className="space-y-3">
-              {productData?.auctionDetails?.bidders?.map((bidder, index) => {
-                return (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
-                        <span className="text-sm font-medium">
-                          {bidder.userName[0].toUpperCase()}
-                        </span>
+          {/* Bidders - Only show for auction */}
+          {isAuction && (
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h3 className="text-lg font-semibold mb-4 flex items-center">
+                <Users className="w-5 h-5 mr-2" />
+                Recent Bidders
+              </h3>
+              <div className="space-y-3">
+                {productData?.auctionDetails?.bidders?.map((bidder, index) => {
+                  return (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
+                          <span className="text-sm font-medium">
+                            {bidder.userName[0].toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="font-medium">{bidder.userName}</p>
+                          {bidder.isLive && (
+                            <div className="flex items-center text-green-600 text-xs">
+                              <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
+                              Live
+                            </div>
+                          )}
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-medium">{bidder.userName}</p>
-                        {bidder.isLive && (
-                          <div className="flex items-center text-green-600 text-xs">
-                            <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                            Live
-                          </div>
-                        )}
+                      <div className="text-right">
+                        <p className="font-semibold">฿{bidder.latestBidAmount}</p>
+                        <p className="text-xs text-gray-500">Latest bid</p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-semibold">฿{bidder.latestBidAmount}</p>
-                      <p className="text-xs text-gray-500">Latest bid</p>
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Comments */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className={`bg-white p-6 rounded-lg shadow-md ${!isAuction ? 'lg:col-span-2' : ''}`}>
             <h3 className="text-lg font-semibold mb-4 flex items-center">
               <MessageCircle className="w-5 h-5 mr-2" />
               Comments ({productData?.commentData?.totalComments})
