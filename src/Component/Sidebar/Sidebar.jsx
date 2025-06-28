@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   AiOutlineHome,
@@ -9,27 +9,252 @@ import {
   AiOutlineSetting,
   AiOutlineLeft,
   AiOutlineRight,
+  AiOutlineDown,
+  AiOutlineUp,
+  AiOutlineShop,
+  AiOutlineTag,
+  AiOutlineQuestionCircle,
 } from "react-icons/ai";
+import { MdOutlineIndeterminateCheckBox } from "react-icons/md";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
 import clsx from "clsx";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const { theme } = useTheme();
   const location = useLocation();
+  const [expandedItems, setExpandedItems] = useState({});
 
   const menuItems = [
     { name: "Dashboard", href: "/dashboard", icon: AiOutlineDashboard },
     { name: "Users", href: "/user", icon: AiOutlineTeam },
     { name: "Reports", href: "/#", icon: AiOutlineFileText },
-    // { name: "Notifications", href: "/#", icon: AiOutlineBell },
-    { name: "Settings", href: "/Setting", icon: AiOutlineSetting },
-    { name: "FAQ", href: "/faq", icon: AiOutlineSetting },
-    { name: "Products", href: "/sellProduct", icon: AiOutlineSetting },
-    { name: "Auctions", href: "/auctionProduct", icon: AiOutlineSetting },
-    // { name: "Threads", href: "/#", icon: AiOutlineSetting },
-    { name: "Category", href: "/category", icon: AiOutlineSetting },
-    // { name: "Chat", href: "/chat", icon: AiOutlineSetting },
+    {
+      name: "Items",
+      icon: AiOutlineShop,
+      isParent: true,
+      children: [
+        { name: "Products", href: "/sellProduct", icon: AiOutlineTag },
+        { name: "Auctions", href: "/auctionProduct", icon: AiOutlineBell },
+      ],
+    },
+
+    {
+      name: "Setting",
+      icon: AiOutlineSetting,
+      isParent: true,
+      children: [
+        {
+          name: "Rules",
+          href: "/Setting",
+          icon: MdOutlineIndeterminateCheckBox,
+        },
+        { name: "FAQ", href: "/faq", icon: AiOutlineQuestionCircle },
+      ],
+    },
+
+    { name: "Category", href: "/category", icon: AiOutlineTag },
   ];
+
+  const toggleExpanded = (itemName) => {
+    setExpandedItems((prev) => ({
+      ...prev,
+      [itemName]: !prev[itemName],
+    }));
+  };
+
+  const isChildActive = (children) => {
+    return children.some((child) => location.pathname === child.href);
+  };
+
+  const renderMenuItem = (item) => {
+    const Icon = item.icon;
+    const isActive = location.pathname === item.href;
+    const isExpanded = expandedItems[item.name];
+    const hasActiveChild = item.children && isChildActive(item.children);
+
+    if (item.isParent) {
+      return (
+        <li key={item.name} className="relative">
+          {/* Parent Item */}
+          <div
+            className={clsx(
+              "group flex items-center px-3 py-3 rounded-xl transition-all duration-200 cursor-pointer relative",
+              !isOpen && "md:justify-center md:px-2"
+            )}
+            style={{
+              backgroundColor: hasActiveChild
+                ? theme.colors.sidebarActive
+                : undefined,
+              color: theme.colors.textPrimary,
+            }}
+            onMouseEnter={(e) => {
+              if (!hasActiveChild)
+                e.currentTarget.style.backgroundColor =
+                  theme.colors.sidebarHover;
+            }}
+            onMouseLeave={(e) => {
+              if (!hasActiveChild) e.currentTarget.style.backgroundColor = "";
+            }}
+            onClick={() => {
+              if (isOpen || window.innerWidth < 768) {
+                toggleExpanded(item.name);
+              }
+            }}
+            title={!isOpen ? item.name : ""}
+          >
+            <Icon className="w-6 h-6 flex-shrink-0" />
+
+            {/* Parent label - always show on mobile, conditionally on desktop */}
+            <span
+              className={clsx(
+                "ml-3 font-medium text-sm overflow-hidden whitespace-nowrap flex-1",
+                !isOpen && "md:hidden"
+              )}
+            >
+              {item.name}
+            </span>
+
+            {/* Expand/Collapse Icon */}
+            <div
+              className={clsx(
+                "ml-2 transition-transform duration-200",
+                !isOpen && "md:hidden",
+                isExpanded && "rotate-180"
+              )}
+            >
+              <AiOutlineDown className="w-4 h-4" />
+            </div>
+
+            {/* Tooltip for collapsed state - only on desktop */}
+            {!isOpen && (
+              <div
+                className="absolute left-16 bg-gray-900 text-white px-2 py-1 rounded text-sm 
+                  opacity-0 group-hover:opacity-100 transition-opacity duration-200 
+                  pointer-events-none whitespace-nowrap z-50 hidden md:block"
+              >
+                {item.name}
+                <div className="mt-1 text-xs opacity-75">
+                  {item.children.map((child) => child.name).join(", ")}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Sub Items */}
+          <div
+            className={clsx(
+              "overflow-hidden transition-all duration-300 ease-in-out",
+              !isOpen && "md:hidden", // Hide sub-items when sidebar is collapsed on desktop
+              isExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+            )}
+          >
+            <ul className="mt-1 space-y-1">
+              {item.children.map((child) => {
+                const ChildIcon = child.icon;
+                const isChildActiveItem = location.pathname === child.href;
+
+                return (
+                  <li key={child.name}>
+                    <NavLink
+                      to={child.href}
+                      className={clsx(
+                        "group flex items-center px-3 py-2 ml-6 rounded-lg transition-all duration-200 relative"
+                      )}
+                      style={{
+                        backgroundColor: isChildActiveItem
+                          ? theme.colors.sidebarActive
+                          : undefined,
+                        color: theme.colors.textPrimary,
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isChildActiveItem)
+                          e.currentTarget.style.backgroundColor =
+                            theme.colors.sidebarHover;
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isChildActiveItem)
+                          e.currentTarget.style.backgroundColor = "";
+                      }}
+                      onClick={() => {
+                        // Close sidebar on mobile when a link is clicked
+                        if (window.innerWidth < 768) {
+                          toggleSidebar();
+                        }
+                      }}
+                    >
+                      <ChildIcon className="w-5 h-5 flex-shrink-0 opacity-70" />
+                      <span className="ml-3 font-medium text-sm">
+                        {child.name}
+                      </span>
+                    </NavLink>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </li>
+      );
+    }
+
+    // Regular menu item (non-parent)
+    return (
+      <li
+        key={item.name}
+        className="relative"
+        style={{
+          borderRadius: theme.borderRadius.lg,
+        }}
+      >
+        <NavLink
+          to={item.href}
+          className={clsx(
+            "group flex items-center px-3 py-3 rounded-xl transition-all duration-200 relative",
+            !isOpen && "md:justify-center md:px-2"
+          )}
+          style={{
+            backgroundColor: isActive ? theme.colors.sidebarActive : undefined,
+            color: theme.colors.textPrimary,
+          }}
+          onMouseEnter={(e) => {
+            if (!isActive)
+              e.currentTarget.style.backgroundColor = theme.colors.sidebarHover;
+          }}
+          onMouseLeave={(e) => {
+            if (!isActive) e.currentTarget.style.backgroundColor = "";
+          }}
+          title={!isOpen ? item.name : ""}
+          onClick={() => {
+            // Close sidebar on mobile when a link is clicked
+            if (window.innerWidth < 768) {
+              toggleSidebar();
+            }
+          }}
+        >
+          <Icon className="w-6 h-6 flex-shrink-0" />
+          {/* Always show text on mobile, conditionally on desktop */}
+          <span
+            className={clsx(
+              "ml-3 font-medium text-sm overflow-hidden whitespace-nowrap",
+              !isOpen && "md:hidden"
+            )}
+          >
+            {item.name}
+          </span>
+
+          {/* Tooltip for collapsed state - only on desktop */}
+          {!isOpen && (
+            <div
+              className="absolute left-16 bg-gray-900 text-white px-2 py-1 rounded text-sm 
+                opacity-0 group-hover:opacity-100 transition-opacity duration-200 
+                pointer-events-none whitespace-nowrap z-50 hidden md:block"
+            >
+              {item.name}
+            </div>
+          )}
+        </NavLink>
+      </li>
+    );
+  };
 
   return (
     <>
@@ -48,9 +273,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         }}
         className={clsx(
           "fixed left-0 top-0 h-full border-r z-40 transition-all duration-300 ease-in-out",
-          // Desktop behavior - removed extra space after md:w-48
+          // Desktop behavior
           "md:translate-x-0",
-          isOpen ? "md:w-52" : "md:w-16",
+          isOpen ? "md:w-[13rem]" : "md:w-16",
           // Mobile behavior
           "w-64 md:w-auto",
           isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
@@ -64,7 +289,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             borderColor: theme.colors.borderLight,
           }}
           className={clsx(
-            "absolute -right-3 top-8 border-2 rounded-full p-1.5 transition-colors duration-200",
+            "absolute -right-3 top-8 border-2 rounded-full p-1.5 transition-all duration-200 hover:scale-110",
             !isOpen && "md:rotate-180",
             // Hide toggle button on mobile when sidebar is closed
             "hidden md:block",
@@ -73,12 +298,12 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         >
           {isOpen ? (
             <AiOutlineLeft
-              className="w-4 h-4"
+              className="w-4 h-4 transition-transform duration-200"
               style={{ color: theme.colors.textPrimary }}
             />
           ) : (
             <AiOutlineRight
-              className="w-4 h-4"
+              className="w-4 h-4 transition-transform duration-200"
               style={{ color: theme.colors.textPrimary }}
             />
           )}
@@ -87,26 +312,31 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         {/* Logo Section */}
         <div
           className={clsx(
-            "flex items-center p-4 border-b",
+            "flex items-center p-4 border-b transition-all duration-300",
             !isOpen && "md:justify-center md:px-2"
           )}
           style={{
             borderColor: theme.colors.border,
           }}
         >
-          <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
-            <span className="text-white font-bold text-lg">L</span>
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg">
+            <span className="text-white font-bold text-lg">M</span>
           </div>
           {/* Always show text on mobile, conditionally on desktop */}
-          <div className={clsx("ml-3 overflow-hidden", !isOpen && "md:hidden")}>
+          <div
+            className={clsx(
+              "ml-3 overflow-hidden transition-all duration-300",
+              !isOpen && "md:hidden md:w-0"
+            )}
+          >
             <h1
-              className="text-xl font-bold"
+              className="text-xl font-bold transition-colors duration-200"
               style={{ color: theme.colors.textPrimary }}
             >
               MyApp
             </h1>
             <p
-              className="text-xs"
+              className="text-xs transition-colors duration-200"
               style={{ color: theme.colors.textSecondary }}
             >
               Admin Panel
@@ -115,75 +345,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         </div>
 
         {/* Navigation Menu */}
-        <nav className="flex-1 py-6">
-          <ul className="space-y-2 px-3">
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = location.pathname === item.href;
-
-              return (
-                <li
-                  key={item.name}
-                  className="relative"
-                  style={{
-                    borderRadius: theme.borderRadius.lg,
-                  }}
-                >
-                  <NavLink
-                    to={item.href}
-                    className={clsx(
-                      "group flex items-center px-3 py-3 rounded-xl transition-all duration-200 relative",
-                      !isOpen && "md:justify-center md:px-2"
-                    )}
-                    style={{
-                      backgroundColor: isActive
-                        ? theme.colors.sidebarActive
-                        : undefined,
-                      color: theme.colors.textPrimary,
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isActive)
-                        e.currentTarget.style.backgroundColor =
-                          theme.colors.sidebarHover;
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isActive) e.currentTarget.style.backgroundColor = 
-                        isActive ? theme.colors.sidebarActive : "";
-                    }}
-                    title={!isOpen ? item.name : ""}
-                    onClick={() => {
-                      // Close sidebar on mobile when a link is clicked
-                      if (window.innerWidth < 768) {
-                        toggleSidebar();
-                      }
-                    }}
-                  >
-                    <Icon className="w-6 h-6 flex-shrink-0" />
-                    {/* Always show text on mobile, conditionally on desktop */}
-                    <span
-                      className={clsx(
-                        "ml-3 font-medium text-sm overflow-hidden whitespace-nowrap",
-                        !isOpen && "md:hidden"
-                      )}
-                    >
-                      {item.name}
-                    </span>
-
-                    {/* Tooltip for collapsed state - only on desktop */}
-                    {!isOpen && (
-                      <div
-                        className="absolute left-16 bg-gray-900 text-white px-2 py-1 rounded text-sm 
-                          opacity-0 group-hover:opacity-100 transition-opacity duration-200 
-                          pointer-events-none whitespace-nowrap z-50 hidden md:block"
-                      >
-                        {item.name}
-                      </div>
-                    )}
-                  </NavLink>
-                </li>
-              );
-            })}
-          </ul>
+        <nav className="flex-1 py-6 overflow-y-auto">
+          <ul className="space-y-2 px-3">{menuItems.map(renderMenuItem)}</ul>
         </nav>
       </div>
     </>

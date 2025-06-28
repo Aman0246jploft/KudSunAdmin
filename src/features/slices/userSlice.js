@@ -2,7 +2,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosClient from '../../api/axiosClient';
 import authAxiosClient from '../../api/authAxiosClient';
-import useToast from '../../Component/ToastProvider/useToast';
+
 import { toast } from 'react-toastify';
 
 export function capitalizeFirstLetter(str) {
@@ -131,13 +131,150 @@ export const resetPassword = createAsyncThunk(
 
 
 
+
+
+
+export const userList = createAsyncThunk(
+    'user/userList',
+    async (queryParams = {}, thunkAPI) => {
+        try {
+            const res = await authAxiosClient.get('/user/userList', { params: queryParams });
+            return res?.data?.data;
+        } catch (err) {
+            let message = capitalizeFirstLetter(err.message)
+            toast.error(message)
+            return thunkAPI.rejectWithValue({
+                message: err.message,
+                code: err.responseCode || 500,
+            });
+        }
+    }
+);
+
+
+
+export const getDashboardCount = createAsyncThunk(
+    'user/getDashboardSummary',
+    async (_, thunkAPI) => {
+        try {
+            const res = await authAxiosClient.get('/user/getDashboardSummary');
+            return res?.data?.data;
+        } catch (err) {
+            let message = capitalizeFirstLetter(err.message)
+            toast.error(message)
+            return thunkAPI.rejectWithValue({
+                message: err.message,
+                code: err.responseCode || 500,
+            });
+        }
+    }
+);
+
+
+
+
+
+export const hardDelete = createAsyncThunk(
+    'user/hardDelete',
+    async (data, thunkAPI) => {
+        try {
+            const res = await authAxiosClient.post('/user/hardDelete', data);
+            return res.data;
+        } catch (err) {
+            let message = capitalizeFirstLetter(err.message)
+            toast.error(message)
+            return thunkAPI.rejectWithValue({
+                message: err.message,
+                code: err.responseCode || 500,
+            });
+        }
+    }
+);
+
+
+
+export const softDelete = createAsyncThunk(
+    'user/softDelete',
+    async (data, thunkAPI) => {
+        try {
+            const res = await authAxiosClient.post('/user/softDelete', data);
+            return res.data;
+        } catch (err) {
+            let message = capitalizeFirstLetter(err.message)
+            toast.error(message)
+            return thunkAPI.rejectWithValue({
+                message: err.message,
+                code: err.responseCode || 500,
+            });
+        }
+    }
+);
+
+
+export const update = createAsyncThunk(
+    'user/update',
+    async (data, thunkAPI) => {
+        try {
+            const res = await authAxiosClient.post('/user/update', data);
+            return res.data;
+        } catch (err) {
+            let message = capitalizeFirstLetter(err.message)
+            toast.error(message)
+            return thunkAPI.rejectWithValue({
+                message: err.message,
+                code: err.responseCode || 500,
+            });
+        }
+    }
+);
+
+
+
+export const sellerVerification = createAsyncThunk(
+    'sellerVerification/changeVerificationStatus',
+    async (data, thunkAPI) => {
+        try {
+            const res = await authAxiosClient.post('/sellerVerification/changeVerificationStatus', data);
+            return res.data;
+        } catch (err) {
+            let message = capitalizeFirstLetter(err.message)
+            toast.error(message)
+            return thunkAPI.rejectWithValue({
+                message: err.message,
+                code: err.responseCode || 500,
+            });
+        }
+    }
+);
+
+
+
+
+
+
+export const adminChangeUserPassword = createAsyncThunk(
+    'user/adminChangeUserPassword',
+    async (data, thunkAPI) => {
+        try {
+            const res = await authAxiosClient.post('/user/adminChangeUserPassword', data);
+            return res.data;
+        } catch (err) {
+            let message = capitalizeFirstLetter(err.message)
+            toast.error(message)
+            return thunkAPI.rejectWithValue({
+                message: err.message,
+                code: err.responseCode || 500,
+            });
+        }
+    }
+);
+
+
+
+
 const userSlice = createSlice({
     name: 'user',
-    initialState: {
-        loading: false,
-        error: null,
-        authData: {}
-    },
+    initialState: {},
     reducers: {},
     extraReducers: (builder) => {
         builder
@@ -153,6 +290,33 @@ const userSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
+            .addCase(userList.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(userList.fulfilled, (state, action) => {
+                state.loading = false;
+                state.userList = action.payload;
+            })
+            .addCase(userList.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(getDashboardCount.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getDashboardCount.fulfilled, (state, action) => {
+                state.loading = false;
+                state.getDashboardSummary = action.payload;
+            })
+            .addCase(getDashboardCount.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
+
+
 
     },
 });
