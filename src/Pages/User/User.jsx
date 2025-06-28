@@ -248,41 +248,8 @@ export default function User() {
           color: theme.colors.textPrimary,
         }}
       >
-        <label className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            checked={showSellerRequests}
-            onChange={(e) => {
-              setShowSellerRequests(e.target.checked);
-              setPagination((prev) => ({ ...prev, pageNo: 1 }));
-            }}
-          />
-          <span>Show only users requesting seller verification</span>
-        </label>
-
-        <div className="flex gap-2 mb-2">
-          <div>
-            <label>Registration Start:</label>
-            <input
-              type="date"
-              value={registrationDateStart}
-              onChange={(e) => setRegistrationDateStart(e.target.value)}
-              className="border rounded px-2 py-1"
-            />
-          </div>
-          <div>
-            <label>Registration End:</label>
-            <input
-              type="date"
-              value={registrationDateEnd}
-              onChange={(e) => setRegistrationDateEnd(e.target.value)}
-              className="border rounded px-2 py-1"
-            />
-          </div>
-        </div>
-
         <div
-          className="flex justify-between items-center px-2 py-2"
+          className="flex justify-between items-end px-2 py-2"
           style={{ borderBottom: `1px solid ${theme.colors.borderLight}` }}
         >
           <div
@@ -290,6 +257,56 @@ export default function User() {
             style={{ color: theme.colors.textPrimary }}
           >
             User List
+          </div>
+          <div className="flex flex-wrap  justify-end items-end gap-3">
+            <label className="flex items-center space-x-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={showSellerRequests}
+                onChange={(e) => {
+                  setShowSellerRequests(e.target.checked);
+                  setPagination((prev) => ({ ...prev, pageNo: 1 }));
+                }}
+                className="w-4 h-4"
+              />
+              <span className="text-sm font-medium text-gray-700">
+                Seller Request
+              </span>
+            </label>
+
+            <div className="flex flex-col">
+              <label
+                htmlFor="reg-start"
+                className="mb-1 text-sm font-medium text-gray-700 select-none"
+              >
+                Registration Start:
+              </label>
+              <input
+                id="reg-start"
+                type="date"
+                value={registrationDateStart}
+                onChange={(e) => setRegistrationDateStart(e.target.value)}
+                className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={{ minWidth: "140px" }}
+              />
+            </div>
+
+            <div className="flex flex-col">
+              <label
+                htmlFor="reg-end"
+                className="mb-1 text-sm font-medium text-gray-700 select-none"
+              >
+                Registration End:
+              </label>
+              <input
+                id="reg-end"
+                type="date"
+                value={registrationDateEnd}
+                onChange={(e) => setRegistrationDateEnd(e.target.value)}
+                className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={{ minWidth: "140px" }}
+              />
+            </div>
           </div>
         </div>
 
