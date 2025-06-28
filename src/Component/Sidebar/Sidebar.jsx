@@ -24,7 +24,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     // { name: "Notifications", href: "/#", icon: AiOutlineBell },
     { name: "Settings", href: "/Setting", icon: AiOutlineSetting },
     { name: "FAQ", href: "/faq", icon: AiOutlineSetting },
-
     { name: "Products", href: "/sellProduct", icon: AiOutlineSetting },
     { name: "Auctions", href: "/auctionProduct", icon: AiOutlineSetting },
     // { name: "Threads", href: "/#", icon: AiOutlineSetting },
@@ -49,10 +48,10 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         }}
         className={clsx(
           "fixed left-0 top-0 h-full border-r z-40 transition-all duration-300 ease-in-out",
-          // Desktop behavior (unchanged)
+          // Desktop behavior - removed extra space after md:w-48
           "md:translate-x-0",
-          isOpen ? "md:w-48 " : "md:w-16",
-          // Mobile behavior (new)
+          isOpen ? "md:w-52" : "md:w-16",
+          // Mobile behavior
           "w-64 md:w-auto",
           isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
@@ -125,29 +124,15 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               return (
                 <li
                   key={item.name}
+                  className="relative"
                   style={{
-                    backgroundColor: isActive
-                      ? theme.colors.sidebarActive
-                      : undefined,
-                    color: theme.colors.textPrimary,
                     borderRadius: theme.borderRadius.lg,
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isActive)
-                      e.currentTarget.style.backgroundColor =
-                        theme.colors.sidebarHover;
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isActive) e.currentTarget.style.backgroundColor = "";
                   }}
                 >
                   <NavLink
                     to={item.href}
                     className={clsx(
-                      "group flex items-center px-3 py-3 rounded-xl transition-all duration-200",
-                      isActive
-                        ? `bg-${theme.colors.sidebarActive} text-${theme.colors.textPrimary} shadow-lg`
-                        : `text-${theme.colors.textPrimary} `,
+                      "group flex items-center px-3 py-3 rounded-xl transition-all duration-200 relative",
                       !isOpen && "md:justify-center md:px-2"
                     )}
                     style={{
@@ -155,6 +140,15 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                         ? theme.colors.sidebarActive
                         : undefined,
                       color: theme.colors.textPrimary,
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isActive)
+                        e.currentTarget.style.backgroundColor =
+                          theme.colors.sidebarHover;
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isActive) e.currentTarget.style.backgroundColor = 
+                        isActive ? theme.colors.sidebarActive : "";
                     }}
                     title={!isOpen ? item.name : ""}
                     onClick={() => {
