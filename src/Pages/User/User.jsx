@@ -17,8 +17,9 @@ import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 import Modal from "./Modal";
 import { FaEye } from "react-icons/fa";
-import SellerVerification from "./SellerVerification";
+
 import { toast } from "react-toastify";
+import { byUser } from "../../features/slices/settingSlice";
 
 export default function User() {
   const dispatch = useDispatch();
@@ -27,6 +28,7 @@ export default function User() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [pagination, setPagination] = useState({ pageNo: 1, size: 10 });
   const [showSellerRequests, setShowSellerRequests] = useState(false);
+  const [showReportedRequests, setshowReportedRequests] = useState(false);
   const { userList, loading, error } = useSelector((state) => state.user || {});
   const [newPassword, setNewPassword] = useState("");
   const { users = [], total = 0 } = userList || {};
@@ -34,14 +36,34 @@ export default function User() {
   const [passwordError, setPasswordError] = useState("");
   const [registrationDateStart, setRegistrationDateStart] = useState("");
   const [registrationDateEnd, setRegistrationDateEnd] = useState("");
+  const [sortBy, setSortBy] = useState("userName");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [userStatusFilter, setUserStatusFilter] = useState(""); // "", "enabled", "disabled"
+
+
+  const [reportModalOpen, setReportModalOpen] = useState(false);
+  const [reportLoading, setReportLoading] = useState(false);
+  const [reports, setReports] = useState([]);
+
+  const handleSort = (newSortBy, newSortOrder) => {
+    setSortBy(newSortBy);
+    setSortOrder(newSortOrder);
+    fetchData({ sortBy: newSortBy, sortOrder: newSortOrder }); // or trigger query
+  };
 
   useEffect(() => {
+    const isDisable = userStatusFilter === "enabled" ? false : userStatusFilter === "disabled" ? true : undefined;
+
     dispatch(
       fetchUserList({
         ...pagination,
         showSellerRequests,
+        reported: showReportedRequests,
         registrationDateStart,
         registrationDateEnd,
+        sortBy,
+        sortOrder,
+        ...(isDisable !== undefined && { isDisable }), // only include if defined
       })
     )
       .then((result) => {
@@ -59,6 +81,9 @@ export default function User() {
     showSellerRequests,
     registrationDateStart,
     registrationDateEnd,
+    sortBy,
+    showReportedRequests,
+    sortOrder,
   ]);
 
   const handlePageChange = (newPage) => {
@@ -131,11 +156,29 @@ export default function User() {
         },
         {
           label: "No",
-          onClick: () => {},
+          onClick: () => { },
         },
       ],
     });
   };
+
+
+  const fetchUserReports = async (userId) => {
+    console.log("userIduserId",userId)
+    try {
+      setReportLoading(true);
+      // Replace this with actual API call
+      const res = await dispatch(byUser({userId:userId?._id})).unwrap();
+      console.log("res",res)
+      setReports(res.data || []);
+    } catch (err) {
+      toast.error("Failed to fetch reports");
+      console.error(err);
+    } finally {
+      setReportLoading(false);
+    }
+  };
+
 
   const columns = [
     {
@@ -145,10 +188,27 @@ export default function User() {
       render: (_, __, rowIndex) =>
         (pagination.pageNo - 1) * pagination.size + rowIndex + 1,
     },
-    { key: "userName", label: "Username" },
+    {
+      key: "userName",
+      label: "User Name",
+      sortable: true, // enables click to sort
+      sortKey: "userName",
+    },
     { key: "email", label: "Email" },
     { key: "phoneNumber", label: "Phone" },
     { key: "gender", label: "Gender" },
+    {
+      key: "userAddress",
+      label: "Location",
+      sortable: true,
+      sortKey: "userAddress.city", // backend expects this
+      render: (value) => {
+        if (!value) return "-";
+        const { city, state, country } = value;
+        return [city, state, country].filter(Boolean).join(", ");
+      },
+    },
+
     {
       key: "dob",
       label: "DOB",
@@ -181,6 +241,9 @@ export default function User() {
       render: (value, row) => {
         const isPendingSeller =
           showSellerRequests && row.sellerVerificationStatus === "Pending";
+        const isReported = row?.reportCount > 0;
+        console.log("isReportedisReported", isReported, row?.reportCount)
+
 
         return (
           <div className="flex gap-2">
@@ -226,6 +289,20 @@ export default function User() {
                 >
                   <FiTrash2 size={18} />
                 </button>
+                {showReportedRequests && isReported && (
+                  <button
+                    onClick={() => {
+                      setReportModalOpen(true);
+                      setSelectedUser(row);
+                      fetchUserReports(row);
+                    }}
+                    className="p-1 rounded hover:bg-gray-200 "
+                    // style={{ color: theme.colors.primary }}
+                    title="View Reports"
+                  >
+                    <IoEyeOutline size={18} />
+                  </button>
+                )}
               </>
             )}
           </div>
@@ -259,6 +336,7 @@ export default function User() {
             User List
           </div>
           <div className="flex flex-wrap  justify-end items-end gap-3">
+
             <label className="flex items-center space-x-2 cursor-pointer select-none">
               <input
                 type="checkbox"
@@ -273,6 +351,48 @@ export default function User() {
                 Seller Request
               </span>
             </label>
+
+
+
+            <label className="flex items-center space-x-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={showReportedRequests}
+                onChange={(e) => {
+                  setshowReportedRequests(e.target.checked);
+                  setPagination((prev) => ({ ...prev, pageNo: 1 }));
+                }}
+                className="w-4 h-4"
+              />
+              <span className="text-sm font-medium text-gray-700">
+                Reported User
+              </span>
+            </label>
+
+
+
+
+
+
+            <div className="flex flex-col">
+              <label className="mb-1 text-sm font-medium text-gray-700 select-none">
+                User Status:
+              </label>
+              <select
+                value={userStatusFilter}
+                onChange={(e) => {
+                  setUserStatusFilter(e.target.value);
+                  setPagination((prev) => ({ ...prev, pageNo: 1 })); // Reset to page 1
+                }}
+                className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={{ minWidth: "140px" }}
+              >
+                <option value="">All</option>
+                <option value="enabled">Enabled Users</option>
+                <option value="disabled">Disabled Users</option>
+              </select>
+            </div>
+
 
             <div className="flex flex-col">
               <label
@@ -343,7 +463,14 @@ export default function User() {
             </div>
           ) : (
             <div className="px-1 pt-1">
-              <DataTable columns={columns} data={users} />
+              <DataTable
+                columns={columns}
+                data={users}
+                sortBy={sortBy}
+                sortOrder={sortOrder}
+                onSort={handleSort}
+              />
+
             </div>
           )}
         </div>
@@ -452,20 +579,33 @@ export default function User() {
                   >
                     Change Password
                   </button>
-                  <button
-                    type="button"
-                    // onClick={handleCancel}
-                    className="px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium
-                   hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2
-                   transition-colors"
-                  >
-                    Cancel
-                  </button>
                 </div>
               </div>
             </div>
           )}
         </Modal>
+
+
+        {reportModalOpen && (
+          <Modal onClose={() => setReportModalOpen(false)}>
+            <h2 className="text-lg font-semibold mb-3">User Reports</h2>
+            {reportLoading ? (
+              <p>Loading...</p>
+            ) : reports.length > 0 ? (
+              <ul className="space-y-2">
+                {reports.map((report, index) => (
+                  <li key={index} className="border p-2 rounded">
+                    <div><strong>Reason:</strong> {report.reason}</div>
+                    <div><strong>Message:</strong> {report.message}</div>
+                    <div className="text-xs text-gray-500">{new Date(report.createdAt).toLocaleString()}</div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No reports found.</p>
+            )}
+          </Modal>
+        )}
       </div>
     </div>
   );

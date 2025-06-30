@@ -151,6 +151,41 @@ export const updateFee = createAsyncThunk(
 
 
 
+
+
+
+
+
+
+
+
+export const byUser = createAsyncThunk(
+    'feesetting/byUser',
+    async ({userId,payload}, thunkAPI) => {
+        try {
+            const res = await authAxiosClient.get(`/reportUser/byUser/${userId}`,{ parmas: payload });
+            return res.data;
+        } catch (err) {
+
+            let message = capitalizeFirstLetter(err.response?.data?.message || err.message);
+            toast.error(message);
+            return thunkAPI.rejectWithValue({
+                message: err.response?.data?.message || err.message,
+                code: err.response?.status || 500,
+            });
+        }
+    }
+);
+
+
+
+
+
+
+
+
+
+
 export const deleteSetting = createAsyncThunk(
     'product/harddelete',
     async (id, thunkAPI) => {
@@ -251,8 +286,21 @@ const settingSlice = createSlice({
             .addCase(feeSettingList.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-            });
+            })
 
+
+            .addCase(byUser.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(byUser.fulfilled, (state, action) => {
+                state.loading = false;
+                state.byUserReports = action.payload.data;
+            })
+            .addCase(byUser.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
 
 
 

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
 
-const DataTable = ({ columns, data }) => {
+const DataTable = ({ columns, data, sortBy, sortOrder, onSort }) => {
   const { theme } = useTheme();
   const [tooltip, setTooltip] = useState({
     visible: false,
@@ -9,6 +9,16 @@ const DataTable = ({ columns, data }) => {
     x: 0,
     y: 0,
   });
+  const handleSort = (col) => {
+    if (!col.sortable) return;
+
+    const newSortBy = col.sortKey || col.key;
+    const newSortOrder =
+      sortBy === newSortBy ? (sortOrder === "asc" ? "desc" : "asc") : "asc";
+
+    onSort(newSortBy, newSortOrder);
+  };
+
 
   const handleMouseEnter = (e, value) => {
     if (String(value).length > 30) {
@@ -48,7 +58,17 @@ const DataTable = ({ columns, data }) => {
                     width: col.width || "auto",
                   }}
                 >
-                  {col.label}
+                  {/* {col.label} */}
+                  <div
+                    className="flex items-center gap-1 select-none"
+                    onClick={() => handleSort(col)}
+                    style={{ cursor: col.sortable ? "pointer" : "default" }}
+                  >
+                    {col.label}
+                    {col.sortable && sortBy === (col.sortKey || col.key) && (
+                      <span>{sortOrder === "asc" ? "▲" : "▼"}</span>
+                    )}
+                  </div>
                 </th>
               ))}
             </tr>
