@@ -50,7 +50,7 @@ const MainLayout = ({ children }) => {
           isMobile 
             ? "" 
             : isSidebarOpen 
-              ? "ml-48" 
+              ? "ml-64" 
               : "ml-16"
         }`}
       >

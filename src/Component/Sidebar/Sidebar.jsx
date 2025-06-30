@@ -271,13 +271,13 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           backgroundColor: theme.colors.background,
           color: theme.colors.textPrimary,
         }}
-        className={clsx(
+         className={clsx(
           "fixed left-0 top-0 h-full border-r z-40 transition-all duration-300 ease-in-out",
           // Desktop behavior
           "md:translate-x-0",
-          isOpen ? "md:w-[13rem]" : "md:w-16",
-          // Mobile behavior
-          "w-64 md:w-auto",
+          isOpen ? "md:w-64" : "md:w-16",
+          // Mobile behavior - REMOVED THE CONFLICTING w-64 md:w-auto
+          isOpen ? "w-64" : "w-16", // Use consistent width classes
           isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
       >
