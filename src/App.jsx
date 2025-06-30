@@ -19,10 +19,16 @@ import Setting from "./Pages/Setting/Setting";
 import FaqSettings from "./Pages/Setting/FaqSettings";
 import Faqs from "./Pages/Faqs/Faqs";
 
+
+
 // Lazy-loaded pages
 const Login = lazy(() => import("./Pages/Auth/Login"));
 const Dashboard = lazy(() => import("./Pages/Dashboard/Dashboard"));
 const Home = lazy(() => import("./Pages/Home/Home"));
+const ContactUs = lazy(() => import("./Pages/ContactUs/ContactUs"));
+const FeeSetting = lazy(() => import("./Pages/FeeSetting/FeeSetting"));
+
+
 
 const SellProduct = lazy(() => import("./Pages/SellProduct/SellProduct"));
 const User = lazy(() => import("./Pages/User/User"));
@@ -52,6 +58,10 @@ function App() {
               <Route path="/productInfo/:id" element={<ProductInfo />} />
               <Route path="/Setting" element={<Setting />} />
               <Route path="/faq" element={<Faqs />} />
+              <Route path="/contact_us" element={<ContactUs />} />
+              <Route path="/feeSetting" element={<FeeSetting/>} />
+
+
 
 
               <Route path="/category" element={<Category />} />

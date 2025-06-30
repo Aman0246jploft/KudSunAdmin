@@ -49,6 +49,12 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           icon: MdOutlineIndeterminateCheckBox,
         },
         { name: "FAQ", href: "/faq", icon: AiOutlineQuestionCircle },
+        { name: "ContactUs", href: "/contact_us", icon: AiOutlineQuestionCircle },
+        { name: "FeeSetting", href: "/feeSetting", icon: AiOutlineQuestionCircle },
+
+
+
+
       ],
     },
 
