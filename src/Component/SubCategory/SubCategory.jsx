@@ -79,21 +79,11 @@ export default function SubCategory() {
         ),
     },
     {
-      key: "Parameter",
-      label: "Parameter",
+      key: "parameterCount",
+      label: "Parament Count",
       width: "25%",
-      render: (_, row) => {
-        return (
-          <button
-            onClick={() => navigate(`/subcategoryParameter/${row?._id}`)}
-            className="p-1 rounded hover:bg-gray-200 "
-            style={{ color: theme.colors.textPrimary }}
-          >
-            <FaEye size={18} />
-          </button>
-        );
-      },
     },
+
     {
       key: "actions",
       label: "Actions",
@@ -101,6 +91,13 @@ export default function SubCategory() {
 
       render: (_, row) => (
         <div className="flex gap-2">
+          <button
+            onClick={() => navigate(`/subcategoryParameter/${row?._id}`)}
+            className="p-1 rounded hover:bg-gray-200 "
+            style={{ color: theme.colors.textPrimary }}
+          >
+            <FaEye size={18} />
+          </button>
           <button
             onClick={() => handleEdit(row)}
             className="p-1 rounded hover:bg-gray-200 "

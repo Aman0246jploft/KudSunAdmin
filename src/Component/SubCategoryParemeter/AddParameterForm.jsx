@@ -7,14 +7,23 @@ import { toast } from "react-toastify";
 import {
   subCategoryParameter,
   addParameter,
+  updateParameter,
 } from "../../features/slices/categorySlice";
 
-export default function AddParameterForm({ onClose, pagination }) {
+export default function AddParameterForm({ onClose, pagination, editData }) {
   const { theme } = useTheme();
   const dispatch = useDispatch();
   const param = useParams();
-  const [keyInput, setKeyInput] = useState("");
-  const [values, setValues] = useState([""]);
+  const [keyInput, setKeyInput] = useState(editData?.key || "");
+
+  const [values, setValues] = useState(
+    editData?.values?.map((val) => val.value) || [""]
+  );
+
+  console.log("editDataeditData", editData)
+
+  const isEdit = !!editData;
+
 
   const handleKeyChange = (e) => setKeyInput(e.target.value);
 
@@ -43,31 +52,60 @@ export default function AddParameterForm({ onClose, pagination }) {
       toast.error("Both key and at least one value are required.");
       return;
     }
+    console.log("654654", trimmedKey, trimmedValues)
 
+    // Move this line up here so it's available in both add and edit flows
     const formData = new FormData();
     formData.append("key", trimmedKey);
     trimmedValues.forEach((val) => {
-      formData.append("values", val); // appending multiple 'values'
+      formData.append("values", val);
     });
 
-    dispatch(addParameter({ subCategoryId: param?.id, formData }))
-      .then((result) => {
-        if (addParameter.fulfilled.match(result)) {
-          toast.success("Parameter added successfully");
-          dispatch(
-            subCategoryParameter({ subCategoryId: param?.id, pagination })
-          );
-          onClose();
-        } else {
-          const { message, code } = result.payload || {};
-          toast.error(`Failed [${code}]: ${message}`);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        toast.error("Unexpected error occurred");
+    if (isEdit) {
+      const formData = new FormData();
+      formData.append("newKey", trimmedKey);
+      trimmedValues.forEach((val) => {
+        formData.append("newValues", val);
       });
+
+      dispatch(updateParameter({ subCategoryId: param?.id, paramKey: editData?.key, formData }))
+        .then((result) => {
+          if (updateParameter.fulfilled.match(result)) {
+            toast.success("Parameter updated successfully");
+            dispatch(
+              subCategoryParameter({ subCategoryId: param?.id, pagination })
+            );
+            onClose();
+          } else {
+            const { message, code } = result.payload || {};
+            toast.error(`Update failed [${code}]: ${message}`);
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          toast.error("Unexpected error occurred");
+        });
+    } else {
+      dispatch(addParameter({ subCategoryId: param?.id, formData }))
+        .then((result) => {
+          if (addParameter.fulfilled.match(result)) {
+            toast.success("Parameter added successfully");
+            dispatch(
+              subCategoryParameter({ subCategoryId: param?.id, pagination })
+            );
+            onClose();
+          } else {
+            const { message, code } = result.payload || {};
+            toast.error(`Failed [${code}]: ${message}`);
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          toast.error("Unexpected error occurred");
+        });
+    }
   };
+
 
   return (
     <form
@@ -78,7 +116,10 @@ export default function AddParameterForm({ onClose, pagination }) {
         color: theme.colors.textPrimary,
       }}
     >
-      <h3 className="text-lg font-bold">Add New Parameter</h3>
+      <h3 className="text-lg font-bold">
+        {isEdit ? "Update Parameter" : "Add New Parameter"}
+      </h3>
+
 
       <div>
         <label className="block mb-1 font-medium">Parameter Key</label>

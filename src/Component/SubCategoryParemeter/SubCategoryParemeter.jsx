@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   acceptParameterValueByAdmin,
+  deleteParameterFromSubCategory,
   rejectParameterValueByAdmin,
   subCategory,
   subCategoryParameter,
@@ -15,6 +16,7 @@ import { FiEdit, FiTrash2 } from "react-icons/fi"; // From Feather Icons
 import { useTheme } from "../../contexts/theme/hook/useTheme";
 import { useParams } from "react-router";
 import AddParameterForm from "./AddParameterForm";
+import { toast } from "react-toastify";
 
 export default function SubCategoryParemeter() {
   const dispatch = useDispatch();
@@ -22,6 +24,7 @@ export default function SubCategoryParemeter() {
   const [pagination, setPagination] = useState({ pageNo: 1, size: 10 });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const param = useParams();
+  const [editData, setEditData] = useState(null);
   const { subCategoryParameterList, loading, error } = useSelector(
     (state) => state.category || {}
   );
@@ -39,6 +42,13 @@ export default function SubCategoryParemeter() {
           console.error("Unexpected error:", error);
         });
   }, [dispatch, pagination, param?.id]);
+
+
+  const handleEdit = (row) => {
+    setEditData(row);           // Set the row data to edit
+    setIsModalOpen(true);       // Open the modal
+  };
+
 
   const handleAccept = async (paramKey, value) => {
     try {
@@ -70,6 +80,9 @@ export default function SubCategoryParemeter() {
     }
   };
 
+
+
+
   const handleReject = async (paramKey, value) => {
     try {
       const { id: subCategoryId } = param;
@@ -99,6 +112,28 @@ export default function SubCategoryParemeter() {
       console.error("Accept error:", error);
     }
   };
+
+  const handleDelete = async (data) => {
+  
+   dispatch(deleteParameterFromSubCategory({ subCategoryId: param?.id, paramKey: data?.key }))
+        .then((result) => {
+          if (deleteParameterFromSubCategory.fulfilled.match(result)) {
+            toast.success("Parameter updated successfully");
+            dispatch(
+              subCategoryParameter({ subCategoryId: param?.id, pagination })
+            );
+            onClose();
+          } else {
+            const { message, code } = result.payload || {};
+            toast.error(`Update failed [${code}]: ${message}`);
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+
+
+  }
 
   const columns = [
     {
@@ -220,7 +255,7 @@ export default function SubCategoryParemeter() {
               color: theme.colors.buttonText,
             }}
           >
-            Add SubCategory
+            Add Parameters
           </Button>
         </div>
 
@@ -279,10 +314,17 @@ export default function SubCategoryParemeter() {
         </div>
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+      <Modal isOpen={isModalOpen} onClose={() => {
+        setIsModalOpen(false);
+        setEditData(null);  // Clear edit state on close
+      }}>
         <AddParameterForm
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => {
+            setIsModalOpen(false);
+            setEditData(null);
+          }}
           pagination={pagination}
+          editData={editData}  // Pass it down
         />
       </Modal>
     </div>

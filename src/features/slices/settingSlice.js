@@ -161,9 +161,9 @@ export const updateFee = createAsyncThunk(
 
 export const byUser = createAsyncThunk(
     'feesetting/byUser',
-    async ({userId,payload}, thunkAPI) => {
+    async ({userId,pageNo,size}, thunkAPI) => {
         try {
-            const res = await authAxiosClient.get(`/reportUser/byUser/${userId}`,{ parmas: payload });
+            const res = await authAxiosClient.get(`/reportUser/byUser/${userId}?pageNo=${pageNo}&size=${size}`);
             return res.data;
         } catch (err) {
 

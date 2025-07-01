@@ -11,13 +11,14 @@ import {
   softDelete,
   update,
 } from "../../features/slices/userSlice";
+import { RiTriangularFlagFill } from "react-icons/ri";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
 import Pagination from "../../Component/Atoms/Pagination/Pagination";
 import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 import Modal from "./Modal";
 import { FaEye } from "react-icons/fa";
-
+import { RiTriangularFlagLine } from "react-icons/ri";
 import { toast } from "react-toastify";
 import { byUser } from "../../features/slices/settingSlice";
 
@@ -40,10 +41,12 @@ export default function User() {
   const [sortOrder, setSortOrder] = useState("asc");
   const [userStatusFilter, setUserStatusFilter] = useState(""); // "", "enabled", "disabled"
 
-
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [reportLoading, setReportLoading] = useState(false);
   const [reports, setReports] = useState([]);
+  const [reportsPagination, setReportsPagination] = useState({ pageNo: 1, size: 5 });
+  const [reportsTotal, setReportsTotal] = useState(0);
+  const [flagLoading, setFlagLoading] = useState(false);
 
   const handleSort = (newSortBy, newSortOrder) => {
     setSortBy(newSortBy);
@@ -94,6 +97,8 @@ export default function User() {
     setSelectedUser(user);
     setIsModalOpen(true);
   };
+
+  console.log("reportsreports", reports);
 
   const handleChangePassword = () => {
     dispatch(
@@ -156,21 +161,29 @@ export default function User() {
         },
         {
           label: "No",
-          onClick: () => { },
+          onClick: () => {},
         },
       ],
     });
   };
 
-
-  const fetchUserReports = async (userId) => {
-    console.log("userIduserId",userId)
+  const fetchUserReports = async (userId, pageNo = 1, size = 5) => {
+    console.log("userIduserId", userId);
     try {
       setReportLoading(true);
-      // Replace this with actual API call
-      const res = await dispatch(byUser({userId:userId?._id})).unwrap();
-      console.log("res",res)
-      setReports(res.data || []);
+      // Include pagination parameters in the API call
+      const res = await dispatch(
+        byUser({
+          userId: userId?._id,
+          pageNo,
+          size,
+        })
+      ).unwrap();
+      
+      // Set the reports data with pagination info
+      setReports(res.data?.reports || []);
+      setReportsTotal(res.data?.totalCount || 0);
+      setReportsPagination({ pageNo: res.data?.pageNo || 1, size: res.data?.size || 5 });
     } catch (err) {
       toast.error("Failed to fetch reports");
       console.error(err);
@@ -179,6 +192,60 @@ export default function User() {
     }
   };
 
+  const handleReportsPageChange = (newPage) => {
+    fetchUserReports(selectedUser, newPage, reportsPagination.size);
+  };
+
+  const handleToggleFlagUser = async () => {
+    if (!selectedUser?._id) {
+      toast.error("No user selected");
+      return;
+    }
+
+    try {
+      setFlagLoading(true);
+      
+      const newFlagStatus = !selectedUser?.isFlagedReported;
+      
+      const result = await dispatch(update({ 
+        id: selectedUser._id, 
+        isFlagedReported: newFlagStatus 
+      }));
+      
+      if (update.fulfilled.match(result)) {
+        // Update selectedUser state to reflect the change
+        setSelectedUser(prev => ({
+          ...prev,
+          isFlagedReported: newFlagStatus
+        }));
+        
+        toast.success(`User ${newFlagStatus ? 'flagged' : 'unflagged'} successfully`);
+        
+        // Refresh the main user list to reflect changes
+        dispatch(fetchUserList({
+          ...pagination,
+          showSellerRequests,
+          reported: showReportedRequests,
+          registrationDateStart,
+          registrationDateEnd,
+          sortBy,
+          sortOrder,
+          ...(userStatusFilter === "enabled" ? { isDisable: false } : 
+              userStatusFilter === "disabled" ? { isDisable: true } : {})
+        }));
+      } else {
+        // Handle API error response
+        const { message, code } = result.payload || {};
+        console.error(`Flag update failed [${code}]: ${message}`);
+        toast.error(message || "Failed to update flag status");
+      }
+    } catch (err) {
+      console.error("Unexpected error while toggling flag status:", err);
+      toast.error("An unexpected error occurred");
+    } finally {
+      setFlagLoading(false);
+    }
+  };
 
   const columns = [
     {
@@ -242,9 +309,6 @@ export default function User() {
         const isPendingSeller =
           showSellerRequests && row.sellerVerificationStatus === "Pending";
         const isReported = row?.reportCount > 0;
-        console.log("isReportedisReported", isReported, row?.reportCount)
-
-
         return (
           <div className="flex gap-2">
             {isPendingSeller ? (
@@ -294,7 +358,8 @@ export default function User() {
                     onClick={() => {
                       setReportModalOpen(true);
                       setSelectedUser(row);
-                      fetchUserReports(row);
+                      setReportsPagination({ pageNo: 1, size: 5 }); // Reset pagination
+                      fetchUserReports(row, 1, 5); // Fetch first page
                     }}
                     className="p-1 rounded hover:bg-gray-200 "
                     // style={{ color: theme.colors.primary }}
@@ -336,7 +401,6 @@ export default function User() {
             User List
           </div>
           <div className="flex flex-wrap  justify-end items-end gap-3">
-
             <label className="flex items-center space-x-2 cursor-pointer select-none">
               <input
                 type="checkbox"
@@ -352,8 +416,6 @@ export default function User() {
               </span>
             </label>
 
-
-
             <label className="flex items-center space-x-2 cursor-pointer select-none">
               <input
                 type="checkbox"
@@ -368,11 +430,6 @@ export default function User() {
                 Reported User
               </span>
             </label>
-
-
-
-
-
 
             <div className="flex flex-col">
               <label className="mb-1 text-sm font-medium text-gray-700 select-none">
@@ -392,7 +449,6 @@ export default function User() {
                 <option value="disabled">Disabled Users</option>
               </select>
             </div>
-
 
             <div className="flex flex-col">
               <label
@@ -470,7 +526,6 @@ export default function User() {
                 sortOrder={sortOrder}
                 onSort={handleSort}
               />
-
             </div>
           )}
         </div>
@@ -489,21 +544,6 @@ export default function User() {
             />
           </div>
         </div>
-
-        {/* <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-          {selectedUser && (
-            <SellerVerification
-              data={selectedUser}
-              onClose={() => {
-                setIsModalOpen(false);
-                setSelectedUser(null);
-              }}
-              onActionComplete={() => {
-                dispatch(fetchUserList({ ...pagination, showSellerRequests }));
-              }}
-            />
-          )}
-        </Modal> */}
 
         <Modal
           isOpen={isModalOpen}
@@ -585,25 +625,120 @@ export default function User() {
           )}
         </Modal>
 
-
+        {/* Updated Reports Modal */}
         {reportModalOpen && (
-          <Modal onClose={() => setReportModalOpen(false)}>
-            <h2 className="text-lg font-semibold mb-3">User Reports</h2>
-            {reportLoading ? (
-              <p>Loading...</p>
-            ) : reports.length > 0 ? (
-              <ul className="space-y-2">
-                {reports.map((report, index) => (
-                  <li key={index} className="border p-2 rounded">
-                    <div><strong>Reason:</strong> {report.reason}</div>
-                    <div><strong>Message:</strong> {report.message}</div>
-                    <div className="text-xs text-gray-500">{new Date(report.createdAt).toLocaleString()}</div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>No reports found.</p>
-            )}
+          <Modal 
+            isOpen={reportModalOpen}
+            onClose={() => {
+              setReportModalOpen(false);
+              setSelectedUser(null);
+              setReports([]);
+              setReportsTotal(0);
+              setReportsPagination({ pageNo: 1, size: 5 });
+            }}
+          >
+            <div className="p-6 bg-white rounded-lg shadow-sm border border-gray-200 max-w-4xl mx-auto max-h-[80vh] overflow-y-auto">
+              <div className="mb-4 flex justify-between items-start">
+                <div>
+                  <h2 className="text-xl font-semibold mb-2">
+                    Users Who Reported: {selectedUser?.userName}
+                  </h2>
+                  <p className="text-sm text-gray-600">
+                    Total Reports: {reportsTotal}
+                  </p>
+                </div>
+                <button
+                  onClick={handleToggleFlagUser}
+                  disabled={flagLoading}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed `}
+                >
+                  {flagLoading ? 'Updating...' : selectedUser?.isFlagedReported ? <RiTriangularFlagFill className=" text-red-500" />: <RiTriangularFlagLine />}
+                </button>
+              </div>
+
+              {reportLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                  <p className="ml-2">Loading reports...</p>
+                </div>
+              ) : reports.length > 0 ? (
+                <>
+                  <div className="space-y-4 mb-4">
+                    {reports.map((report, index) => (
+                      <div key={report._id} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                              <span className="text-blue-600 font-semibold">
+                                {((reportsPagination.pageNo - 1) * reportsPagination.size + index + 1)}
+                              </span>
+                            </div>
+                            <div>
+                              <p className="font-medium text-gray-900">
+                                Reporter ID: {report.reportedBy._id}
+                              </p>
+                              <p className="text-sm text-gray-500">
+                                {new Date(report.createdAt).toLocaleString()}
+                              </p>
+                            </div>
+                          </div>
+                          <span className={`px-2 py-1 rounded text-xs font-medium ${
+                            report.isDisable 
+                              ? 'bg-red-100 text-red-800' 
+                              : 'bg-green-100 text-green-800'
+                          }`}>
+                            {report.isDisable ? 'Disabled' : 'Active'}
+                          </span>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <div>
+                            <span className="font-medium text-gray-700">Title:</span>
+                            <p className="text-gray-900">{report.title}</p>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-700">Description:</span>
+                            <p className="text-gray-900">{report.description}</p>
+                          </div>
+                          {report.image && report.image.length > 0 && (
+                            <div>
+                              <span className="font-medium text-gray-700">Images:</span>
+                              <div className="flex gap-2 mt-1">
+                                {report.image.map((img, imgIndex) => (
+                                  <img
+                                    key={imgIndex}
+                                    src={img}
+                                    alt={`Report evidence ${imgIndex + 1}`}
+                                    className="w-16 h-16 object-cover rounded border"
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Pagination for Reports */}
+                  {reportsTotal > reportsPagination.size && (
+                    <div className="flex justify-center mt-4 pt-4 border-t border-gray-200">
+                      <Pagination
+                        pageNo={reportsPagination.pageNo}
+                        size={reportsPagination.size}
+                        total={reportsTotal}
+                        onChange={handleReportsPageChange}
+                        theme={theme}
+                      />
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-gray-500">No reports found for this user.</p>
+                </div>
+              )}
+            </div>
           </Modal>
         )}
       </div>

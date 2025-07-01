@@ -27,7 +27,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   const menuItems = [
     { name: "Dashboard", href: "/dashboard", icon: AiOutlineDashboard },
     { name: "Users", href: "/user", icon: AiOutlineTeam },
-    { name: "Reports", href: "/#", icon: AiOutlineFileText },
     {
       name: "Items",
       icon: AiOutlineShop,

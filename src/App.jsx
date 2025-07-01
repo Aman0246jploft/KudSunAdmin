@@ -18,6 +18,7 @@ import ResetPassword from "./Pages/ForgotPassword/ResetPassword";
 import Setting from "./Pages/Setting/Setting";
 import FaqSettings from "./Pages/Setting/FaqSettings";
 import Faqs from "./Pages/Faqs/Faqs";
+import NetworkStatus from "./Component/NetworkStatus";
 
 
 
@@ -36,6 +37,7 @@ const User = lazy(() => import("./Pages/User/User"));
 function App() {
   return (
     <Router>
+       <NetworkStatus />
       <Suspense fallback={<Loader />}>
         <Routes>
           {/* Public Routes */}

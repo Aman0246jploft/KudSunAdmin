@@ -30,6 +30,8 @@ export const mainCategory = createAsyncThunk(
 
 
 
+
+
 export const subCategory = createAsyncThunk(
     'category/getSubCategoriesByCategoryId',
     async ({ categoryId, pageNo = 1, size = 10 } = {}, thunkAPI) => {
@@ -91,6 +93,35 @@ export const createCategory = createAsyncThunk(
         }
     }
 );
+
+
+
+
+
+
+export const updateCategory = createAsyncThunk(
+    'category/update',
+    async (payload = {}, thunkAPI) => {
+        try {
+            const res = await authAxiosClient.post(`/category/update`, payload, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            return res.data;
+        } catch (err) {
+            console.error(`Category List [${err.responseCode || 500}]: ${err.message}`);
+            let message = capitalizeFirstLetter(err.message)
+            toast.error(message)
+            return thunkAPI.rejectWithValue({
+                message: err.message,
+                code: err.responseCode || 500,
+            });
+        }
+    }
+);
+
+
 
 
 
@@ -190,6 +221,60 @@ export const addParameter = createAsyncThunk(
         }
     }
 );
+
+
+
+
+  
+
+export const updateParameter = createAsyncThunk(
+    'category/updateParameter',
+    async ({ subCategoryId,paramKey, formData } = {}, thunkAPI) => {
+
+        try {
+            const res = await authAxiosClient.post(`/category/updateParameterForSubCategory/${subCategoryId}/${paramKey}`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            return res.data;
+        } catch (err) {
+            console.error(`Category List [${err.responseCode || 500}]: ${err.message}`);
+            let message = capitalizeFirstLetter(err.message)
+            toast.error(message)
+            return thunkAPI.rejectWithValue({
+                message: err.message,
+                code: err.responseCode || 500,
+            });
+        }
+    }
+);
+
+
+
+export const deleteParameterFromSubCategory = createAsyncThunk(
+    'category/deleteParameterFromSubCategory',
+    async ({ subCategoryId,paramKey } = {}, thunkAPI) => {
+
+        try {
+            const res = await authAxiosClient.post(`/category/deleteParameterFromSubCategory/${subCategoryId}/${paramKey}`, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            return res.data;
+        } catch (err) {
+            console.error(`Category List [${err.responseCode || 500}]: ${err.message}`);
+            let message = capitalizeFirstLetter(err.message)
+            toast.error(message)
+            return thunkAPI.rejectWithValue({
+                message: err.message,
+                code: err.responseCode || 500,
+            });
+        }
+    }
+);
+
 
 
 

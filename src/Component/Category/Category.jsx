@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { mainCategory } from "../../features/slices/categorySlice";
+import { mainCategory, updateCategory } from "../../features/slices/categorySlice";
 import DataTable from "../Table/DataTable";
 import Pagination from "../Atoms/Pagination/Pagination";
 import Modal from "./Modal";
@@ -126,29 +126,25 @@ export default function Category() {
   };
 
   const handleDelete = (product) => {
-    const updatedStatus = product;
-
-
     confirmAlert({
       title: "Confirm to submit",
-      message: "Are you sure to delete this.",  
+      message: "Are you sure to delete this.",
       buttons: [
         {
           label: "Yes",
           onClick: () => {
-            // dispatch(deleteProduct({ id: product._id, formData }))
-            //   .unwrap()
-            //   .then((res) => {
-            //     dispatch(productList(pagination));
-            //   })
-            //   .catch((err) => {
-            //     console.error("Failed to update product status:", err);
-            //   });
+            dispatch(updateCategory({ id: product._id, isDeleted: !product.isDeleted }))
+              .then((res) => {
+                dispatch(mainCategory(pagination));
+              })
+              .catch((err) => {
+                console.error("Failed to update product status:", err);
+              });
           },
         },
         {
           label: "No",
-          onClick: () => {},
+          onClick: () => { },
         },
       ],
     });

@@ -79,7 +79,7 @@ export default function UpdateCategoryForm({
           onClose();
         } else {
           const { message, code } = result.payload || {};
-          toast.error(`Update failed [${code}]: ${message}`);
+          console.error(`Update failed [${code}]: ${message}`);
         }
       })
       .catch((err) => {
