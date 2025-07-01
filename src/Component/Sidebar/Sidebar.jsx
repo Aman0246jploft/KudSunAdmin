@@ -50,7 +50,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         { name: "FAQ", href: "/faq", icon: AiOutlineQuestionCircle },
         { name: "ContactUs", href: "/contact_us", icon: AiOutlineQuestionCircle },
         { name: "FeeSetting", href: "/feeSetting", icon: AiOutlineQuestionCircle },
-
+        { name: "Bank", href: "/bank", icon: AiOutlineQuestionCircle },
+        { name: "LocationSetting", href: "/location", icon: AiOutlineQuestionCircle },
 
 
 

@@ -22,12 +22,17 @@ import NetworkStatus from "./Component/NetworkStatus";
 
 
 
+
 // Lazy-loaded pages
 const Login = lazy(() => import("./Pages/Auth/Login"));
 const Dashboard = lazy(() => import("./Pages/Dashboard/Dashboard"));
 const Home = lazy(() => import("./Pages/Home/Home"));
 const ContactUs = lazy(() => import("./Pages/ContactUs/ContactUs"));
 const FeeSetting = lazy(() => import("./Pages/FeeSetting/FeeSetting"));
+const Location = lazy(() => import("./Pages/Location/Location"));
+const Bank = lazy(() => import("./Pages/Bank/Bank"));
+
+
 
 
 
@@ -37,7 +42,7 @@ const User = lazy(() => import("./Pages/User/User"));
 function App() {
   return (
     <Router>
-       <NetworkStatus />
+      <NetworkStatus />
       <Suspense fallback={<Loader />}>
         <Routes>
           {/* Public Routes */}
@@ -61,7 +66,11 @@ function App() {
               <Route path="/Setting" element={<Setting />} />
               <Route path="/faq" element={<Faqs />} />
               <Route path="/contact_us" element={<ContactUs />} />
-              <Route path="/feeSetting" element={<FeeSetting/>} />
+              <Route path="/feeSetting" element={<FeeSetting />} />
+              <Route path="/location" element={<Location />} />
+              <Route path="/bank" element={<Bank />} />
+
+
 
 
 
