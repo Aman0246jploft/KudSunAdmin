@@ -242,70 +242,86 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
-    if (!validateForm()) return;
+const handleSubmit = () => {
+  if (!validateForm()) return;
 
-    const payload = {
-      categoryId: selectedCategory,
-      subCategoryId: formData.subCategoryId,
-      title: formData.title,
-      description: formData.description,
-      condition: formData.condition,
-      saleType: "auction",
-      deliveryType: formData.shippingOption,
-      shippingCharge:
-        formData.shippingOption === "charge_shipping"
-          ? formData.shippingCharge?.toString() || "0"
-          : "0",
-      isDraft: formData.isDraft ? "true" : "false",
-    };
-
-    let newForm = new FormData();
-
-    Object.entries(payload).forEach(([key, value]) => {
-      if (Array.isArray(value)) return;
-      if (typeof value === "object" && value !== null) return;
-      newForm.append(key, value);
-    });
-
-    if (Array.isArray(formData.tags)) {
-      formData.tags.forEach((tag) => {
-        newForm.append("tags", tag);
-      });
-    }
-
-    if (Array.isArray(selectedSpecifics)) {
-      selectedSpecifics.forEach((spec) => {
-        newForm.append("specifics", JSON.stringify(spec));
-      });
-    }
-
-    newForm.append("auctionSettings", JSON.stringify(formData.auctionSettings));
-
-    if (formData.images?.length > 0) {
-      formData.images.slice(0, 5).forEach((file) => {
-        newForm.append("files", file);
-      });
-    }
-
-    dispatch(updateProduct({ id: productData._id, formData: newForm }))
-      .then((result) => {
-        if (updateProduct.fulfilled.match(result)) {
-          toast.success("Product Updated Successfully");
-          if (onProductUpdate) {
-            onProductUpdate();
-          }
-          closeForm();
-        } else {
-          const { message, code } = result.payload || {};
-          console.error(`Update Product failed [${code}]: ${message}`);
-        }
-      })
-      .catch((error) => {
-        console.error("Unexpected error:", error);
-        toast.error("Unexpected error occurred");
-      });
+  const payload = {
+    categoryId: selectedCategory,
+    subCategoryId: formData.subCategoryId,
+    title: formData.title,
+    description: formData.description,
+    condition: formData.condition,
+    saleType: "auction",
+    deliveryType: formData.shippingOption,
+    shippingCharge:
+      formData.shippingOption === "charge_shipping"
+        ? formData.shippingCharge?.toString() || "0"
+        : "0",
+    isDraft: formData.isDraft ? "true" : "false",
   };
+
+  const testPayload = {
+    ...payload,
+    tags: formData.tags || [],
+    specifics: selectedSpecifics || [],
+    auctionSettings: formData.auctionSettings || {},
+  };
+
+  console.log("Payload before FormData:", JSON.stringify(testPayload, null, 2));
+
+  let newForm = new FormData();
+
+  // Append simple string fields
+  Object.entries(payload).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      newForm.append(key, value);
+    }
+  });
+
+  // Append tags (multiple entries)
+  if (Array.isArray(formData.tags)) {
+    formData.tags.forEach((tag) => {
+      if (tag) newForm.append("tags", tag);
+    });
+  }
+
+  // Append specifics (each as stringified JSON)
+if (Array.isArray(selectedSpecifics) && selectedSpecifics.length > 0) {
+  newForm.append("specifics", JSON.stringify(selectedSpecifics));
+}
+
+
+  // Append auctionSettings as JSON string (if valid object)
+  if (formData.auctionSettings && typeof formData.auctionSettings === "object") {
+    newForm.append("auctionSettings", JSON.stringify(formData.auctionSettings));
+  }
+
+  // Append files (limit 5)
+  if (Array.isArray(formData.images) && formData.images.length > 0) {
+    formData.images.slice(0, 5).forEach((file) => {
+      if (file) newForm.append("files", file);
+    });
+  }
+
+  dispatch(updateProduct({ id: productData._id, formData: newForm }))
+    .then((result) => {
+      if (updateProduct.fulfilled.match(result)) {
+        toast.success("Product Updated Successfully");
+        onProductUpdate?.();
+        closeForm();
+      } else {
+        const { message, code } = result.payload || {};
+        console.error(`Update Product failed [${code}]: ${message}`);
+        toast.error(message || "Failed to update product");
+      }
+    })
+    .catch((error) => {
+      console.error("Unexpected error:", error);
+      toast.error("Unexpected error occurred");
+    });
+};
+
+
 
   const conditionOptions = [
     {
