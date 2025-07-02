@@ -19,6 +19,7 @@ import { MdInfo } from "react-icons/md";
 import { useNavigate } from "react-router";
 import { FaCircleInfo } from "react-icons/fa6";
 import { mainCategory, subCategory } from "../../features/slices/categorySlice";
+import EditProductForm from "./EditProductForm";
 
 export default function AuctionProduct() {
   const dispatch = useDispatch();
