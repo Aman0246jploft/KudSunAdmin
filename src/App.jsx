@@ -71,10 +71,6 @@ function App() {
               <Route path="/bank" element={<Bank />} />
 
 
-
-
-
-
               <Route path="/category" element={<Category />} />
               <Route path="/subcategory/:id" element={<SubCategory />} />
               <Route path="/chat" element={<Chat />} />

@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
-  AiOutlineHome,
   AiOutlineDashboard,
   AiOutlineTeam,
-  AiOutlineFileText,
   AiOutlineBell,
   AiOutlineSetting,
   AiOutlineLeft,
@@ -52,8 +50,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         { name: "FeeSetting", href: "/feeSetting", icon: AiOutlineQuestionCircle },
         { name: "Bank", href: "/bank", icon: AiOutlineQuestionCircle },
         { name: "LocationSetting", href: "/location", icon: AiOutlineQuestionCircle },
-
-
 
       ],
     },
