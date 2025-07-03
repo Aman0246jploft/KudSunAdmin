@@ -70,10 +70,10 @@ export default function Login() {
   return (
     <div
       className="min-h-screen flex items-center justify-center px-4"
-      style={{ backgroundColor: theme.colors.background }}
+      style={{ backgroundColor: "#bdd5fc" }}
     >
       <div
-        className="w-full max-w-md p-8 rounded-xl shadow-lg"
+        className="w-full max-w-md p-8 bg-[#ffffff] rounded-xl shadow-lg"
         style={{
           backgroundColor: theme.colors.card,
           color: theme.colors.textPrimary,

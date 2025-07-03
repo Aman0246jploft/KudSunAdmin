@@ -62,10 +62,10 @@ export default function ForgotPassword() {
   return (
     <div
       className="min-h-screen flex items-center justify-center px-4"
-      style={{ backgroundColor: theme.colors.background }}
+      style={{ backgroundColor: "#bdd5fc" }}
     >
       <div
-        className="w-full max-w-md p-8 shadow-xl"
+        className="w-full max-w-md p-8 bg-white shadow-xl"
         style={{
           backgroundColor: theme.colors.card,
           color: theme.colors.textPrimary,
