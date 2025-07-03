@@ -36,8 +36,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     },
 
     {
-      name: "Setting",
-      icon: AiOutlineSetting,
+      name: "Cms Management",
+      icon: AiOutlineShop,
       isParent: true,
       children: [
         {
@@ -46,6 +46,17 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           icon: MdOutlineIndeterminateCheckBox,
         },
         { name: "FAQ", href: "/faq", icon: AiOutlineQuestionCircle },
+
+      ],
+    },
+
+    {
+      name: "Setting",
+      icon: AiOutlineSetting,
+      isParent: true,
+      children: [
+
+
         { name: "ContactUs", href: "/contact_us", icon: AiOutlineQuestionCircle },
         { name: "FeeSetting", href: "/feeSetting", icon: AiOutlineQuestionCircle },
         { name: "Bank", href: "/bank", icon: AiOutlineQuestionCircle },
@@ -273,7 +284,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           backgroundColor: theme.colors.background,
           color: theme.colors.textPrimary,
         }}
-         className={clsx(
+        className={clsx(
           "fixed left-0 top-0 h-full border-r z-40 transition-all duration-300 ease-in-out",
           // Desktop behavior
           "md:translate-x-0",

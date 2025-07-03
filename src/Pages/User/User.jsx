@@ -161,7 +161,7 @@ export default function User() {
         },
         {
           label: "No",
-          onClick: () => {},
+          onClick: () => { },
         },
       ],
     });
@@ -179,7 +179,7 @@ export default function User() {
           size,
         })
       ).unwrap();
-      
+
       // Set the reports data with pagination info
       setReports(res.data?.reports || []);
       setReportsTotal(res.data?.totalCount || 0);
@@ -204,23 +204,23 @@ export default function User() {
 
     try {
       setFlagLoading(true);
-      
+
       const newFlagStatus = !selectedUser?.isFlagedReported;
-      
-      const result = await dispatch(update({ 
-        id: selectedUser._id, 
-        isFlagedReported: newFlagStatus 
+
+      const result = await dispatch(update({
+        id: selectedUser._id,
+        isFlagedReported: newFlagStatus
       }));
-      
+
       if (update.fulfilled.match(result)) {
         // Update selectedUser state to reflect the change
         setSelectedUser(prev => ({
           ...prev,
           isFlagedReported: newFlagStatus
         }));
-        
+
         toast.success(`User ${newFlagStatus ? 'flagged' : 'unflagged'} successfully`);
-        
+
         // Refresh the main user list to reflect changes
         dispatch(fetchUserList({
           ...pagination,
@@ -230,8 +230,8 @@ export default function User() {
           registrationDateEnd,
           sortBy,
           sortOrder,
-          ...(userStatusFilter === "enabled" ? { isDisable: false } : 
-              userStatusFilter === "disabled" ? { isDisable: true } : {})
+          ...(userStatusFilter === "enabled" ? { isDisable: false } :
+            userStatusFilter === "disabled" ? { isDisable: true } : {})
         }));
       } else {
         // Handle API error response
@@ -264,17 +264,17 @@ export default function User() {
     { key: "email", label: "Email" },
     { key: "phoneNumber", label: "Phone" },
     { key: "gender", label: "Gender" },
-    {
-      key: "userAddress",
-      label: "Location",
-      sortable: true,
-      sortKey: "userAddress.city", // backend expects this
-      render: (value) => {
-        if (!value) return "-";
-        const { city, state, country } = value;
-        return [city, state, country].filter(Boolean).join(", ");
-      },
-    },
+    // {
+    //   key: "userAddress",
+    //   label: "Location",
+    //   sortable: true,
+    //   sortKey: "userAddress.city", // backend expects this
+    //   render: (value) => {
+    //     if (!value) return "-";
+    //     const { city, state, country } = value;
+    //     return [city, state, country].filter(Boolean).join(", ");
+    //   },
+    // },
 
     {
       key: "dob",
@@ -627,7 +627,7 @@ export default function User() {
 
         {/* Updated Reports Modal */}
         {reportModalOpen && (
-          <Modal 
+          <Modal
             isOpen={reportModalOpen}
             onClose={() => {
               setReportModalOpen(false);
@@ -652,7 +652,7 @@ export default function User() {
                   disabled={flagLoading}
                   className={`px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed `}
                 >
-                  {flagLoading ? 'Updating...' : selectedUser?.isFlagedReported ? <RiTriangularFlagFill className=" text-red-500" />: <RiTriangularFlagLine />}
+                  {flagLoading ? 'Updating...' : selectedUser?.isFlagedReported ? <RiTriangularFlagFill className=" text-red-500" /> : <RiTriangularFlagLine />}
                 </button>
               </div>
 
@@ -682,15 +682,14 @@ export default function User() {
                               </p>
                             </div>
                           </div>
-                          <span className={`px-2 py-1 rounded text-xs font-medium ${
-                            report.isDisable 
-                              ? 'bg-red-100 text-red-800' 
+                          <span className={`px-2 py-1 rounded text-xs font-medium ${report.isDisable
+                              ? 'bg-red-100 text-red-800'
                               : 'bg-green-100 text-green-800'
-                          }`}>
+                            }`}>
                             {report.isDisable ? 'Disabled' : 'Active'}
                           </span>
                         </div>
-                        
+
                         <div className="space-y-2">
                           <div>
                             <span className="font-medium text-gray-700">Title:</span>

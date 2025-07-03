@@ -18,7 +18,7 @@ export default function Faqs() {
 
   const selector = useSelector((state) => state?.setting);
   const { error, loading, contactUs } = selector || {};
-  const { data, total } = contactUs?contactUs: {};
+  const { data, total } = contactUs ? contactUs : {};
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedFaq, setSelectedFaq] = useState(null);
 
@@ -226,7 +226,7 @@ export default function Faqs() {
             <Pagination
               pageNo={pagination.pageNo}
               size={pagination.size}
-              total={total?total:0}
+              total={total ? total : 0}
               onChange={handlePageChange}
               theme={theme}
             />
@@ -240,19 +240,35 @@ export default function Faqs() {
             <div><strong>Name:</strong> {selectedFaq.name}</div>
             <div><strong>Contact:</strong> {selectedFaq.contact}</div>
             <div><strong>Type:</strong> {selectedFaq.type}</div>
-            <div><strong>Description:</strong> {selectedFaq.desc}</div>
+            <div
+              style={{
+                wordBreak: "break-word",
+                whiteSpace: "normal",
+                maxWidth: "100%",
+                maxHeight: "150px",    // set max height as needed
+                overflowY: "auto",     // enable vertical scrollbar when content overflows
+              }}
+            >
+              <strong>Description:</strong> {selectedFaq.desc}
+            </div>
             <div><strong>Date:</strong> {new Date(selectedFaq.createdAt).toLocaleString()}</div>
             <div>
               <strong>Images:</strong>
               {selectedFaq.image && selectedFaq.image.length > 0 ? (
                 <div className="flex flex-wrap gap-2 mt-2">
                   {selectedFaq.image.map((img, index) => (
-                    <img
+                    <a
                       key={index}
-                      src={img}
-                      alt="contact"
-                      className="w-16 h-16 object-cover rounded border"
-                    />
+                      href={img}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <img
+                        src={img}
+                        alt="contact"
+                        className="w-16 h-16 object-cover rounded border cursor-pointer"
+                      />
+                    </a>
                   ))}
                 </div>
               ) : (
