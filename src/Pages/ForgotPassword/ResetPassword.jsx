@@ -7,13 +7,14 @@ import { useDispatch } from "react-redux";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
 import { resetPassword } from "../../features/slices/userSlice";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import { IoIosArrowBack } from "react-icons/io";
 
 export default function ResetPassword() {
   const { theme } = useTheme();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { state } = useLocation();
-  const phoneNumber = state?.phoneNumber;
+  const email = state?.email;
 
   const [form, setForm] = useState({ newPassword: "", confirmPassword: "" });
   const [errors, setErrors] = useState({ newPassword: "", confirmPassword: "" });
@@ -59,7 +60,7 @@ export default function ResetPassword() {
     if (!isNewPasswordValid || !isConfirmPasswordValid) return;
 
     setLoading(true);
-    dispatch(resetPassword({ phoneNumber, newPassword: form.newPassword, confirmPassword: form.confirmPassword }))
+    dispatch(resetPassword({ email, newPassword: form.newPassword, confirmPassword: form.confirmPassword }))
       .then((result) => {
         if (resetPassword.fulfilled.match(result)) {
           toast.success("Password reset successful");
@@ -91,6 +92,15 @@ export default function ResetPassword() {
           border: `1px solid ${theme.colors.borderLight}`,
         }}
       >
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate(-1)}
+          className="mb-4"
+        >
+          <IoIosArrowBack />
+        </Button>
         <h2 className="text-2xl font-bold mb-6 text-center">Reset Password</h2>
         <form onSubmit={handleReset} className="space-y-4" noValidate>
           <Input

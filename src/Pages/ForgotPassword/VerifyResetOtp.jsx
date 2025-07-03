@@ -6,12 +6,15 @@ import Button from "../../Component/Atoms/Button/Button";
 import { toast } from "react-toastify";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
 import { resendResetOtps, verifyResetOtps } from "../../features/slices/userSlice";
+import { IoIosArrowBack } from "react-icons/io";
 
 export default function VerifyResetOtp() {
   const { theme } = useTheme();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { state } = useLocation();
+
+
   const email = state?.email || "";
 
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -94,6 +97,15 @@ export default function VerifyResetOtp() {
           border: `1px solid ${theme.colors.borderLight}`,
         }}
       >
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate(-1)}
+          className="mb-4"
+        >
+          <IoIosArrowBack />
+        </Button>
         <h2 className="text-2xl font-bold mb-6 text-center">Verify OTP</h2>
         <form onSubmit={handleVerify} className="space-y-6">
           <div className="flex justify-between gap-2">
@@ -116,27 +128,36 @@ export default function VerifyResetOtp() {
               />
             ))}
           </div>
+          <div className="flex  justify-between">
 
-          <Button
-            type="submit"
-            variant="primary"
-            size="lg"
-            fullWidth
-            loading={loading}
-            loaderText="Verifying..."
-          >
-            Verify
-          </Button>
 
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            fullWidth
-            onClick={handleResendOtp}
-          >
-            Resend OTP
-          </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              fullWidth
+              loading={loading}
+              loaderText="Verifying..."
+            >
+              Verify
+            </Button>
+
+            <Button
+
+
+              type="button"
+              variant="primary"
+              // size="lg"
+              fullWidth
+              onClick={handleResendOtp}
+              loaderText="Verifying..."
+
+
+
+            >
+              Resend OTP
+            </Button>
+          </div>
         </form>
       </div>
     </div>

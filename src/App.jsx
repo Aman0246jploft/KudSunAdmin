@@ -1,7 +1,7 @@
 // src/App.jsx
 
 import React, { Suspense, lazy } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import PrivateRoute from "./routes/PrivateRoute";
 import PublicRoute from "./routes/PublicRoute";
 import LayoutWrapper from "./Component/Layout/LayoutWrapper";
@@ -16,9 +16,9 @@ import ForgotPassword from "./Pages/ForgotPassword/ForgotPassword";
 import VerifyResetOtp from "./Pages/ForgotPassword/VerifyResetOtp";
 import ResetPassword from "./Pages/ForgotPassword/ResetPassword";
 import Setting from "./Pages/Setting/Setting";
-import FaqSettings from "./Pages/Setting/FaqSettings";
 import Faqs from "./Pages/Faqs/Faqs";
 import NetworkStatus from "./Component/NetworkStatus";
+import ProfilePage from "./Pages/ProfilePage";
 
 
 
@@ -57,7 +57,7 @@ function App() {
           {/* Private Routes */}
           <Route element={<PrivateRoute />}>
             <Route element={<LayoutWrapper />}>
-              <Route path="/" element={<Home />} />
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/user" element={<User />} />
               <Route path="/sellProduct" element={<SellProduct />} />
@@ -74,6 +74,11 @@ function App() {
               <Route path="/category" element={<Category />} />
               <Route path="/subcategory/:id" element={<SubCategory />} />
               <Route path="/chat" element={<Chat />} />
+
+              <Route path="/ProfilePage" element={<ProfilePage />} />
+
+
+              
 
               <Route
                 path="/subcategoryParameter/:id"

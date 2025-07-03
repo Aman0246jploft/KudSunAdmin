@@ -12,13 +12,22 @@ import { useTheme } from "../../contexts/theme/hook/useTheme";
 import Image from "../Atoms/Image/Image";
 import { useNavigate } from "react-router-dom";
 
+import { getLoginProfile } from "../../features/slices/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+
 const Header = ({ toggleSidebar }) => {
+  const dispatch = useDispatch()
   const { currentTheme, changeTheme, theme } = useTheme();
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showThemeDropdown, setShowThemeDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const profileDropdownRef = useRef(null);
+  const selector = useSelector(state=>state?.user?.getLoginProfiledata)
+  useEffect(()=>{
+    dispatch(getLoginProfile())
+  },[localStorage.getItem("kadSunInfo")])
+
   let userInfo = JSON.parse(localStorage.getItem("kadSunInfo"));
 
   const navigate = useNavigate();
@@ -105,7 +114,7 @@ const Header = ({ toggleSidebar }) => {
       icon: AiOutlineProfile,
       label: "View Profile",
       onClick: () => {
-        console.log("View Profile clicked");
+        navigate('/profilePage')
         setShowProfileDropdown(false);
       },
     },
@@ -295,7 +304,7 @@ const Header = ({ toggleSidebar }) => {
               }}
             >
               <Image
-                src="/api/placeholder/32/32"
+                src={selector?.profileImage}
                 alt="Profile"
                 width={32}
                 height={32}
@@ -303,12 +312,11 @@ const Header = ({ toggleSidebar }) => {
                 className="w-8 h-8"
               />
               <span className="hidden md:block font-medium">
-                {userInfo?.userName}
+                {selector?.userName}
               </span>
               <AiOutlineDown
-                className={`w-4 h-4 transition-transform duration-200 ${
-                  showProfileDropdown ? "rotate-180" : ""
-                }`}
+                className={`w-4 h-4 transition-transform duration-200 ${showProfileDropdown ? "rotate-180" : ""
+                  }`}
               />
             </button>
 
@@ -329,7 +337,7 @@ const Header = ({ toggleSidebar }) => {
                 >
                   <div className="flex items-center space-x-3">
                     <Image
-                      src="/api/placeholder/40/40"
+                      src={selector?.profileImage}
                       alt="Profile"
                       width={40}
                       height={40}
@@ -341,7 +349,7 @@ const Header = ({ toggleSidebar }) => {
                         className="font-medium"
                         style={{ color: theme.colors.textPrimary }}
                       >
-                        {userInfo?.userName}
+                        {selector?.userName}
                       </p>
                       <p
                         className="text-sm"
@@ -352,9 +360,9 @@ const Header = ({ toggleSidebar }) => {
                           overflow: "hidden",
                           textOverflow: "ellipsis",
                         }}
-                        title={userInfo?.email} // show full email on hover
+                        title={selector?.email} // show full email on hover
                       >
-                        {userInfo?.email}
+                        {selector?.email}
                       </p>
                     </div>
                   </div>

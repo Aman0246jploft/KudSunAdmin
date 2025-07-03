@@ -84,7 +84,7 @@ export const verifyResetOtps = createAsyncThunk(
     'user/verifyResetOtps',
     async (data, thunkAPI) => {
         try {
-            const res = await axiosClient.post('/user/verifyResetOtp', data);
+            const res = await axiosClient.post('/user/verifyResetOtpByEmail', data);
             return res.data;
         } catch (err) {
             console.error(`verifyResetOtp error [${err.responseCode || 500}]: ${err.message}`);
@@ -101,7 +101,7 @@ export const resendResetOtps = createAsyncThunk(
     'user/resendResetOtps',
     async (data, thunkAPI) => {
         try {
-            const res = await axiosClient.post('/user/resendResetOtp', data);
+            const res = await axiosClient.post('/user/resendResetOtpByEmail', data);
             return res.data;
         } catch (err) {
             let message = capitalizeFirstLetter(err.message)
@@ -117,7 +117,7 @@ export const resetPassword = createAsyncThunk(
     'user/resetPassword',
     async (data, thunkAPI) => {
         try {
-            const res = await axiosClient.post('/user/resetPassword', data);
+            const res = await axiosClient.post('/user/resetPasswordByEmail', data);
             return res.data;
         } catch (err) {
             let message = capitalizeFirstLetter(err.message)
@@ -150,6 +150,27 @@ export const userList = createAsyncThunk(
         }
     }
 );
+
+
+
+export const getLoginProfile = createAsyncThunk(
+    'user/getLoginProfile',
+    async (queryParams = {}, thunkAPI) => {
+        try {
+            const res = await authAxiosClient.get('/user/getProfile', { params: queryParams });
+            return res?.data?.data;
+        } catch (err) {
+            let message = capitalizeFirstLetter(err.message)
+            toast.error(message)
+            return thunkAPI.rejectWithValue({
+                message: err.message,
+                code: err.responseCode || 500,
+            });
+        }
+    }
+);
+
+
 
 
 
@@ -315,7 +336,18 @@ const userSlice = createSlice({
                 state.error = action.payload;
             })
 
-
+            .addCase(getLoginProfile.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getLoginProfile.fulfilled, (state, action) => {
+                state.loading = false;
+                state.getLoginProfiledata = action.payload;
+            })
+            .addCase(getLoginProfile.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
 
 
     },

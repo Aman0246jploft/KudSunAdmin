@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
 import { useDispatch } from "react-redux";
 import { requestResetOtp } from "../../features/slices/userSlice";
-
+import { IoIosArrowBack } from "react-icons/io";
 export default function ForgotPassword() {
   const { theme } = useTheme();
   const navigate = useNavigate();
@@ -73,6 +73,15 @@ export default function ForgotPassword() {
           border: `1px solid ${theme.colors.borderLight}`,
         }}
       >
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate(-1)}
+          className="mb-4"
+        >
+          <IoIosArrowBack/>
+        </Button>
         <h2 className="text-2xl font-bold mb-6 text-center">Forgot Password</h2>
         <form onSubmit={handleRequestOtp} className="space-y-4">
           <Input
