@@ -1,7 +1,6 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import Input from "../../Component/Atoms/InputFields/Inputfield";
 import Button from "../../Component/Atoms/Button/Button";
 import { toast } from "react-toastify";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
@@ -13,20 +12,19 @@ export default function VerifyResetOtp() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { state } = useLocation();
-
-
   const email = state?.email || "";
 
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
   const inputRefs = useRef([]);
 
+  // Handle OTP input
   const handleChange = (index, value) => {
     if (!/^\d?$/.test(value)) return;
     const updatedOtp = [...otp];
     updatedOtp[index] = value;
     setOtp(updatedOtp);
-
     if (value && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
@@ -38,10 +36,10 @@ export default function VerifyResetOtp() {
     }
   };
 
+  // OTP verification
   const handleVerify = (e) => {
     e.preventDefault();
     const fullOtp = otp.join("");
-
     if (fullOtp.length !== 6) {
       return toast.error("Please enter a valid 6-digit OTP");
     }
@@ -53,35 +51,38 @@ export default function VerifyResetOtp() {
           toast.success("OTP verified");
           navigate("/reset-password", { state: { email } });
         } else {
-          const message = result.payload?.message || "Verification failed";
-          toast.error(message);
+          toast.error(result.payload?.message || "Verification failed");
         }
       })
-      .catch((err) => {
-        console.error("Unexpected error:", err);
-        toast.error("Unexpected error occurred");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+      .catch(() => toast.error("Unexpected error occurred"))
+      .finally(() => setLoading(false));
   };
 
+  // Resend OTP with timer
   const handleResendOtp = () => {
+    if (resendTimer > 0) return;
     dispatch(resendResetOtps({ email }))
       .then((result) => {
         if (resendResetOtps.fulfilled.match(result)) {
           toast.success("OTP resent successfully");
           setOtp(["", "", "", "", "", ""]);
           inputRefs.current[0]?.focus();
+          setResendTimer(30); // Start 30s timer
         } else {
           toast.error(result.payload?.message || "Failed to resend OTP");
         }
       })
-      .catch((err) => {
-        console.error("Resend OTP error:", err);
-        toast.error("Unexpected error occurred");
-      });
+      .catch(() => toast.error("Unexpected error occurred"));
   };
+
+  // Countdown effect
+  useEffect(() => {
+    if (resendTimer === 0) return;
+    const interval = setInterval(() => {
+      setResendTimer((prev) => prev - 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [resendTimer]);
 
   return (
     <div
@@ -89,11 +90,10 @@ export default function VerifyResetOtp() {
       style={{ backgroundColor: theme.colors.background }}
     >
       <div
-        className="w-full max-w-md p-8 shadow-xl"
+        className="w-full max-w-md p-6 md:p-8 rounded-xl shadow-2xl"
         style={{
           backgroundColor: theme.colors.card,
           color: theme.colors.textPrimary,
-          borderRadius: theme.borderRadius.lg,
           border: `1px solid ${theme.colors.borderLight}`,
         }}
       >
@@ -104,9 +104,11 @@ export default function VerifyResetOtp() {
           onClick={() => navigate(-1)}
           className="mb-4"
         >
-          <IoIosArrowBack />
+          <IoIosArrowBack className="text-lg" />
         </Button>
-        <h2 className="text-2xl font-bold mb-6 text-center">Verify OTP</h2>
+
+        <h2 className="text-2xl font-bold text-center mb-6">Verify OTP</h2>
+
         <form onSubmit={handleVerify} className="space-y-6">
           <div className="flex justify-between gap-2">
             {otp.map((digit, idx) => (
@@ -116,26 +118,26 @@ export default function VerifyResetOtp() {
                 type="text"
                 inputMode="numeric"
                 maxLength="1"
+                aria-label={`OTP digit ${idx + 1}`}
                 value={digit}
                 onChange={(e) => handleChange(idx, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(idx, e)}
-                className="w-12 h-12 text-xl text-center border rounded-md focus:outline-none"
+                className="w-12 h-12 md:w-14 md:h-14 text-xl text-center border rounded-lg focus:outline-none focus:ring-2 transition-all"
                 style={{
                   backgroundColor: theme.colors.input,
                   color: theme.colors.textPrimary,
                   borderColor: theme.colors.borderLight,
+                  boxShadow: `0 1px 2px ${theme.colors.borderLight}`,
                 }}
               />
             ))}
           </div>
-          <div className="flex  justify-between">
 
-
+          <div className="flex flex-col md:flex-row gap-3">
             <Button
               type="submit"
               variant="primary"
-              size="lg"
-              fullWidth
+              className="w-full h-12 text-base"
               loading={loading}
               loaderText="Verifying..."
             >
@@ -143,19 +145,13 @@ export default function VerifyResetOtp() {
             </Button>
 
             <Button
-
-
               type="button"
-              variant="primary"
-              // size="lg"
-              fullWidth
+              variant="outline"
+              className="w-full h-12 text-base"
               onClick={handleResendOtp}
-              loaderText="Verifying..."
-
-
-
+              disabled={resendTimer > 0}
             >
-              Resend OTP
+              {resendTimer > 0 ? `Resend in ${resendTimer}s` : "Resend"}
             </Button>
           </div>
         </form>

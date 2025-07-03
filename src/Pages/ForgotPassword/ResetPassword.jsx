@@ -110,6 +110,7 @@ export default function ResetPassword() {
             value={form.newPassword}
             onChange={handleChange}
             fullWidth
+            placeholder='New Password'
             error={errors.newPassword}
             endAdornment={
               <button
@@ -130,6 +131,8 @@ export default function ResetPassword() {
             value={form.confirmPassword}
             onChange={handleChange}
             fullWidth
+            placeholder='Confirm Password'
+
             error={errors.confirmPassword}
             endAdornment={
               <button

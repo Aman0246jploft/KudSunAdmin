@@ -120,7 +120,7 @@ const Header = ({ toggleSidebar }) => {
     },
     {
       icon: AiOutlineLogout,
-      label: "Sign Out",
+      label: "Log Out",
       onClick: () => {
         localStorage.removeItem("kadSunInfo");
         navigate("/login");
@@ -351,11 +351,11 @@ const Header = ({ toggleSidebar }) => {
                       >
                         {selector?.userName}
                       </p>
-                      <p
+                      {/* <p
                         className="text-sm"
                         style={{
                           color: theme.colors.textSecondary,
-                          maxWidth: "160px", // limit max width as per your dropdown size
+                          maxWidth: "140px", // limit max width as per your dropdown size
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
@@ -363,7 +363,7 @@ const Header = ({ toggleSidebar }) => {
                         title={selector?.email} // show full email on hover
                       >
                         {selector?.email}
-                      </p>
+                      </p> */}
                     </div>
                   </div>
                 </div>

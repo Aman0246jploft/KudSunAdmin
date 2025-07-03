@@ -1,12 +1,22 @@
 import React, { useState } from "react";
 import Button from "../../Component/Atoms/Button/Button";
 import Input from "../../Component/Atoms/InputFields/Inputfield";
-import Image from "../../Component/Atoms/Image/Image";
 import { useDispatch, useSelector } from "react-redux";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
 import { login } from "../../features/slices/userSlice";
 import { toast } from "react-toastify";
-import { Navigate, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+
+
+// You can use an icon library or SVG for the eye icon. Here's a simple inline SVG example:
+const EyeIcon = ({ open }) => (
+  open ? (
+    <AiOutlineEye />
+  ) : (
+    <AiOutlineEyeInvisible />
+  )
+);
 
 export default function Login() {
   const navigate = useNavigate();
@@ -14,11 +24,17 @@ export default function Login() {
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false); // <-- new state for toggling password
   const dispatch = useDispatch();
   const selector = useSelector((state) => state.user);
+
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     setErrors((prev) => ({ ...prev, [e.target.name]: "" }));
+  };
+
+  const togglePassword = () => {
+    setShowPassword((prev) => !prev);
   };
 
   const handleSubmit = async (e) => {
@@ -50,7 +66,6 @@ export default function Login() {
   };
 
   let { loading, error } = selector ? selector : {};
-  console.log("error", error);
 
   return (
     <div
@@ -80,16 +95,28 @@ export default function Login() {
             fullWidth
           />
 
-          <Input
-            label="Password"
-            type="password"
-            name="password"
-            value={form.password}
-            onChange={handleChange}
-            placeholder="Enter your password"
-            error={errors.password}
-            fullWidth
-          />
+          {/* Password input with eye icon */}
+          <div className="relative w-full">
+            <Input
+              label="Password"
+              type={showPassword ? "text" : "password"}
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              placeholder="Enter your password"
+              error={errors.password}
+              fullWidth
+            />
+            <div
+              className="absolute top-[38px] right-3 text-xl text-black-500"
+              onClick={togglePassword}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === "Enter" && togglePassword()}
+            >
+              <EyeIcon open={showPassword} />
+            </div>
+          </div>
 
           <Button
             type="submit"

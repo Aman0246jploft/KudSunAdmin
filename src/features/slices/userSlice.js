@@ -161,7 +161,7 @@ export const getLoginProfile = createAsyncThunk(
             return res?.data?.data;
         } catch (err) {
             let message = capitalizeFirstLetter(err.message)
-            toast.error(message)
+            // toast.error(message)
             return thunkAPI.rejectWithValue({
                 message: err.message,
                 code: err.responseCode || 500,
