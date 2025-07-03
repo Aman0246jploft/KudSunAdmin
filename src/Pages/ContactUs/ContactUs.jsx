@@ -96,29 +96,49 @@ export default function Faqs() {
       render: (_, row) => row.desc || "N/A",
     },
     {
-      key: "image",
-      label: "Image(s)",
+      key: "media",
+      label: "Media",
       disableTooltip: true,
       width: "20%",
       render: (_, row) =>
         row.image && row.image.length > 0 ? (
           <div className="flex flex-wrap gap-1">
-            {row.image.slice(0, 2).map((url, index) => (
-              <img
-                key={index}
-                src={url}
-                alt="contact"
-                className="w-10 h-10 object-cover rounded"
-              />
-            ))}
+            {row.image.slice(0, 2).map((url, index) => {
+              const isVideo = url.match(/\.(mp4|webm|ogg)$/i);
+              return (
+                <a
+                  key={index}
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 block"
+                >
+                  {isVideo ? (
+                    <video
+                      src={url}
+                      className="w-10 h-10 object-cover rounded border"
+                      muted
+                      playsInline
+                    />
+                  ) : (
+                    <img
+                      src={url}
+                      alt="media"
+                      className="w-10 h-10 object-cover rounded border"
+                    />
+                  )}
+                </a>
+              );
+            })}
             {row.image.length > 2 && (
               <span className="text-xs text-gray-500">+{row.image.length - 2} more</span>
             )}
           </div>
         ) : (
-          "No Images"
+          "No Media"
         ),
-    },
+    }
+    ,
     {
       key: "view",
       label: "View",
@@ -253,28 +273,43 @@ export default function Faqs() {
             </div>
             <div><strong>Date:</strong> {new Date(selectedFaq.createdAt).toLocaleString()}</div>
             <div>
-              <strong>Images:</strong>
+              <strong>Media:</strong>
               {selectedFaq.image && selectedFaq.image.length > 0 ? (
                 <div className="flex flex-wrap gap-2 mt-2">
-                  {selectedFaq.image.map((img, index) => (
-                    <a
-                      key={index}
-                      href={img}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <img
-                        src={img}
-                        alt="contact"
-                        className="w-16 h-16 object-cover rounded border cursor-pointer"
-                      />
-                    </a>
-                  ))}
+                  {selectedFaq.image.map((url, index) => {
+                    const isVideo = url.match(/\.(mp4|webm|ogg)$/i);
+                    return (
+                      <a
+                        key={index}
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-16 h-16 block"
+                      >
+                        {isVideo ? (
+                          <video
+                            src={url}
+                            className="w-16 h-16 object-cover rounded border"
+                            muted
+                            playsInline
+                          />
+                        ) : (
+                          <img
+                            src={url}
+                            alt="media"
+                            className="w-16 h-16 object-cover rounded border"
+                          />
+                        )}
+                      </a>
+                    );
+                  })}
                 </div>
               ) : (
-                <div>No images</div>
+                <div>No media</div>
               )}
             </div>
+
+
           </div>
         )}
       </Modal>
