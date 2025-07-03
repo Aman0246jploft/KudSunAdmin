@@ -61,13 +61,13 @@ export const login = createAsyncThunk(
 
 
 export const requestResetOtp = createAsyncThunk(
-    'user/requestResetOtp',
+    'user/requestResetOtpByEmail',
     async (data, thunkAPI) => {
         try {
-            const res = await axiosClient.post('/user/requestResetOtp', data);
+            const res = await axiosClient.post('/user/requestResetOtpByEmail', data);
             return res.data;
         } catch (err) {
-            console.error(`requestResetOtp error [${err.responseCode || 500}]: ${err.message}`);
+            console.error(`requestResetOtpByEmail error [${err.responseCode || 500}]: ${err.message}`);
             let message = capitalizeFirstLetter(err.message)
             toast.error(message)
             return thunkAPI.rejectWithValue({

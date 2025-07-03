@@ -7,13 +7,12 @@ import { toast } from "react-toastify";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
 import { resendResetOtps, verifyResetOtps } from "../../features/slices/userSlice";
 
-
 export default function VerifyResetOtp() {
   const { theme } = useTheme();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { state } = useLocation();
-  const phoneNumber = state?.phoneNumber || "";
+  const email = state?.email || "";
 
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
@@ -45,11 +44,11 @@ export default function VerifyResetOtp() {
     }
 
     setLoading(true);
-    dispatch(verifyResetOtps({ phoneNumber, otp: fullOtp }))
+    dispatch(verifyResetOtps({ email, otp: fullOtp }))
       .then((result) => {
         if (verifyResetOtps.fulfilled.match(result)) {
           toast.success("OTP verified");
-          navigate("/reset-password", { state: { phoneNumber } });
+          navigate("/reset-password", { state: { email } });
         } else {
           const message = result.payload?.message || "Verification failed";
           toast.error(message);
@@ -57,6 +56,7 @@ export default function VerifyResetOtp() {
       })
       .catch((err) => {
         console.error("Unexpected error:", err);
+        toast.error("Unexpected error occurred");
       })
       .finally(() => {
         setLoading(false);
@@ -64,7 +64,7 @@ export default function VerifyResetOtp() {
   };
 
   const handleResendOtp = () => {
-    dispatch(resendResetOtps({ phoneNumber }))
+    dispatch(resendResetOtps({ email }))
       .then((result) => {
         if (resendResetOtps.fulfilled.match(result)) {
           toast.success("OTP resent successfully");
