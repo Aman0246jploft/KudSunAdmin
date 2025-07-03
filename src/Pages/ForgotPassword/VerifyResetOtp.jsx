@@ -87,10 +87,11 @@ export default function VerifyResetOtp() {
   return (
     <div
       className="min-h-screen flex items-center justify-center px-4"
-      style={{ backgroundColor: theme.colors.background }}
+         style={{ backgroundColor: "#bdd5fc" }}
+
     >
       <div
-        className="w-full max-w-md p-6 md:p-8 rounded-xl shadow-2xl"
+        className="w-full bg-white max-w-md p-6 md:p-8 rounded-xl shadow-2xl"
         style={{
           backgroundColor: theme.colors.card,
           color: theme.colors.textPrimary,
