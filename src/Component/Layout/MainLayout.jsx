@@ -4,7 +4,7 @@ import Header from "../Header/Header";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
 
 const MainLayout = ({ children }) => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Start with closed on mobile
   const [isMobile, setIsMobile] = useState(false);
   const { theme } = useTheme();
 
@@ -14,13 +14,11 @@ const MainLayout = ({ children }) => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
       
-      // Auto-close sidebar on mobile by default
-      if (mobile && isSidebarOpen) {
-        setIsSidebarOpen(false);
-      }
-      // Auto-open sidebar on desktop if it was closed due to mobile
-      else if (!mobile && !isSidebarOpen) {
-        setIsSidebarOpen(true);
+      // Set initial sidebar state based on screen size
+      if (mobile) {
+        setIsSidebarOpen(false); // Always closed on mobile initially
+      } else {
+        setIsSidebarOpen(true); // Always open on desktop initially
       }
     };
 
@@ -28,7 +26,7 @@ const MainLayout = ({ children }) => {
     window.addEventListener('resize', checkMobile);
     
     return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+  }, []); // Remove isSidebarOpen from dependency array to prevent loops
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -36,30 +34,34 @@ const MainLayout = ({ children }) => {
 
   return (
     <div
-      className="flex h-screen"
+      className="flex h-screen overflow-hidden"
       style={{ backgroundColor: theme.colors.background }}
     >
       {/* Sidebar */} 
-      <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+      <Sidebar 
+        isOpen={isSidebarOpen} 
+        toggleSidebar={toggleSidebar} 
+        isMobile={isMobile}
+      />
 
       {/* Main Content Area */}
       <div
         className={`flex-1 flex flex-col transition-all duration-300 ${
-          // On desktop: apply margin based on sidebar state
           // On mobile: no margin (sidebar overlays)
+          // On desktop: apply margin based on sidebar state
           isMobile 
-            ? "" 
+            ? "ml-0" 
             : isSidebarOpen 
               ? "ml-64" 
               : "ml-16"
         }`}
       >
         {/* Header */}
-        <Header toggleSidebar={toggleSidebar} />
+        <Header toggleSidebar={toggleSidebar} isMobile={isMobile} />
 
         {/* Page Content */}
         <main
-          className="flex-1 p-6 overflow-y-auto"
+          className="flex-1 p-4 md:p-6 overflow-y-auto"
           style={{
             backgroundColor: theme.colors.background,
             color: theme.colors.textPrimary,

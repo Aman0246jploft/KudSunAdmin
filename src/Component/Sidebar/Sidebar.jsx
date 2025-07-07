@@ -18,7 +18,7 @@ import { useTheme } from "../../contexts/theme/hook/useTheme";
 import clsx from "clsx";
 import logo from './logo.png'
 
-const Sidebar = ({ isOpen, toggleSidebar }) => {
+const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
   const { theme } = useTheme();
   const location = useLocation();
   const [expandedItems, setExpandedItems] = useState({});
@@ -78,6 +78,13 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     return children.some((child) => location.pathname === child.href);
   };
 
+  const handleLinkClick = () => {
+    // Close sidebar on mobile when a link is clicked
+    if (isMobile) {
+      toggleSidebar();
+    }
+  };
+
   const renderMenuItem = (item) => {
     const Icon = item.icon;
     const isActive = location.pathname === item.href;
@@ -91,7 +98,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           <div
             className={clsx(
               "group flex items-center px-3 py-3 rounded-xl transition-all duration-200 cursor-pointer relative",
-              !isOpen && "md:justify-center md:px-2"
+              !isOpen && !isMobile && "md:justify-center md:px-2"
             )}
             style={{
               backgroundColor: hasActiveChild
@@ -108,11 +115,11 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               if (!hasActiveChild) e.currentTarget.style.backgroundColor = "";
             }}
             onClick={() => {
-              if (isOpen || window.innerWidth < 768) {
+              if (isOpen || isMobile) {
                 toggleExpanded(item.name);
               }
             }}
-            title={!isOpen ? item.name : ""}
+            title={!isOpen && !isMobile ? item.name : ""}
           >
             <Icon className="w-6 h-6 flex-shrink-0" />
 
@@ -120,7 +127,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             <span
               className={clsx(
                 "ml-3 font-medium text-sm overflow-hidden whitespace-nowrap flex-1",
-                !isOpen && "md:hidden"
+                !isOpen && !isMobile && "md:hidden"
               )}
             >
               {item.name}
@@ -130,7 +137,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             <div
               className={clsx(
                 "ml-2 transition-transform duration-200",
-                !isOpen && "md:hidden",
+                !isOpen && !isMobile && "md:hidden",
                 isExpanded && "rotate-180"
               )}
             >
@@ -138,7 +145,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             </div>
 
             {/* Tooltip for collapsed state - only on desktop */}
-            {!isOpen && (
+            {!isOpen && !isMobile && (
               <div
                 className="absolute left-16 bg-gray-900 text-white px-2 py-1 rounded text-sm 
                   opacity-0 group-hover:opacity-100 transition-opacity duration-200 
@@ -156,7 +163,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           <div
             className={clsx(
               "overflow-hidden transition-all duration-300 ease-in-out",
-              !isOpen && "md:hidden", // Hide sub-items when sidebar is collapsed on desktop
+              !isOpen && !isMobile && "md:hidden", // Hide sub-items when sidebar is collapsed on desktop
               isExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
             )}
           >
@@ -187,12 +194,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                         if (!isChildActiveItem)
                           e.currentTarget.style.backgroundColor = "";
                       }}
-                      onClick={() => {
-                        // Close sidebar on mobile when a link is clicked
-                        if (window.innerWidth < 768) {
-                          toggleSidebar();
-                        }
-                      }}
+                      onClick={handleLinkClick}
                     >
                       <ChildIcon className="w-5 h-5 flex-shrink-0 opacity-70" />
                       <span className="ml-3 font-medium text-sm">
@@ -221,7 +223,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           to={item.href}
           className={clsx(
             "group flex items-center px-3 py-3 rounded-xl transition-all duration-200 relative",
-            !isOpen && "md:justify-center md:px-2"
+            !isOpen && !isMobile && "md:justify-center md:px-2"
           )}
           style={{
             backgroundColor: isActive ? theme.colors.sidebarActive : undefined,
@@ -234,27 +236,22 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           onMouseLeave={(e) => {
             if (!isActive) e.currentTarget.style.backgroundColor = "";
           }}
-          title={!isOpen ? item.name : ""}
-          onClick={() => {
-            // Close sidebar on mobile when a link is clicked
-            if (window.innerWidth < 768) {
-              toggleSidebar();
-            }
-          }}
+          title={!isOpen && !isMobile ? item.name : ""}
+          onClick={handleLinkClick}
         >
           <Icon className="w-6 h-6 flex-shrink-0" />
           {/* Always show text on mobile, conditionally on desktop */}
           <span
             className={clsx(
               "ml-3 font-medium text-sm overflow-hidden whitespace-nowrap",
-              !isOpen && "md:hidden"
+              !isOpen && !isMobile && "md:hidden"
             )}
           >
             {item.name}
           </span>
 
           {/* Tooltip for collapsed state - only on desktop */}
-          {!isOpen && (
+          {!isOpen && !isMobile && (
             <div
               className="absolute left-16 bg-gray-900 text-white px-2 py-1 rounded text-sm 
                 opacity-0 group-hover:opacity-100 transition-opacity duration-200 
@@ -271,9 +268,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   return (
     <>
       {/* Mobile Overlay */}
-      {isOpen && (
+      {isMobile && isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-30"
           onClick={toggleSidebar}
         />
       )}
@@ -285,15 +282,18 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         }}
         className={clsx(
           "fixed left-0 top-0 h-full border-r z-40 transition-all duration-300 ease-in-out",
-          // Desktop behavior
-          "md:translate-x-0",
-          isOpen ? "md:w-64" : "md:w-16",
-          // Mobile behavior - REMOVED THE CONFLICTING w-64 md:w-auto
-          isOpen ? "w-64" : "w-16", // Use consistent width classes
-          isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+          // Mobile behavior
+          isMobile ? [
+            "w-64",
+            isOpen ? "translate-x-0" : "-translate-x-full"
+          ] : [
+            // Desktop behavior
+            "translate-x-0",
+            isOpen ? "w-64" : "w-16"
+          ]
         )}
       >
-        {/* Toggle Button */}
+        {/* Toggle Button - Show on desktop, hide on mobile when closed */}
         <button
           onClick={toggleSidebar}
           style={{
@@ -302,10 +302,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           }}
           className={clsx(
             "absolute -right-3 top-8 border-2 rounded-full p-1.5 transition-all duration-200 hover:scale-110",
-            !isOpen && "md:rotate-180",
-            // Hide toggle button on mobile when sidebar is closed
-            "hidden md:block",
-            isOpen && "md:block"
+            isMobile ? "hidden" : "block", // Hide on mobile, show on desktop
+            !isOpen && !isMobile && "rotate-180"
           )}
         >
           {isOpen ? (
@@ -325,20 +323,20 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         <div
           className={clsx(
             "flex items-center p-4 border-b transition-all duration-300",
-            !isOpen && "md:justify-center md:px-2"
+            !isOpen && !isMobile && "md:justify-center md:px-2"
           )}
           style={{
             borderColor: theme.colors.border,
           }}
         >
-          <div className="w-10 h-10 bg-gradient-to-br  rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg">
-            <img src={logo} />
+          <div className="w-10 h-10 bg-gradient-to-br rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg">
+            <img src={logo} className="w-8 h-8 object-contain" alt="Logo" />
           </div>
           {/* Always show text on mobile, conditionally on desktop */}
           <div
             className={clsx(
               "ml-3 overflow-hidden transition-all duration-300",
-              !isOpen && "md:hidden md:w-0"
+              !isOpen && !isMobile && "md:hidden md:w-0"
             )}
           >
             <h1

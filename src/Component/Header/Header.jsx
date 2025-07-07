@@ -15,13 +15,12 @@ import { useNavigate } from "react-router-dom";
 import { getLoginProfile } from "../../features/slices/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-const Header = ({ toggleSidebar }) => {
+const Header = ({ toggleSidebar, isMobile }) => {
   const dispatch = useDispatch()
   const { currentTheme, changeTheme, theme } = useTheme();
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showThemeDropdown, setShowThemeDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const profileDropdownRef = useRef(null);
   const selector = useSelector(state=>state?.user?.getLoginProfiledata)
   useEffect(()=>{
@@ -33,18 +32,6 @@ const Header = ({ toggleSidebar }) => {
   const navigate = useNavigate();
 
   const themeDropdownRef = useRef(null);
-
-  // Check if screen is mobile
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
 
   // Theme options with their display info
   const themeOptions = [
