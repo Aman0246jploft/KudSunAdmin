@@ -243,7 +243,7 @@ const ProductInfo = () => {
                       <div className="flex items-center text-green-100 mb-1">
                         <Truck className="w-4 h-4 mr-1" />
                         <span className="text-sm">
-                          {productData?.deliveryType === 'free_shipping' ? 'Free Shipping' : 'Paid Shipping'}
+                          {productData?.deliveryType === 'free shipping' ? 'Free Shipping' : 'Paid Shipping'}
                         </span>
                       </div>
                     </div>
@@ -312,7 +312,7 @@ const ProductInfo = () => {
                 <div>
                   <p className="text-gray-500">Shipping</p>
                   <p className="font-semibold">
-                    {productData?.deliveryType === 'free_shipping' ? 'Free' : `฿${productData?.shippingCharge || 0}`}
+                    {productData?.deliveryType === 'free shipping' ? 'Free' : `฿${productData?.shippingCharge || 0}`}
                   </p>
                 </div>
               </div>

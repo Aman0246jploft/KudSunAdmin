@@ -49,7 +49,7 @@ const AddProductForm = () => {
       endDate: "",
       endTime: "",
     },
-    shippingOption: "local_pickup",
+    shippingOption: "local pickup",
     shippingCharge: "",
   });
 
@@ -190,7 +190,7 @@ const AddProductForm = () => {
     }
 
     if (
-      formData.shippingOption === "charge_shipping" &&
+      formData.shippingOption === "charge shipping" &&
       !formData.shippingCharge
     ) {
       newErrors.shippingCharge = "Shipping charge is required";
@@ -212,7 +212,7 @@ const AddProductForm = () => {
       saleType: "auction",
       deliveryType: formData.shippingOption,
       shippingCharge:
-        formData.shippingOption === "charge_shipping"
+        formData.shippingOption === "charge shipping"
           ? formData.shippingCharge?.toString() || "0"
           : "0",
       isDraft: formData.isDraft ? "true" : "false",
@@ -744,8 +744,8 @@ const AddProductForm = () => {
                   <input
                     type="radio"
                     name="shippingOption"
-                    value="local_pickup"
-                    checked={formData.shippingOption === "local_pickup"}
+                    value="local pickup"
+                    checked={formData.shippingOption === "local pickup"}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
@@ -770,8 +770,8 @@ const AddProductForm = () => {
                   <input
                     type="radio"
                     name="shippingOption"
-                    value="free_shipping"
-                    checked={formData.shippingOption === "free_shipping"}
+                    value="free shipping"
+                    checked={formData.shippingOption === "free shipping"}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
@@ -795,8 +795,8 @@ const AddProductForm = () => {
                   <input
                     type="radio"
                     name="shippingOption"
-                    value="charge_shipping"
-                    checked={formData.shippingOption === "charge_shipping"}
+                    value="charge shipping"
+                    checked={formData.shippingOption === "charge shipping"}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
@@ -810,7 +810,7 @@ const AddProductForm = () => {
                       Charged Shipping
                     </div>
                     <p className="text-sm text-gray-600">Buyer pays shipping</p>
-                    {formData.shippingOption === "charge_shipping" && (
+                    {formData.shippingOption === "charge shipping" && (
                       <input
                         type="number"
                         placeholder="Shipping charge"

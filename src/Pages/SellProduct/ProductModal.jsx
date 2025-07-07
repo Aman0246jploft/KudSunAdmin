@@ -17,7 +17,7 @@ export default function ProductModal({ onClose, onSubmit }) {
     showOriginalPrice: false,
     originalPrice: '',
     condition: '',
-    deliveryType: 'free_shipping',
+    deliveryType: 'free shipping',
     shippingCharge: '',
     localPickup: false
   });
@@ -40,7 +40,7 @@ export default function ProductModal({ onClose, onSubmit }) {
       errs.originalPrice = 'Original price is required';
     }
     if (!form.condition) errs.condition = 'Condition is required';
-    if (form.deliveryType === 'charge_shipping' && (!form.shippingCharge || isNaN(form.shippingCharge))) {
+    if (form.deliveryType === 'charge shipping' && (!form.shippingCharge || isNaN(form.shippingCharge))) {
       errs.shippingCharge = 'Shipping charge required';
     }
     return errs;
@@ -57,7 +57,7 @@ export default function ProductModal({ onClose, onSubmit }) {
         saleType: 'fixed',
         fixedPrice: parseFloat(form.fixedPrice),
         originalPrice: form.showOriginalPrice ? parseFloat(form.originalPrice) : null,
-        shippingCharge: form.deliveryType === 'charge_shipping' ? parseFloat(form.shippingCharge) : 0,
+        shippingCharge: form.deliveryType === 'charge shipping' ? parseFloat(form.shippingCharge) : 0,
       };
       onSubmit(data);
     }
@@ -177,8 +177,8 @@ export default function ProductModal({ onClose, onSubmit }) {
                 <input
                   type="radio"
                   name="deliveryType"
-                  value="free_shipping"
-                  checked={form.deliveryType === 'free_shipping'}
+                  value="free shipping"
+                  checked={form.deliveryType === 'free shipping'}
                   onChange={handleChange}
                 />
                 Free Shipping
@@ -187,13 +187,13 @@ export default function ProductModal({ onClose, onSubmit }) {
                 <input
                   type="radio"
                   name="deliveryType"
-                  value="charge_shipping"
-                  checked={form.deliveryType === 'charge_shipping'}
+                  value="charge shipping"
+                  checked={form.deliveryType === 'charge shipping'}
                   onChange={handleChange}
                 />
                 Charge Shipping
               </label>
-              {form.deliveryType === 'charge_shipping' && (
+              {form.deliveryType === 'charge shipping' && (
                 <input
                   type="number"
                   name="shippingCharge"

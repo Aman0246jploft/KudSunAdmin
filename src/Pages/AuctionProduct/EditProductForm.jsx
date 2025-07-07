@@ -49,7 +49,7 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
       endDate: "",
       endTime: "",
     },
-    shippingOption: "local_pickup",
+    shippingOption: "local pickup",
     shippingCharge: "",
   });
 
@@ -87,7 +87,7 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
           endDate: productData.auctionSettings?.endDate || "",
           endTime: productData.auctionSettings?.endTime || "",
         },
-        shippingOption: productData.deliveryType || "local_pickup",
+        shippingOption: productData.deliveryType || "local pickup",
         shippingCharge: productData.shippingCharge || "",
       });
 
@@ -232,7 +232,7 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
     }
 
     if (
-      formData.shippingOption === "charge_shipping" &&
+      formData.shippingOption === "charge shipping" &&
       !formData.shippingCharge
     ) {
       newErrors.shippingCharge = "Shipping charge is required";
@@ -254,7 +254,7 @@ const handleSubmit = () => {
     saleType: "auction",
     deliveryType: formData.shippingOption,
     shippingCharge:
-      formData.shippingOption === "charge_shipping"
+      formData.shippingOption === "charge shipping"
         ? formData.shippingCharge?.toString() || "0"
         : "0",
     isDraft: formData.isDraft ? "true" : "false",
@@ -802,8 +802,8 @@ if (Array.isArray(selectedSpecifics) && selectedSpecifics.length > 0) {
                   <input
                     type="radio"
                     name="shippingOption"
-                    value="local_pickup"
-                    checked={formData.shippingOption === "local_pickup"}
+                    value="local pickup"
+                    checked={formData.shippingOption === "local pickup"}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
@@ -828,8 +828,8 @@ if (Array.isArray(selectedSpecifics) && selectedSpecifics.length > 0) {
                   <input
                     type="radio"
                     name="shippingOption"
-                    value="free_shipping"
-                    checked={formData.shippingOption === "free_shipping"}
+                    value="free shipping"
+                    checked={formData.shippingOption === "free shipping"}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
@@ -853,8 +853,8 @@ if (Array.isArray(selectedSpecifics) && selectedSpecifics.length > 0) {
                   <input
                     type="radio"
                     name="shippingOption"
-                    value="charge_shipping"
-                    checked={formData.shippingOption === "charge_shipping"}
+                    value="charge shipping"
+                    checked={formData.shippingOption === "charge shipping"}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
@@ -868,7 +868,7 @@ if (Array.isArray(selectedSpecifics) && selectedSpecifics.length > 0) {
                       Charged Shipping
                     </div>
                     <p className="text-sm text-gray-600">Buyer pays shipping</p>
-                    {formData.shippingOption === "charge_shipping" && (
+                    {formData.shippingOption === "charge shipping" && (
                       <input
                         type="number"
                         placeholder="Shipping charge"

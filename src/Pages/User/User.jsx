@@ -609,30 +609,21 @@ export default function User() {
           }}
         >
           {selectedUser && isModalOpen === true && (
-            <div className="p-6 bg-white rounded-lg shadow-sm border border-gray-200 max-w-md mx-auto">
+            <div className="p-0 bg-white  rounded-lg shadow-sm border border-gray-200  w-full max-w-md sm:max-w-lg mx-auto flex flex-col max-h-[80vh]">
               {/* Header */}
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                  Change Password
-                </h2>
-                <p className="text-sm text-gray-600">
-                  Update password for{" "}
-                  <span className="font-medium text-gray-800">
-                    {selectedUser.userName}
-                  </span>
+              <div className="sticky top-0 z-10 bg-white  rounded-t-lg px-4 sm:px-6 pt-4 pb-2 border-b border-gray-200 ">
+                <h2 className="text-2xl font-bold text-gray-900 -1">Change Password</h2>
+                <p className="text-sm text-gray-600 ">
+                  Update password for{' '}
+                  <span className="font-medium text-gray-800 ">{selectedUser.userName}</span>
                 </p>
               </div>
 
-              {/* Form */}
-              <div className="space-y-4">
+              {/* Scrollable Body */}
+              <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 space-y-4">
                 {/* Password Input Field */}
                 <div className="space-y-2">
-                  <label
-                    htmlFor="new-password"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    New Password
-                  </label>
+                  <label htmlFor="new-password" className="block text-sm font-medium text-gray-700 ">New Password</label>
                   <div className="relative">
                     <input
                       id="new-password"
@@ -640,146 +631,146 @@ export default function User() {
                       placeholder="Enter new password"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className="w-full px-3 py-2.5 pr-10 border border-gray-300 rounded-lg 
-                     focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
-                     placeholder-gray-400 text-gray-900 transition-colors"
+                      className="w-full px-3 py-2.5 pr-10 border border-gray-300  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 text-gray-900  transition-colors"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword((prev) => !prev)}
-                      className="absolute inset-y-0 right-0 flex items-center justify-center w-10 
-                     text-gray-400 hover:text-gray-600 transition-colors"
+                      className="absolute inset-y-0 right-0 flex items-center justify-center w-10 text-gray-400 hover:text-gray-600 -200 transition-colors"
                       tabIndex={-1}
-                      aria-label={
-                        showPassword ? "Hide password" : "Show password"
-                      }
+                      aria-label={showPassword ? "Hide password" : "Show password"}
                     >
-                      {showPassword ? (
-                        <IoEyeOutline size={20} />
-                      ) : (
-                        <FaRegEyeSlash size={20} />
-                      )}
+                      {showPassword ? <IoEyeOutline size={20} /> : <FaRegEyeSlash size={20} />}
                     </button>
                   </div>
                 </div>
+              </div>
 
-                {/* Action Buttons */}
-                <div className="flex gap-3 pt-2">
-                  <button
-                    onClick={() => handleChangePassword()}
-                    className="flex-1 bg-blue-600 text-white px-4 py-2.5 rounded-lg font-medium
-                   hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-                   transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={!newPassword.trim()}
-                  >
-                    Change Password
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-          {selectedUser && isModalOpen === 'seller-request' && (
-            <div className="p-6 bg-white rounded-lg shadow-sm border border-gray-200 max-w-md mx-auto">
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                  Seller Request Details
-                </h2>
-                <p className="text-sm text-gray-600">
-                  Request for: <span className="font-medium text-gray-800">{selectedUser.userName}</span>
-                </p>
-              </div>
-              {sellerRequestLoading ? (
-                <div className="text-center py-4">Loading seller request...</div>
-              ) : sellerRequestDetails ? (
-                <div className="mb-4 space-y-2">
-                  <p><span className="font-medium">Legal Name:</span> {sellerRequestDetails.legalFullName || '-'}</p>
-                  <p><span className="font-medium">ID Number:</span> {sellerRequestDetails.idNumber || '-'}</p>
-                  <p><span className="font-medium">Payment Payout Method:</span> {sellerRequestDetails.paymentPayoutMethod || '-'}</p>
-                  {/* Conditional payout info */}
-                  {sellerRequestDetails.paymentPayoutMethod === 'BankTransfer' && sellerRequestDetails.bankDetails ? (
-                    <div className="pl-2 space-y-1">
-                      <p><span className="font-medium">Bank Name:</span> {sellerRequestDetails.bankDetails.bankName || '-'}</p>
-                      <p><span className="font-medium">Account Number:</span> {sellerRequestDetails.bankDetails.accountNumber || '-'}</p>
-                      <p><span className="font-medium">Account Holder Name:</span> {sellerRequestDetails.bankDetails.accountHolderName || '-'}</p>
-                      <p><span className="font-medium">Bank Book Image:</span> {sellerRequestDetails.bankDetails.bankBookUrl ? (
-                        <a href={sellerRequestDetails.bankDetails.bankBookUrl} target="_blank" rel="noopener noreferrer">
-                          <img
-                            src={sellerRequestDetails.bankDetails.bankBookUrl}
-                            alt="Bank Book"
-                            className="w-24 h-24 object-cover border rounded mt-1 inline-block hover:shadow-lg cursor-pointer"
-                          />
-                        </a>
-                      ) : '-'}</p>
-                    </div>
-                  ) : sellerRequestDetails.paymentPayoutMethod === 'PromptPay' ? (
-                    <p><span className="font-medium">PromptPay ID:</span> {sellerRequestDetails.promptPayId || '-'}</p>
-                  ) : null}
-                  <p><span className="font-medium">Verification Status:</span> {sellerRequestDetails.verificationStatus || '-'}</p>
-                  <p><span className="font-medium">Created At:</span> {sellerRequestDetails.createdAt ? new Date(sellerRequestDetails.createdAt).toLocaleString() : '-'}</p>
-                  <p><span className="font-medium">Updated At:</span> {sellerRequestDetails.updatedAt ? new Date(sellerRequestDetails.updatedAt).toLocaleString() : '-'}</p>
-                  {/* User Info */}
-                  <div className="pt-2">
-                    <h3 className="font-semibold text-gray-800">User Info</h3>
-                    <p><span className="font-medium">User ID:</span> {sellerRequestDetails.userId?._id || '-'}</p>
-                    <p><span className="font-medium">Email:</span> {sellerRequestDetails.userId?.email || '-'}</p>
-                    <p><span className="font-medium">Phone:</span> {selectedUser.phoneNumber || '-'}</p>
-               </div>
-                  {/* Images */}
-                  <div className="pt-2">
-                    <h3 className="font-semibold text-gray-800">Documents</h3>
-                    <div className="flex flex-col gap-2">
-                      <div>
-                        <span className="font-medium">ID Document Front:</span>{' '}
-                        {sellerRequestDetails.idDocumentFrontUrl ? (
-                          <a href={sellerRequestDetails.idDocumentFrontUrl} target="_blank" rel="noopener noreferrer">
-                            <img
-                              src={sellerRequestDetails.idDocumentFrontUrl}
-                              alt="ID Document Front"
-                              className="w-24 h-24 object-cover border rounded mt-1 inline-block hover:shadow-lg cursor-pointer"
-                            />
-                          </a>
-                        ) : (
-                          '-'
-                        )}
-                      </div>
-                      <div>
-                        <span className="font-medium">Selfie With ID:</span>{' '}
-                        {sellerRequestDetails.selfieWithIdUrl ? (
-                          <a href={sellerRequestDetails.selfieWithIdUrl} target="_blank" rel="noopener noreferrer">
-                            <img
-                              src={sellerRequestDetails.selfieWithIdUrl}
-                              alt="Selfie With ID"
-                              className="w-24 h-24 object-cover border rounded mt-1 inline-block hover:shadow-lg cursor-pointer"
-                            />
-                          </a>
-                        ) : (
-                          '-'
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-4 text-red-500">No seller request found.</div>
-              )}
-              <div className="flex gap-3 pt-2">
+              {/* Sticky Footer (Actions) */}
+              <div className="sticky bottom-0 z-10 bg-white  rounded-b-lg px-4 sm:px-6 py-3 border-t border-gray-200  flex flex-col sm:flex-row gap-2">
                 <button
-                  className="flex-1 bg-green-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
-                  onClick={() => handleSellerRequestAction('Approved')}
-                  disabled={sellerRequestLoading || !sellerRequestDetails}
+                  onClick={() => handleChangePassword()}
+                  className="flex-1 bg-blue-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={!newPassword.trim()}
                 >
-                  Accept
-                </button>
-                <button
-                  className="flex-1 bg-red-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
-                  onClick={() => handleSellerRequestAction('Rejected')}
-                  disabled={sellerRequestLoading || !sellerRequestDetails}
-                >
-                  Reject
+                  Change Password
                 </button>
               </div>
             </div>
           )}
+       
+
+
+       {selectedUser && isModalOpen === 'seller-request' && (
+  <div className="p-0 bg-white  rounded-lg shadow-sm border border-gray-200  w-full max-w-md sm:max-w-lg mx-auto flex flex-col max-h-[80vh]">
+    {/* Header */}
+    <div className="sticky top-0 z-10 bg-white  rounded-t-lg px-4 sm:px-6 pt-4 pb-2 border-b border-gray-200 ">
+      <h2 className="text-2xl font-bold text-gray-900 -1">Seller Request Details</h2>
+      <p className="text-sm text-gray-600 ">
+        Request for: <span className="font-medium text-gray-800 ">{selectedUser.userName}</span>
+      </p>
+    </div>
+
+    {/* Scrollable Body */}
+    <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4">
+      {sellerRequestLoading ? (
+        <div className="text-center py-4">Loading seller request...</div>
+      ) : sellerRequestDetails ? (
+        <div className="mb-4 space-y-2">
+          <p><span className="font-medium">Legal Name:</span> {sellerRequestDetails.legalFullName || '-'}</p>
+          <p><span className="font-medium">ID Number:</span> {sellerRequestDetails.idNumber || '-'}</p>
+          <p><span className="font-medium">Payment Payout Method:</span> {sellerRequestDetails.paymentPayoutMethod || '-'}</p>
+
+          {/* Conditional payout info */}
+          {sellerRequestDetails.paymentPayoutMethod === 'BankTransfer' && sellerRequestDetails.bankDetails ? (
+            <div className="pl-2 space-y-1">
+              <p><span className="font-medium">Bank Name:</span> {sellerRequestDetails.bankDetails.bankName || '-'}</p>
+              <p><span className="font-medium">Account Number:</span> {sellerRequestDetails.bankDetails.accountNumber || '-'}</p>
+              <p><span className="font-medium">Account Holder Name:</span> {sellerRequestDetails.bankDetails.accountHolderName || '-'}</p>
+              <p><span className="font-medium">Bank Book Image:</span> {sellerRequestDetails.bankDetails.bankBookUrl ? (
+                <a href={sellerRequestDetails.bankDetails.bankBookUrl} target="_blank" rel="noopener noreferrer">
+                  <img
+                    src={sellerRequestDetails.bankDetails.bankBookUrl}
+                    alt="Bank Book"
+                    className="max-w-full h-auto w-24 sm:w-32 object-cover border rounded mt-1 inline-block hover:shadow-lg cursor-pointer"
+                  />
+                </a>
+              ) : ('-')}
+              </p>
+            </div>
+          ) : sellerRequestDetails.paymentPayoutMethod === 'PromptPay' ? (
+            <p><span className="font-medium">PromptPay ID:</span> {sellerRequestDetails.promptPayId || '-'}</p>
+          ) : null}
+
+          <p><span className="font-medium">Verification Status:</span> {sellerRequestDetails.verificationStatus || '-'}</p>
+          <p><span className="font-medium">Created At:</span> {sellerRequestDetails.createdAt ? new Date(sellerRequestDetails.createdAt).toLocaleString() : '-'}</p>
+          <p><span className="font-medium">Updated At:</span> {sellerRequestDetails.updatedAt ? new Date(sellerRequestDetails.updatedAt).toLocaleString() : '-'}</p>
+
+          {/* User Info */}
+          <div className="pt-2">
+            <h3 className="font-semibold text-gray-800 ">User Info</h3>
+            <p><span className="font-medium">User ID:</span> {sellerRequestDetails.userId?._id || '-'}</p>
+            <p><span className="font-medium">Email:</span> {sellerRequestDetails.userId?.email || '-'}</p>
+            <p><span className="font-medium">Phone:</span> {selectedUser.phoneNumber || '-'}</p>
+          </div>
+
+          {/* Images */}
+          <div className="pt-2">
+            <h3 className="font-semibold text-gray-800 ">Documents</h3>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <div>
+                <span className="font-medium">ID Document Front:</span>{' '}
+                {sellerRequestDetails.idDocumentFrontUrl ? (
+                  <a href={sellerRequestDetails.idDocumentFrontUrl} target="_blank" rel="noopener noreferrer">
+                    <img
+                      src={sellerRequestDetails.idDocumentFrontUrl}
+                      alt="ID Document Front"
+                      className="max-w-full h-auto w-24 sm:w-32 object-cover border rounded mt-1 inline-block hover:shadow-lg cursor-pointer"
+                    />
+                  </a>
+                ) : ('-')}
+              </div>
+              <div>
+                <span className="font-medium">Selfie With ID:</span>{' '}
+                {sellerRequestDetails.selfieWithIdUrl ? (
+                  <a href={sellerRequestDetails.selfieWithIdUrl} target="_blank" rel="noopener noreferrer">
+                    <img
+                      src={sellerRequestDetails.selfieWithIdUrl}
+                      alt="Selfie With ID"
+                      className="max-w-full h-auto w-24 sm:w-32 object-cover border rounded mt-1 inline-block hover:shadow-lg cursor-pointer"
+                    />
+                  </a>
+                ) : ('-')}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="text-center py-4 text-red-500">No seller request found.</div>
+      )}
+    </div>
+
+    {/* Sticky Footer (Actions) */}
+    <div className="sticky bottom-0 z-10 bg-white  rounded-b-lg px-4 sm:px-6 py-3 border-t border-gray-200  flex flex-col sm:flex-row gap-2">
+      <button
+        className="flex-1 bg-green-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
+        onClick={() => handleSellerRequestAction('Approved')}
+        disabled={sellerRequestLoading || !sellerRequestDetails}
+      >
+        Accept
+      </button>
+      <button
+        className="flex-1 bg-red-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
+        onClick={() => handleSellerRequestAction('Rejected')}
+        disabled={sellerRequestLoading || !sellerRequestDetails}
+      >
+        Reject
+      </button>
+    </div>
+  </div>
+)}
+
+
         </Modal>
 
         {/* Updated Reports Modal */}
