@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import DataTable from "../../Component/Table/DataTable";
-import { FiCheckCircle, FiEdit, FiSlash, FiTrash2 } from "react-icons/fi";
+import { FiCheckCircle, FiEdit, FiSlash, FiTrash2, FiLock } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import { IoEyeOutline } from "react-icons/io5";
 import { FaRegEyeSlash } from "react-icons/fa6";
@@ -10,6 +10,8 @@ import {
   hardDelete,
   softDelete,
   update,
+  getSellerRequests,
+  sellerVerification,
 } from "../../features/slices/userSlice";
 import { RiTriangularFlagFill } from "react-icons/ri";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
@@ -47,6 +49,9 @@ export default function User() {
   const [reportsPagination, setReportsPagination] = useState({ pageNo: 1, size: 5 });
   const [reportsTotal, setReportsTotal] = useState(0);
   const [flagLoading, setFlagLoading] = useState(false);
+
+  const [sellerRequestDetails, setSellerRequestDetails] = useState(null);
+  const [sellerRequestLoading, setSellerRequestLoading] = useState(false);
 
   const handleSort = (newSortBy, newSortOrder) => {
     setSortBy(newSortBy);
@@ -92,6 +97,8 @@ export default function User() {
   const handlePageChange = (newPage) => {
     setPagination((prev) => ({ ...prev, pageNo: newPage }));
   };
+
+
 
   const handleApproveSeller = (user) => {
     setSelectedUser(user);
@@ -247,6 +254,38 @@ export default function User() {
     }
   };
 
+  // Fetch seller request details when modal opens
+  useEffect(() => {
+    if (isModalOpen === 'seller-request' && selectedUser?._id) {
+      setSellerRequestLoading(true);
+      dispatch(getSellerRequests({ userId: selectedUser._id, status: 'Pending', size: 1 }))
+        .unwrap()
+        .then((res) => {
+          setSellerRequestDetails(res?.data?.data?.[0] || null);
+        })
+        .catch(() => {
+          setSellerRequestDetails(null);
+        })
+        .finally(() => setSellerRequestLoading(false));
+    } else if (!isModalOpen) {
+      setSellerRequestDetails(null);
+    }
+  }, [isModalOpen, selectedUser, dispatch]);
+
+  const handleSellerRequestAction = async (status) => {
+    if (!sellerRequestDetails?._id) return;
+    try {
+      await dispatch(sellerVerification({ id: sellerRequestDetails._id, status })).unwrap();
+      toast.success(`Seller request ${status === 'Approved' ? 'approved' : 'rejected'} successfully`);
+      setIsModalOpen(false);
+      setSelectedUser(null);
+      setSellerRequestDetails(null);
+      dispatch(fetchUserList({ ...pagination, showSellerRequests: true }));
+    } catch (err) {
+      toast.error(err.message || 'Failed to update status');
+    }
+  };
+
   const columns = [
     {
       key: "serial",
@@ -260,10 +299,15 @@ export default function User() {
       label: "User Name",
       sortable: true, // enables click to sort
       sortKey: "userName",
+      render: (value) => (value && value.trim() ? value : "-"),
     },
     { key: "email", label: "Email" },
     { key: "phoneNumber", label: "Phone" },
-    { key: "gender", label: "Gender" },
+    {
+      key: "gender",
+      label: "Gender",
+      render: (value) => (value && value.trim() ? value : "-"),
+    },
     // {
     //   key: "userAddress",
     //   label: "Location",
@@ -311,40 +355,51 @@ export default function User() {
         const isReported = row?.reportCount > 0;
         return (
           <div className="flex gap-2">
-            {isPendingSeller ? (
+            {showSellerRequests ? (
               <>
                 <button
+                  onClick={() => handleDelete(row)}
+                  className="p-1 rounded hover:bg-gray-200"
+                  style={{ color: theme.colors.error }}
+                  title="Delete"
+                >
+                  <FiTrash2 size={18} />
+                </button>
+                <button
                   onClick={() => {
-                    setIsModalOpen(true);
                     setSelectedUser(row);
+                    setIsModalOpen(true);
                   }}
-                  className="p-1 rounded hover:bg-gray-200 "
+                  className="p-1 rounded hover:bg-gray-200"
                   style={{ color: theme.colors.textPrimary }}
+                  title="Change Password"
+                >
+                  <FiLock size={18} />
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedUser(row);
+                    setIsModalOpen('seller-request');
+                  }}
+                  className="p-1 rounded hover:bg-gray-200"
+                  style={{ color: theme.colors.textPrimary }}
+                  title="View Seller Request"
                 >
                   <FaEye size={18} />
                 </button>
-
-                {/* <button
-                  className="px-2 py-1 rounded bg-green-500 text-white hover:bg-green-600 text-sm"
-                  onClick={() => handleApproveSeller(row)}
-                >
-                  Approve
-                </button>
-                <button
-                  className="px-2 py-1 rounded bg-red-500 text-white hover:bg-red-600 text-sm"
-                  onClick={() => handleRejectSeller(row)}
-                >
-                  Reject
-                </button> */}
               </>
             ) : (
               <>
                 <button
-                  onClick={() => handleEdit(row)}
+                  onClick={() => {
+                    setSelectedUser(row);
+                    setIsModalOpen(true);
+                  }}
                   className="p-1 rounded hover:bg-gray-200"
                   style={{ color: theme.colors.textPrimary }}
+                  title="Change Password"
                 >
-                  <FiEdit size={18} />
+                  <FiLock size={18} />
                 </button>
                 <button
                   onClick={() => handleDelete(row)}
@@ -546,14 +601,14 @@ export default function User() {
         </div>
 
         <Modal
-          isOpen={isModalOpen}
+          isOpen={!!isModalOpen}
           onClose={() => {
             setIsModalOpen(false);
             setSelectedUser(null);
             setNewPassword("");
           }}
         >
-          {selectedUser && (
+          {selectedUser && isModalOpen === true && (
             <div className="p-6 bg-white rounded-lg shadow-sm border border-gray-200 max-w-md mx-auto">
               {/* Header */}
               <div className="mb-6">
@@ -620,6 +675,108 @@ export default function User() {
                     Change Password
                   </button>
                 </div>
+              </div>
+            </div>
+          )}
+          {selectedUser && isModalOpen === 'seller-request' && (
+            <div className="p-6 bg-white rounded-lg shadow-sm border border-gray-200 max-w-md mx-auto">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  Seller Request Details
+                </h2>
+                <p className="text-sm text-gray-600">
+                  Request for: <span className="font-medium text-gray-800">{selectedUser.userName}</span>
+                </p>
+              </div>
+              {sellerRequestLoading ? (
+                <div className="text-center py-4">Loading seller request...</div>
+              ) : sellerRequestDetails ? (
+                <div className="mb-4 space-y-2">
+                  <p><span className="font-medium">Legal Name:</span> {sellerRequestDetails.legalFullName || '-'}</p>
+                  <p><span className="font-medium">ID Number:</span> {sellerRequestDetails.idNumber || '-'}</p>
+                  <p><span className="font-medium">Payment Payout Method:</span> {sellerRequestDetails.paymentPayoutMethod || '-'}</p>
+                  {/* Conditional payout info */}
+                  {sellerRequestDetails.paymentPayoutMethod === 'BankTransfer' && sellerRequestDetails.bankDetails ? (
+                    <div className="pl-2 space-y-1">
+                      <p><span className="font-medium">Bank Name:</span> {sellerRequestDetails.bankDetails.bankName || '-'}</p>
+                      <p><span className="font-medium">Account Number:</span> {sellerRequestDetails.bankDetails.accountNumber || '-'}</p>
+                      <p><span className="font-medium">Account Holder Name:</span> {sellerRequestDetails.bankDetails.accountHolderName || '-'}</p>
+                      <p><span className="font-medium">Bank Book Image:</span> {sellerRequestDetails.bankDetails.bankBookUrl ? (
+                        <a href={sellerRequestDetails.bankDetails.bankBookUrl} target="_blank" rel="noopener noreferrer">
+                          <img
+                            src={sellerRequestDetails.bankDetails.bankBookUrl}
+                            alt="Bank Book"
+                            className="w-24 h-24 object-cover border rounded mt-1 inline-block hover:shadow-lg cursor-pointer"
+                          />
+                        </a>
+                      ) : '-'}</p>
+                    </div>
+                  ) : sellerRequestDetails.paymentPayoutMethod === 'PromptPay' ? (
+                    <p><span className="font-medium">PromptPay ID:</span> {sellerRequestDetails.promptPayId || '-'}</p>
+                  ) : null}
+                  <p><span className="font-medium">Verification Status:</span> {sellerRequestDetails.verificationStatus || '-'}</p>
+                  <p><span className="font-medium">Created At:</span> {sellerRequestDetails.createdAt ? new Date(sellerRequestDetails.createdAt).toLocaleString() : '-'}</p>
+                  <p><span className="font-medium">Updated At:</span> {sellerRequestDetails.updatedAt ? new Date(sellerRequestDetails.updatedAt).toLocaleString() : '-'}</p>
+                  {/* User Info */}
+                  <div className="pt-2">
+                    <h3 className="font-semibold text-gray-800">User Info</h3>
+                    <p><span className="font-medium">User ID:</span> {sellerRequestDetails.userId?._id || '-'}</p>
+                    <p><span className="font-medium">Email:</span> {sellerRequestDetails.userId?.email || '-'}</p>
+                    <p><span className="font-medium">Phone:</span> {selectedUser.phoneNumber || '-'}</p>
+               </div>
+                  {/* Images */}
+                  <div className="pt-2">
+                    <h3 className="font-semibold text-gray-800">Documents</h3>
+                    <div className="flex flex-col gap-2">
+                      <div>
+                        <span className="font-medium">ID Document Front:</span>{' '}
+                        {sellerRequestDetails.idDocumentFrontUrl ? (
+                          <a href={sellerRequestDetails.idDocumentFrontUrl} target="_blank" rel="noopener noreferrer">
+                            <img
+                              src={sellerRequestDetails.idDocumentFrontUrl}
+                              alt="ID Document Front"
+                              className="w-24 h-24 object-cover border rounded mt-1 inline-block hover:shadow-lg cursor-pointer"
+                            />
+                          </a>
+                        ) : (
+                          '-'
+                        )}
+                      </div>
+                      <div>
+                        <span className="font-medium">Selfie With ID:</span>{' '}
+                        {sellerRequestDetails.selfieWithIdUrl ? (
+                          <a href={sellerRequestDetails.selfieWithIdUrl} target="_blank" rel="noopener noreferrer">
+                            <img
+                              src={sellerRequestDetails.selfieWithIdUrl}
+                              alt="Selfie With ID"
+                              className="w-24 h-24 object-cover border rounded mt-1 inline-block hover:shadow-lg cursor-pointer"
+                            />
+                          </a>
+                        ) : (
+                          '-'
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-4 text-red-500">No seller request found.</div>
+              )}
+              <div className="flex gap-3 pt-2">
+                <button
+                  className="flex-1 bg-green-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
+                  onClick={() => handleSellerRequestAction('Approved')}
+                  disabled={sellerRequestLoading || !sellerRequestDetails}
+                >
+                  Accept
+                </button>
+                <button
+                  className="flex-1 bg-red-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
+                  onClick={() => handleSellerRequestAction('Rejected')}
+                  disabled={sellerRequestLoading || !sellerRequestDetails}
+                >
+                  Reject
+                </button>
               </div>
             </div>
           )}

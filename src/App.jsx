@@ -19,6 +19,7 @@ import Setting from "./Pages/Setting/Setting";
 import Faqs from "./Pages/Faqs/Faqs";
 import NetworkStatus from "./Component/NetworkStatus";
 import ProfilePage from "./Pages/ProfilePage";
+import StaticSettings from "./Pages/Setting/StaticSettings";
 
 
 
@@ -70,6 +71,7 @@ function App() {
               <Route path="/location" element={<Location />} />
               <Route path="/bank" element={<Bank />} />
 
+              <Route path="/StaticSettings" element={<StaticSettings />} />
 
               <Route path="/category" element={<Category />} />
               <Route path="/subcategory/:id" element={<SubCategory />} />

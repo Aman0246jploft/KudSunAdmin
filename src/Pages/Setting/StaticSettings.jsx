@@ -6,6 +6,8 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { updateAppSetting } from "../../features/slices/settingSlice";
 import { toast } from "react-toastify";
+import axiosClient from '../../api/axiosClient';
+import authAxiosClient from "../../api/authAxiosClient";
 
 // ------------------- AdvancedRichTextEditor -------------------
 const AdvancedRichTextEditor = ({ value, onChange }) => {
@@ -70,8 +72,8 @@ const AdvancedRichTextEditor = ({ value, onChange }) => {
       title={title}
       className={`p-2 rounded transition-colors ${
         variant === "active"
-          ? "bg-blue-100 text-blue-700"
-          : "hover:bg-gray-100 text-gray-700"
+          ? "bg-blue-300 text-blue-700"
+          : "hover:bg-gray-300 text-gray-700"
       }`}
     >
       <Icon size={16} />
@@ -82,7 +84,7 @@ const AdvancedRichTextEditor = ({ value, onChange }) => {
     <button
       onClick={onClick}
       title={title}
-      className="px-3 py-2 text-sm font-medium rounded hover:bg-gray-100 text-gray-700 transition-colors"
+      className="px-3 py-2 text-sm font-medium rounded hover:bg-gray-300 text-gray-700 transition-colors"
     >
       {text}
     </button>
@@ -175,6 +177,90 @@ export default function StaticSettings() {
   const [editData, setEditData] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
+  // Video state
+  const [videoUrl, setVideoUrl] = useState('');
+  const [videoFile, setVideoFile] = useState(null);
+  const [videoPreview, setVideoPreview] = useState('');
+  const [videoLoading, setVideoLoading] = useState(false);
+
+  // Fetch current video URL
+  useEffect(() => {
+    const fetchVideo = async () => {
+      setVideoLoading(true);
+      try {
+        const res = await axiosClient.get('/appsetting/getVideo');
+        setVideoUrl(res.data?.value || res.data?.data?.value || '');
+        setVideoPreview(res.data?.value || res.data?.data?.value || '');
+      } catch (err) {
+        setVideoUrl('');
+        setVideoPreview('');
+      } finally {
+        setVideoLoading(false);
+      }
+    };
+    fetchVideo();
+  }, []);
+
+  // Handle video file select
+  const handleVideoChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    // Only allow mp4, webm, ogg
+    if (!['video/mp4', 'video/webm', 'video/ogg'].includes(file.type)) {
+      toast.error('Only MP4, WebM, or OGG videos allowed');
+      return;
+    }
+    // Check duration (async)
+    const url = URL.createObjectURL(file);
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    video.onloadedmetadata = () => {
+      window.URL.revokeObjectURL(url);
+      if (video.duration > 30) {
+        toast.error('Video must be 30 seconds or less');
+        setVideoFile(null);
+        setVideoPreview(videoUrl);
+      } else {
+        setVideoFile(file);
+        setVideoPreview(url);
+      }
+    };
+    video.src = url;
+  };
+
+  // Handle video URL input (optional, if you want to allow direct URL update)
+  const handleVideoUrlInput = (e) => {
+    setVideoPreview(e.target.value);
+    setVideoFile(null);
+  };
+
+  // Placeholder for update handler (to be implemented with backend)
+  const handleVideoUpdate = async () => {
+    if (!videoFile) {
+      toast.error('Please select a video file');
+      return;
+    }
+    setVideoLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('video', videoFile);
+      // If backend expects a key, add it:
+      // formData.append('key', '11videoXYZ');
+      const res = await authAxiosClient.post('/appsetting/updateVideo', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      const newUrl = res.data?.value || res.data?.data?.value;
+      setVideoUrl(newUrl);
+      setVideoPreview(newUrl);
+      setVideoFile(null);
+      toast.success('Video updated successfully');
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Failed to update video');
+    } finally {
+      setVideoLoading(false);
+    }
+  };
+
   useEffect(() => {
     const obj = {};
     Object.values(staticSettings).forEach((item) => {
@@ -212,6 +298,36 @@ export default function StaticSettings() {
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-gray-50 min-h-screen">
+      Video Section
+      <div className="bg-white rounded-xl shadow-sm border mb-8">
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b">
+          <h2 className="text-xl font-semibold text-gray-900">Change Video (max 30 seconds)</h2>
+        </div>
+        <div className="p-6 space-y-4">
+          {videoLoading ? (
+            <div>Loading video...</div>
+          ) : videoPreview ? (
+            <video src={videoPreview} controls className="w-full max-w-md rounded" />
+          ) : (
+            <div className="text-gray-400">No video set</div>
+          )}
+
+          <div className="flex flex-col gap-2 max-w-md">
+            <label className="font-medium">Upload new video (MP4/WebM/OGG, ≤30s):</label>
+            <input type="file" accept="video/mp4,video/webm,video/ogg" onChange={handleVideoChange} />
+            {/* Optional: Allow direct URL input */}
+            {/* <input type="text" placeholder="Paste video URL" value={videoPreview} onChange={handleVideoUrlInput} className="border p-2 rounded" /> */}
+            <button
+              className="mt-2 px-6 py-2 rounded-lg font-medium bg-blue-600 text-white hover:bg-blue-700 shadow-sm disabled:bg-gray-200 disabled:text-gray-500"
+              onClick={handleVideoUpdate}
+              disabled={videoLoading || (!videoFile && videoPreview === videoUrl)}
+            >
+              Update Video
+            </button>
+          </div>
+        </div>
+      </div>
+      Existing settings UI
       <div className="space-y-8">
         {Object.values(staticSettings).map((item) => (
           <div key={item._id} className="bg-white rounded-xl shadow-sm border">
@@ -220,31 +336,21 @@ export default function StaticSettings() {
                 <div>
                   <h2 className="text-xl font-semibold text-gray-900">{item.name}</h2>
                   <p className="text-sm text-gray-500 mt-1">
-                    Created:{" "}
-                    {new Date(item.createdAt).toLocaleString("en-US", {
-                      year: "numeric", month: "long", day: "numeric",
-                      hour: "2-digit", minute: "2-digit",
-                    })}
+                    Created: {new Date(item.createdAt).toLocaleString("en-US", { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}
                   </p>
                 </div>
               </div>
             </div>
-
             <div className="p-6">
               <AdvancedRichTextEditor
                 value={editData[item._id] || ""}
                 onChange={(val) => handleChange(item._id, val)}
               />
-
               <div className="flex justify-end mt-6">
                 <button
                   onClick={() => handleUpdate(item)}
                   disabled={isLoading || !hasChanges(item._id)}
-                  className={`px-6 py-2 rounded-lg font-medium transition-all ${
-                    hasChanges(item._id) && !isLoading
-                      ? "bg-blue-600 text-white hover:bg-blue-700 shadow-sm"
-                      : "bg-gray-200 text-gray-500 cursor-not-allowed"
-                  }`}
+                  className={`px-6 py-2 rounded-lg font-medium transition-all ${hasChanges(item._id) && !isLoading ? "bg-blue-600 text-white hover:bg-blue-700 shadow-sm" : "bg-gray-200 text-gray-500 cursor-not-allowed"}`}
                 >
                   {isLoading ? "Updating..." : "Update"}
                 </button>

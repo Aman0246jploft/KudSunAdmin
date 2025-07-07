@@ -16,6 +16,7 @@ import {
 import { MdOutlineIndeterminateCheckBox } from "react-icons/md";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
 import clsx from "clsx";
+import logo from './logo.png'
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const { theme } = useTheme();
@@ -46,7 +47,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           icon: MdOutlineIndeterminateCheckBox,
         },
         { name: "FAQ", href: "/faq", icon: AiOutlineQuestionCircle },
-
+        { name: "ContactUs", href: "/contact_us", icon: AiOutlineQuestionCircle },
+        // { name: "Into Video", href: "/StaticSettings", icon: AiOutlineQuestionCircle },
       ],
     },
 
@@ -55,9 +57,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       icon: AiOutlineSetting,
       isParent: true,
       children: [
-
-
-        { name: "ContactUs", href: "/contact_us", icon: AiOutlineQuestionCircle },
         { name: "FeeSetting", href: "/feeSetting", icon: AiOutlineQuestionCircle },
         { name: "Bank", href: "/bank", icon: AiOutlineQuestionCircle },
         { name: "LocationSetting", href: "/location", icon: AiOutlineQuestionCircle },
@@ -332,8 +331,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             borderColor: theme.colors.border,
           }}
         >
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg">
-            <span className="text-white font-bold text-lg">M</span>
+          <div className="w-10 h-10 bg-gradient-to-br  rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg">
+            <img src={logo} />
           </div>
           {/* Always show text on mobile, conditionally on desktop */}
           <div
@@ -346,7 +345,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               className="text-xl font-bold transition-colors duration-200"
               style={{ color: theme.colors.textPrimary }}
             >
-              MyApp
+              Kadsun
             </h1>
             <p
               className="text-xs transition-colors duration-200"

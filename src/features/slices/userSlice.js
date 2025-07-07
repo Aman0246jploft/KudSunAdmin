@@ -290,6 +290,23 @@ export const adminChangeUserPassword = createAsyncThunk(
     }
 );
 
+export const getSellerRequests = createAsyncThunk(
+    'sellerVerification/getSellerRequests',
+    async (params, thunkAPI) => {
+        try {
+            const res = await authAxiosClient.get('/sellerVerification/getSellerRequests', { params });
+            return res.data;
+        } catch (err) {
+            let message = capitalizeFirstLetter(err.message)
+            // toast.error(message)
+            return thunkAPI.rejectWithValue({
+                message: err.message,
+                code: err.responseCode || 500,
+            });
+        }
+    }
+);
+
 
 
 
