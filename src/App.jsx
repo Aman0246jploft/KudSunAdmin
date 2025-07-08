@@ -21,6 +21,8 @@ import NetworkStatus from "./Component/NetworkStatus";
 import ProfilePage from "./Pages/ProfilePage";
 import StaticSettings from "./Pages/Setting/StaticSettings";
 import Thread from "./Pages/Thread/Thread";
+import EditThread from "./Pages/Thread/EditThread";
+import ThreadDetail from "./Pages/Thread/ThreadDetail";
 
 
 
@@ -64,7 +66,12 @@ function App() {
               <Route path="/user" element={<User />} />
               <Route path="/sellProduct" element={<SellProduct />} />
               <Route path="/auctionProduct" element={<AuctionProduct />} />
-              <Route path="/thread" element={<Thread/>} />
+              <Route path="/thread" element={<Thread />} />
+              <Route path="/thread/edit/:id" element={<EditThread />} />
+
+              <Route path="/thread/:id" element={<ThreadDetail />} />
+
+
               <Route path="/productInfo/:id" element={<ProductInfo />} />
               <Route path="/Setting" element={<Setting />} />
               <Route path="/faq" element={<Faqs />} />
@@ -82,7 +89,7 @@ function App() {
               <Route path="/ProfilePage" element={<ProfilePage />} />
 
 
-              
+
 
               <Route
                 path="/subcategoryParameter/:id"

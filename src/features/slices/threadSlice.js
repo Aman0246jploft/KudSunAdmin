@@ -10,6 +10,14 @@ export const fetchThreads = createAsyncThunk(
   }
 );
 
+export const fetchThreadById = createAsyncThunk(
+  "thread/fetchThreadById",
+  async (threadId) => {
+    const response = await authAxiosClient.get(`/thread/getThreads/${threadId}`);
+    return response.data;
+  }
+);
+
 export const createThread = createAsyncThunk(
   "thread/createThread",
   async (threadData, { rejectWithValue }) => {
@@ -43,36 +51,13 @@ export const createThread = createAsyncThunk(
 
 export const updateThread = createAsyncThunk(
   "thread/updateThread",
-  async ({ id, threadData }, { rejectWithValue }) => {
-    try {
-      const formData = new FormData();
-      Object.keys(threadData).forEach(key => {
-        if (key === 'files') {
-          threadData[key].forEach(file => {
-            formData.append('files', file);
-          });
-        } else if (key === 'tags' && Array.isArray(threadData[key])) {
-          threadData[key].forEach(tag => {
-            formData.append('tags', tag);
-          });
-        } else if (key === 'removePhotos' && Array.isArray(threadData[key])) {
-          threadData[key].forEach(url => {
-            formData.append('removePhotos', url);
-          });
-        } else {
-          formData.append(key, threadData[key]);
-        }
-      });
-
-      const response = await authAxiosClient.post(`/updateThread/${id}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
+  async ({ id, formData }) => {
+    const response = await authAxiosClient.post(`/thread/updateThread/${id}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    return response.data;
   }
 );
 
@@ -96,12 +81,17 @@ const threadSlice = createSlice({
   name: "thread",
   initialState: {
     threads: [],
+    currentThread: null,
     loading: false,
     error: null,
     totalPages: 0,
     totalRecords: 0
   },
-  reducers: {},
+  reducers: {
+    clearCurrentThread: (state) => {
+      state.currentThread = null;
+    }
+  },
   extraReducers: (builder) => {
     builder
       // Fetch Threads
@@ -119,16 +109,40 @@ const threadSlice = createSlice({
         state.loading = false;
         state.error = action.error.message;
       })
+      // Fetch Thread by ID
+      .addCase(fetchThreadById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchThreadById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentThread = action.payload.data;
+      })
+      .addCase(fetchThreadById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
       // Create thread
       .addCase(createThread.fulfilled, (state, action) => {
         state.threads.unshift(action.payload.data);
       })
-      // Update thread
+      // Update Thread
+      .addCase(updateThread.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(updateThread.fulfilled, (state, action) => {
-        const index = state.threads.findIndex(thread => thread._id === action.payload.data._id);
+        state.loading = false;
+        const updatedThread = action.payload.data;
+        const index = state.threads.findIndex(thread => thread._id === updatedThread._id);
         if (index !== -1) {
-          state.threads[index] = action.payload.data;
+          state.threads[index] = updatedThread;
         }
+        state.currentThread = updatedThread;
+      })
+      .addCase(updateThread.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
       })
       // Delete Thread
       .addCase(deleteThread.fulfilled, (state, action) => {
@@ -136,16 +150,17 @@ const threadSlice = createSlice({
           (thread) => thread._id !== action.payload
         );
       })
-      // Toggle Thread Status
-      .addCase(toggleThreadStatus.fulfilled, (state, action) => {
-        const index = state.threads.findIndex(
-          (thread) => thread._id === action.payload.data._id
-        );
-        if (index !== -1) {
-          state.threads[index] = action.payload.data;
-        }
-      });
+      // // Toggle Thread Status
+      // .addCase(toggleThreadStatus.fulfilled, (state, action) => {
+      //   const index = state.threads.findIndex(
+      //     (thread) => thread._id === action.payload.data._id
+      //   );
+      //   if (index !== -1) {
+      //     state.threads[index] = action.payload.data;
+      //   }
+      // });
   },
 });
 
+export const { clearCurrentThread } = threadSlice.actions;
 export default threadSlice.reducer; 
