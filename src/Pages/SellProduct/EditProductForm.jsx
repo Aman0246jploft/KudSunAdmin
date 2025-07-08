@@ -237,16 +237,13 @@ const EditProductForm = ({
     }
 
     // Append specifics
-    if (Array.isArray(selectedSpecifics)) {
-      selectedSpecifics.forEach((spec, index) => {
-        newForm.append(`specifics[${index}][parameterId]`, spec.parameterId);
-        newForm.append(
-          `specifics[${index}][parameterName]`,
-          spec.parameterName
-        );
-        newForm.append(`specifics[${index}][valueId]`, spec.valueId);
-        newForm.append(`specifics[${index}][valueName]`, spec.valueName);
+     // Format specifics as an object with parameterName: valueName
+    if (Array.isArray(selectedSpecifics) && selectedSpecifics.length > 0) {
+      const specificsObj = {};
+      selectedSpecifics.forEach(({ parameterName, valueName }) => {
+        specificsObj[parameterName] = valueName;
       });
+      newForm.append("specifics", JSON.stringify(specificsObj));
     }
 
     // Append removed images

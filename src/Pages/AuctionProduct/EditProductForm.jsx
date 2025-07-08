@@ -237,89 +237,100 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
     ) {
       newErrors.shippingCharge = "Shipping charge is required";
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-const handleSubmit = () => {
-  if (!validateForm()) return;
+  const handleSubmit = () => {
+    if (!validateForm()) return;
 
-  const payload = {
-    categoryId: selectedCategory,
-    subCategoryId: formData.subCategoryId,
-    title: formData.title,
-    description: formData.description,
-    condition: formData.condition,
-    saleType: "auction",
-    deliveryType: formData.shippingOption,
-    shippingCharge:
-      formData.shippingOption === "charge shipping"
-        ? formData.shippingCharge?.toString() || "0"
-        : "0",
-    isDraft: formData.isDraft ? "true" : "false",
-  };
+    const payload = {
+      categoryId: selectedCategory,
+      subCategoryId: formData.subCategoryId,
+      title: formData.title,
+      description: formData.description,
+      condition: formData.condition,
+      saleType: "auction",
+      deliveryType: formData.shippingOption,
+      shippingCharge:
+        formData.shippingOption === "charge shipping"
+          ? formData.shippingCharge?.toString() || "0"
+          : "0",
+      isDraft: formData.isDraft ? "true" : "false",
+    };
 
-  const testPayload = {
-    ...payload,
-    tags: formData.tags || [],
-    specifics: selectedSpecifics || [],
-    auctionSettings: formData.auctionSettings || {},
-  };
-
-  console.log("Payload before FormData:", JSON.stringify(testPayload, null, 2));
-
-  let newForm = new FormData();
-
-  // Append simple string fields
-  Object.entries(payload).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
-      newForm.append(key, value);
-    }
-  });
-
-  // Append tags (multiple entries)
-  if (Array.isArray(formData.tags)) {
-    formData.tags.forEach((tag) => {
-      if (tag) newForm.append("tags", tag);
-    });
-  }
-
-  // Append specifics (each as stringified JSON)
-if (Array.isArray(selectedSpecifics) && selectedSpecifics.length > 0) {
-  newForm.append("specifics", JSON.stringify(selectedSpecifics));
-}
+    const testPayload = {
+      ...payload,
+      tags: formData.tags || [],
+      specifics: selectedSpecifics || [],
+      auctionSettings: formData.auctionSettings || {},
+    };
 
 
-  // Append auctionSettings as JSON string (if valid object)
-  if (formData.auctionSettings && typeof formData.auctionSettings === "object") {
-    newForm.append("auctionSettings", JSON.stringify(formData.auctionSettings));
-  }
+    // 🔍 Log payloads for testing
+    console.log("Raw Payload:", payload);
+    console.log("Test Payload (with tags, specifics, auctionSettings):", testPayload);
 
-  // Append files (limit 5)
-  if (Array.isArray(formData.images) && formData.images.length > 0) {
-    formData.images.slice(0, 5).forEach((file) => {
-      if (file) newForm.append("files", file);
-    });
-  }
 
-  dispatch(updateProduct({ id: productData._id, formData: newForm }))
-    .then((result) => {
-      if (updateProduct.fulfilled.match(result)) {
-        toast.success("Product Updated Successfully");
-        onProductUpdate?.();
-        closeForm();
-      } else {
-        const { message, code } = result.payload || {};
-        console.error(`Update Product failed [${code}]: ${message}`);
-        toast.error(message || "Failed to update product");
+
+
+
+    let newForm = new FormData();
+
+    // Append simple string fields
+    Object.entries(payload).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        newForm.append(key, value);
       }
-    })
-    .catch((error) => {
-      console.error("Unexpected error:", error);
-      toast.error("Unexpected error occurred");
     });
-};
+
+    // Append tags (multiple entries)
+    if (Array.isArray(formData.tags)) {
+      formData.tags.forEach((tag) => {
+        if (tag) newForm.append("tags", tag);
+      });
+    }
+
+    // Format specifics as an object with parameterName: valueName
+    if (Array.isArray(selectedSpecifics) && selectedSpecifics.length > 0) {
+      const specificsObj = {};
+      selectedSpecifics.forEach(({ parameterName, valueName }) => {
+        specificsObj[parameterName] = valueName;
+      });
+      newForm.append("specifics", JSON.stringify(specificsObj));
+    }
+
+
+    // Append auctionSettings as JSON string (if valid object)
+    if (formData.auctionSettings && typeof formData.auctionSettings === "object") {
+      newForm.append("auctionSettings", JSON.stringify(formData.auctionSettings));
+    }
+
+    // Append files (limit 5)
+    if (Array.isArray(formData.images) && formData.images.length > 0) {
+      formData.images.slice(0, 5).forEach((file) => {
+        if (file) newForm.append("files", file);
+      });
+    }
+
+    dispatch(updateProduct({ id: productData._id, formData: newForm }))
+      .then((result) => {
+        if (updateProduct.fulfilled.match(result)) {
+          toast.success("Product Updated Successfully");
+          onProductUpdate?.();
+          closeForm();
+        } else {
+          const { message, code } = result.payload || {};
+          console.error(`Update Product failed [${code}]: ${message}`);
+          toast.error(message || "Failed to update product");
+        }
+      })
+      .catch((error) => {
+        console.error("Unexpected error:", error);
+        toast.error("Unexpected error occurred");
+      });
+  };
 
 
 
@@ -356,9 +367,8 @@ if (Array.isArray(selectedSpecifics) && selectedSpecifics.length > 0) {
                     setSelectedCategory(e.target.value);
                     setFormData({ ...formData, subCategoryId: "" });
                   }}
-                  className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors ${
-                    errors.category ? "border-red-500" : "border-gray-300"
-                  }`}
+                  className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors ${errors.category ? "border-red-500" : "border-gray-300"
+                    }`}
                 >
                   <option value="">Select Category</option>
                   {categoryList?.data?.map((cat) => (
@@ -382,9 +392,8 @@ if (Array.isArray(selectedSpecifics) && selectedSpecifics.length > 0) {
                     setFormData({ ...formData, subCategoryId: e.target.value })
                   }
                   disabled={!selectedCategory}
-                  className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors disabled:bg-gray-100 ${
-                    errors.subCategory ? "border-red-500" : "border-gray-300"
-                  }`}
+                  className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors disabled:bg-gray-100 ${errors.subCategory ? "border-red-500" : "border-gray-300"
+                    }`}
                 >
                   <option value="">Select Subcategory</option>
                   {subCategories?.map((sub) => (
@@ -413,9 +422,8 @@ if (Array.isArray(selectedSpecifics) && selectedSpecifics.length > 0) {
                 onChange={(e) =>
                   setFormData({ ...formData, title: e.target.value })
                 }
-                className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors ${
-                  errors.title ? "border-red-500" : "border-gray-300"
-                }`}
+                className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors ${errors.title ? "border-red-500" : "border-gray-300"
+                  }`}
               />
               {errors.title && (
                 <p className="text-red-500 text-sm mt-1">{errors.title}</p>
@@ -435,9 +443,8 @@ if (Array.isArray(selectedSpecifics) && selectedSpecifics.length > 0) {
                   setFormData({ ...formData, description: e.target.value })
                 }
                 rows={6}
-                className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors resize-none ${
-                  errors.description ? "border-red-500" : "border-gray-300"
-                }`}
+                className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors resize-none ${errors.description ? "border-red-500" : "border-gray-300"
+                  }`}
               />
               <div className="flex justify-between items-center mt-2">
                 {errors.description && (
@@ -590,11 +597,10 @@ if (Array.isArray(selectedSpecifics) && selectedSpecifics.length > 0) {
                 {conditionOptions.map((option) => (
                   <label
                     key={option.value}
-                    className={`cursor-pointer p-3 rounded-lg border-2 text-center transition-all ${
-                      formData.condition === option.value
-                        ? `${option.color} border-current`
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
+                    className={`cursor-pointer p-3 rounded-lg border-2 text-center transition-all ${formData.condition === option.value
+                      ? `${option.color} border-current`
+                      : "border-gray-200 hover:border-gray-300"
+                      }`}
                   >
                     <input
                       type="radio"
@@ -640,11 +646,10 @@ if (Array.isArray(selectedSpecifics) && selectedSpecifics.length > 0) {
                         e.target.value
                       )
                     }
-                    className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors ${
-                      errors.startingPrice
-                        ? "border-red-500"
-                        : "border-gray-300"
-                    }`}
+                    className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors ${errors.startingPrice
+                      ? "border-red-500"
+                      : "border-gray-300"
+                      }`}
                   />
                   {errors.startingPrice && (
                     <p className="text-red-500 text-sm mt-1">
@@ -664,9 +669,8 @@ if (Array.isArray(selectedSpecifics) && selectedSpecifics.length > 0) {
                     onChange={(e) =>
                       handleAuctionSettingChange("reservePrice", e.target.value)
                     }
-                    className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors ${
-                      errors.reservePrice ? "border-red-500" : "border-gray-300"
-                    }`}
+                    className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors ${errors.reservePrice ? "border-red-500" : "border-gray-300"
+                      }`}
                   />
                   {errors.reservePrice && (
                     <p className="text-red-500 text-sm mt-1">
@@ -690,11 +694,10 @@ if (Array.isArray(selectedSpecifics) && selectedSpecifics.length > 0) {
                       e.target.value
                     )
                   }
-                  className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors ${
-                    errors.biddingIncrementPrice
-                      ? "border-red-500"
-                      : "border-gray-300"
-                  }`}
+                  className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors ${errors.biddingIncrementPrice
+                    ? "border-red-500"
+                    : "border-gray-300"
+                    }`}
                 />
                 {errors.biddingIncrementPrice && (
                   <p className="text-red-500 text-sm mt-1">
@@ -712,13 +715,12 @@ if (Array.isArray(selectedSpecifics) && selectedSpecifics.length > 0) {
                   {durationOptions.map((option) => (
                     <label
                       key={option.value}
-                      className={`cursor-pointer p-3 rounded-lg border-2 text-center transition-all ${
-                        (option.value === "other" && showCustomDuration) ||
+                      className={`cursor-pointer p-3 rounded-lg border-2 text-center transition-all ${(option.value === "other" && showCustomDuration) ||
                         (option.value !== "other" &&
                           formData.auctionSettings.duration === option.value)
-                          ? "bg-orange-100 text-orange-800 border-orange-500"
-                          : "border-gray-200 hover:border-gray-300"
-                      }`}
+                        ? "bg-orange-100 text-orange-800 border-orange-500"
+                        : "border-gray-200 hover:border-gray-300"
+                        }`}
                     >
                       <input
                         type="radio"
@@ -755,9 +757,8 @@ if (Array.isArray(selectedSpecifics) && selectedSpecifics.length > 0) {
                         onChange={(e) =>
                           handleAuctionSettingChange("endDate", e.target.value)
                         }
-                        className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors ${
-                          errors.endDate ? "border-red-500" : "border-gray-300"
-                        }`}
+                        className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors ${errors.endDate ? "border-red-500" : "border-gray-300"
+                          }`}
                       />
                       {errors.endDate && (
                         <p className="text-red-500 text-sm mt-1">
@@ -775,9 +776,8 @@ if (Array.isArray(selectedSpecifics) && selectedSpecifics.length > 0) {
                         onChange={(e) =>
                           handleAuctionSettingChange("endTime", e.target.value)
                         }
-                        className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors ${
-                          errors.endTime ? "border-red-500" : "border-gray-300"
-                        }`}
+                        className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors ${errors.endTime ? "border-red-500" : "border-gray-300"
+                          }`}
                       />
                       {errors.endTime && (
                         <p className="text-red-500 text-sm mt-1">
@@ -879,11 +879,10 @@ if (Array.isArray(selectedSpecifics) && selectedSpecifics.length > 0) {
                             shippingCharge: e.target.value,
                           })
                         }
-                        className={`mt-2 w-full p-2 border rounded focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
-                          errors.shippingCharge
-                            ? "border-red-500"
-                            : "border-gray-300"
-                        }`}
+                        className={`mt-2 w-full p-2 border rounded focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${errors.shippingCharge
+                          ? "border-red-500"
+                          : "border-gray-300"
+                          }`}
                       />
                     )}
                   </div>
@@ -976,11 +975,10 @@ if (Array.isArray(selectedSpecifics) && selectedSpecifics.length > 0) {
                                 [param._id]: val._id,
                               }))
                             }
-                            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                              isSelected
-                                ? "bg-blue-600 text-white"
-                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                            }`}
+                            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${isSelected
+                              ? "bg-blue-600 text-white"
+                              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                              }`}
                           >
                             {val.value}
                           </button>

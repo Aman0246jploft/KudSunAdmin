@@ -33,6 +33,8 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
       children: [
         { name: "Products", href: "/sellProduct", icon: AiOutlineTag },
         { name: "Auctions", href: "/auctionProduct", icon: AiOutlineBell },
+        { name: "Thread", href: "/thread", icon: AiOutlineBell },
+
       ],
     },
 
