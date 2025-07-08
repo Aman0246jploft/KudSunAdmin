@@ -33,23 +33,23 @@ export default function Chat() {
       setChatRooms((prev) => [room, ...prev]);
     });
 
-    socket.on("roomUpdated", (updatedRoom) => {
-      setChatRooms((prev) => {
-        const filtered = prev.filter((r) => r._id !== updatedRoom._id);
-        return [updatedRoom, ...filtered];
-      });
-      
-      // Also update active room if it's the one that got updated
-      if (activeRoom?._id === updatedRoom._id) {
-        setActiveRoom(updatedRoom);
-      }
-    });
-
+    // Handle new messages including system messages
     socket.on("newMessage", (message) => {
       // Update chat rooms to reflect the new message
       setChatRooms((prev) => {
         return prev.map((room) => {
           if (room._id === message.chatRoom) {
+            // For system messages, update the room's last message immediately
+            if (message.messageType === 'SYSTEM' || 
+                message.messageType === 'ORDER_STATUS' || 
+                message.messageType === 'PAYMENT_STATUS' || 
+                message.messageType === 'SHIPPING_STATUS') {
+              return {
+                ...room,
+                lastMessage: message,
+                updatedAt: new Date().toISOString()
+              };
+            }
             return {
               ...room,
               lastMessage: message
@@ -58,6 +58,27 @@ export default function Chat() {
           return room;
         });
       });
+
+      // If this is the active room, update it as well
+      if (activeRoom?._id === message.chatRoom) {
+        setActiveRoom((prev) => ({
+          ...prev,
+          lastMessage: message,
+          updatedAt: new Date().toISOString()
+        }));
+      }
+    });
+
+    socket.on("roomUpdated", (updatedRoom) => {
+      setChatRooms((prev) => {
+        const filtered = prev.filter((r) => r._id !== updatedRoom._id);
+        return [updatedRoom, ...filtered];
+      });
+      
+      // Update active room if it's the one that got updated
+      if (activeRoom?._id === updatedRoom._id) {
+        setActiveRoom(updatedRoom);
+      }
     });
 
     // Add listener for system notifications
