@@ -1,7 +1,31 @@
 import React, { useEffect, useState } from "react";
 import Image from "../../Component/Atoms/Image/Image"
 
-export default function ChatRoomList({ chatRooms, setActiveRoom, activeRoom ,socket}) {
+export default function ChatRoomList({ chatRooms, setActiveRoom, activeRoom, socket }) {
+  // Function to format the last message based on type
+  const getFormattedLastMessage = (message) => {
+    if (!message) return "No messages";
+
+    switch (message.messageType) {
+      case 'IMAGE':
+        return "📷 Sent an image";
+      case 'VIDEO':
+        return "🎥 Sent a video";
+      case 'AUDIO':
+        return "🎵 Sent an audio";
+      case 'FILE':
+        return `📎 Sent a file${message.fileName ? `: ${message.fileName}` : ''}`;
+      case 'PRODUCT':
+        return "🛍️ Shared a product";
+      case 'SYSTEM':
+      case 'ORDER_STATUS':
+      case 'PAYMENT_STATUS':
+      case 'SHIPPING_STATUS':
+        return message.content || "System notification";
+      default:
+        return message.content || "No messages";
+    }
+  };
 
   return (
     <div className="w-1/3 border-r p-4 overflow-y-auto">
@@ -18,7 +42,6 @@ export default function ChatRoomList({ chatRooms, setActiveRoom, activeRoom ,soc
           >
             <div className="flex items-center gap-2 relative">
               <div className="relative">
-
                 <Image
                   src={other?.profileImage}
                   className="w-8 h-8 rounded-full"
@@ -27,12 +50,17 @@ export default function ChatRoomList({ chatRooms, setActiveRoom, activeRoom ,soc
                   <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full" />
                 )}
               </div>
-              <div>
+              <div className="flex-1 min-w-0"> {/* Added flex-1 and min-w-0 for better truncation */}
                 <p className="font-medium">{other?.userName}</p>
                 <p className="text-sm text-gray-500 truncate">
-                  {room.lastMessage?.content || "No messages"}
+                  {getFormattedLastMessage(room.lastMessage)}
                 </p>
               </div>
+              {room.unreadCount > 0 && (
+                <div className="bg-blue-500 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center">
+                  {room.unreadCount}
+                </div>
+              )}
             </div>
           </div>
         );

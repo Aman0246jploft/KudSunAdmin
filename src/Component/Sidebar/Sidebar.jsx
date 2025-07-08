@@ -65,6 +65,8 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
     },
 
     { name: "Category", href: "/category", icon: AiOutlineTag },
+    { name: "Chat", href: "/chat", icon: AiOutlineTag },
+
   ];
 
   const toggleExpanded = (itemName) => {

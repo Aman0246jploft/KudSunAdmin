@@ -4,6 +4,7 @@ import ChatRoomList from "./ChatRoomList";
 import ChatWindow from "./ChatWindow";
 import { socketURL } from "../../api/baseUrl";
 import { useAuth } from "../../auth/useAuth";
+import { toast } from 'react-toastify';
 
 const socket = io(socketURL, {
   auth: {
@@ -33,28 +34,77 @@ export default function Chat() {
     });
 
     socket.on("roomUpdated", (updatedRoom) => {
-      console.log("updatedRoom000", updatedRoom);
       setChatRooms((prev) => {
         const filtered = prev.filter((r) => r._id !== updatedRoom._id);
         return [updatedRoom, ...filtered];
       });
+      
+      // Also update active room if it's the one that got updated
+      if (activeRoom?._id === updatedRoom._id) {
+        setActiveRoom(updatedRoom);
+      }
     });
 
-    socket.on("newMessage", (handleNewMessage) => {
-      console.log("handleNewMessage", handleNewMessage);
+    socket.on("newMessage", (message) => {
+      // Update chat rooms to reflect the new message
+      setChatRooms((prev) => {
+        return prev.map((room) => {
+          if (room._id === message.chatRoom) {
+            return {
+              ...room,
+              lastMessage: message
+            };
+          }
+          return room;
+        });
+      });
+    });
+
+    // Add listener for system notifications
+    socket.on("systemNotification", (notification) => {
+      let title = '';
+      let message = '';
+
+      // Handle different types of system notifications
+      if (notification.type === 'ORDER_STATUS') {
+        title = notification.meta.title || 'Order Update';
+        message = `Order #${notification.meta.meta.orderNumber} - ${notification.meta.status}`;
+      } else if (notification.type === 'PAYMENT_STATUS') {
+        title = notification.meta.title;
+        message = notification.meta.status === 'COMPLETED' 
+          ? `Payment completed for Order #${notification.meta.meta.orderNumber}`
+          : `Payment failed for Order #${notification.meta.meta.orderNumber}`;
+      }
+
+      // Show toast notification
+      toast.info(
+        <div>
+          <h4 className="font-medium">{title}</h4>
+          <p>{message}</p>
+        </div>,
+        {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        }
+      );
     });
 
     return () => {
       socket.off("chatRooms");
       socket.off("newChatRoom");
       socket.off("roomUpdated");
+      socket.off("newMessage");
+      socket.off("systemNotification");
     };
-  }, []);
+  }, [activeRoom]); // Added activeRoom to dependencies
 
   useEffect(() => {
     if (activeRoom?._id) {
       socket.emit("joinRoom", activeRoom._id);
-      console.log(`Joining room ${activeRoom._id}`);
     }
   }, [activeRoom]);
 
