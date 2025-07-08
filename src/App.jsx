@@ -20,6 +20,7 @@ import Faqs from "./Pages/Faqs/Faqs";
 import NetworkStatus from "./Component/NetworkStatus";
 import ProfilePage from "./Pages/ProfilePage";
 import StaticSettings from "./Pages/Setting/StaticSettings";
+import Thread from "./Pages/Thread/Thread";
 
 
 
@@ -63,6 +64,7 @@ function App() {
               <Route path="/user" element={<User />} />
               <Route path="/sellProduct" element={<SellProduct />} />
               <Route path="/auctionProduct" element={<AuctionProduct />} />
+              <Route path="/thread" element={<Thread/>} />
               <Route path="/productInfo/:id" element={<ProductInfo />} />
               <Route path="/Setting" element={<Setting />} />
               <Route path="/faq" element={<Faqs />} />

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
 
-const DataTable = ({ columns, data, sortBy, sortOrder, onSort }) => {
+const DataTable = ({ columns, data = [], sortBy, sortOrder, onSort }) => {
   const { theme } = useTheme();
   const [tooltip, setTooltip] = useState({
     visible: false,
@@ -9,8 +9,9 @@ const DataTable = ({ columns, data, sortBy, sortOrder, onSort }) => {
     x: 0,
     y: 0,
   });
+
   const handleSort = (col) => {
-    if (!col.sortable) return;
+    if (!col.sortable || !onSort) return;
 
     const newSortBy = col.sortKey || col.key;
     const newSortOrder =
@@ -19,9 +20,8 @@ const DataTable = ({ columns, data, sortBy, sortOrder, onSort }) => {
     onSort(newSortBy, newSortOrder);
   };
 
-
   const handleMouseEnter = (e, value) => {
-    if (String(value).length > 30) {
+    if (value && String(value).length > 30) {
       const rect = e.target.getBoundingClientRect();
       setTooltip({
         visible: true,
@@ -37,6 +37,23 @@ const DataTable = ({ columns, data, sortBy, sortOrder, onSort }) => {
     if (!related || !related.closest(".custom-tooltip")) {
       setTooltip({ visible: false, content: "", x: 0, y: 0 });
     }
+  };
+
+  const getCellContent = (col, row, rowIndex) => {
+    if (col.render) {
+      return col.render(row[col.key], row, rowIndex);
+    }
+
+    const value = row[col.key];
+    if (value === undefined || value === null) {
+      return "-";
+    }
+
+    if (typeof value === 'object') {
+      return JSON.stringify(value);
+    }
+
+    return String(value);
   };
 
   return (
@@ -58,7 +75,6 @@ const DataTable = ({ columns, data, sortBy, sortOrder, onSort }) => {
                     width: col.width || "auto",
                   }}
                 >
-                  {/* {col.label} */}
                   <div
                     className="flex items-center gap-1 select-none"
                     onClick={() => handleSort(col)}
@@ -74,43 +90,49 @@ const DataTable = ({ columns, data, sortBy, sortOrder, onSort }) => {
             </tr>
           </thead>
           <tbody>
-            {data?.map((row, rowIndex) => (
-              <tr
-                key={rowIndex}
-                className="hover:bg-opacity-75"
-                style={{
-                  borderBottom: `1px solid ${theme.colors.border}`,
-                  backgroundColor: theme.colors.background,
-                  color: theme.colors.textPrimary,
-                }}
-              >
-                {columns.map((col) => {
-                  const value = row[col.key];
-
-                  const content = col.render
-                    ? col.render(value, row, rowIndex) // <-- Fix: include rowIndex
-                    : String(value);
-
-                  return (
-                    <td
-                      key={col.key}
-                      className="p-2 max-w-[200px] truncate align-top"
-                      onMouseEnter={(e) => {
-                        if (!col.disableTooltip) handleMouseEnter(e, value);
-                      }}
-                      onMouseLeave={handleMouseLeave}
-                    >
-                      <div className="truncate">{content}</div>
-                    </td>
-                  );
-                })}
+            {data?.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={columns.length}
+                  className="p-4 text-center"
+                  style={{ color: theme.colors.textSecondary }}
+                >
+                  No data available
+                </td>
               </tr>
-            ))}
+            ) : (
+              data?.map((row, rowIndex) => (
+                <tr
+                  key={rowIndex}
+                  className="hover:bg-opacity-75"
+                  style={{
+                    borderBottom: `1px solid ${theme.colors.border}`,
+                    backgroundColor: theme.colors.background,
+                    color: theme.colors.textPrimary,
+                  }}
+                >
+                  {columns.map((col) => {
+                    const content = getCellContent(col, row, rowIndex);
+                    return (
+                      <td
+                        key={col.key}
+                        className="p-2 max-w-[200px] truncate align-top"
+                        onMouseEnter={(e) => {
+                          if (!col.disableTooltip) handleMouseEnter(e, row[col.key]);
+                        }}
+                        onMouseLeave={handleMouseLeave}
+                      >
+                        <div className="truncate">{content}</div>
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
 
-      {/* Tooltip with theme */}
       {tooltip.visible && (
         <div
           className="fixed z-[9999] pointer-events-auto custom-tooltip"
@@ -126,15 +148,12 @@ const DataTable = ({ columns, data, sortBy, sortOrder, onSort }) => {
             setTooltip({ visible: false, content: "", x: 0, y: 0 })
           }
         >
-          {/* Arrow */}
           <div
             className="absolute left-3 -bottom-2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent"
             style={{
               borderTopColor: theme.colors.background,
             }}
           />
-
-          {/* Tooltip Box */}
           <div
             className="text-sm p-3 break-words whitespace-normal shadow-xl max-w-xs rounded-lg"
             style={{
