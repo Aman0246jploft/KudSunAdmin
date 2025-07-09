@@ -253,26 +253,7 @@ const ProductInfo = () => {
                 <p className="text-gray-500 text-sm">{productData?.seller?.followers} followers</p>
               </div>
             </div>
-            <button
-              onClick={handleFollow}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                isFollowing
-                  ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                  : "bg-blue-500 text-white hover:bg-blue-600"
-              }`}
-            >
-              {isFollowing ? (
-                <>
-                  <UserCheck className="w-4 h-4 inline mr-1" />
-                  Following
-                </>
-              ) : (
-                <>
-                  <UserPlus className="w-4 h-4 inline mr-1" />
-                  Follow
-                </>
-              )}
-            </button>
+
           </div>
         </div>
 

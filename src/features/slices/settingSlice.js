@@ -71,15 +71,14 @@ export const getFAQs = createAsyncThunk(
 );
 
 
-
 export const contactUsList = createAsyncThunk(
     'contactUs/getList',
     async (payload, thunkAPI) => {
         try {
-            const res = await authAxiosClient.get(`/contactUs/getList`, { parmas: payload });
+            const query = new URLSearchParams(payload).toString();
+            const res = await authAxiosClient.get(`/contactUs/getList?${query}`);
             return res.data;
         } catch (err) {
-
             let message = capitalizeFirstLetter(err.response?.data?.message || err.message);
             toast.error(message);
             return thunkAPI.rejectWithValue({
