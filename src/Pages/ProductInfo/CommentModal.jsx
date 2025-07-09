@@ -4,8 +4,10 @@ import { useParams } from "react-router";
 import {
   getProductComment,
   getProductCommentReply,
+  addComment,
 } from "../../features/slices/commentSlice";
 import { MessageCircle, Reply, Send, X, Upload, User } from "lucide-react";
+import { toast } from "react-toastify";
 
 export default function CommentModal() {
   const dispatch = useDispatch();
@@ -44,31 +46,79 @@ export default function CommentModal() {
   const handleSubmitComment = () => {
     if (!newComment.trim()) return;
 
-    const formData = {
-      content: newComment,
-      product: id,
-      photos: selectedImages,
-    };
+    const formData = new FormData();
+    formData.append("content", newComment);
+    formData.append("product", id);
+    formData.append("parent", ""); // Empty parent for main comments
 
-    // dispatch(addComment(formData))
-    console.log("Adding comment:", formData);
-    setNewComment("");
-    setSelectedImages([]);
+    // Add selected images if any
+    if (selectedImages.length > 0) {
+      selectedImages.forEach((image) => {
+        formData.append("files", image);
+      });
+    }
+
+    dispatch(addComment(formData))
+      .then((result) => {
+        if (addComment.fulfilled.match(result)) {
+          toast.success("Comment Added");
+          // Refresh the comments list
+          dispatch(getProductComment({ id, pagination }));
+          setNewComment("");
+          setSelectedImages([]);
+        } else {
+          const { message, code } = result.payload || {};
+          console.error(`Comment failed [${code}]: ${message}`);
+          toast.error("Failed to add comment");
+        }
+      })
+      .catch((error) => {
+        console.error("Unexpected error:", error);
+        toast.error("Unexpected error occurred");
+      });
   };
 
   const handleSubmitReply = (parentId) => {
     if (!replyContent.trim()) return;
 
-    const formData = {
-      content: replyContent,
-      parent: parentId,
-      product: id,
-    };
+    const formData = new FormData();
+    formData.append("content", replyContent);
+    formData.append("parent", parentId);
+    formData.append("product", id);
 
-    // dispatch(addComment(formData))
-    console.log("Adding reply:", formData);
-    setReplyContent("");
-    setReplyTo(null);
+    dispatch(addComment(formData))
+      .then((result) => {
+        if (addComment.fulfilled.match(result)) {
+          toast.success("Reply Added");
+          // Refresh the main comments list
+          dispatch(getProductComment({ id, pagination }));
+          // Refresh the specific reply thread
+          dispatch(
+            getProductCommentReply({
+              parentId: parentId,
+              pageNo: 1,
+              size: 10,
+            })
+          ).then((replyResult) => {
+            if (getProductCommentReply.fulfilled.match(replyResult)) {
+              setRepliesData((prev) => ({
+                ...prev,
+                [parentId]: replyResult.payload.data,
+              }));
+            }
+          });
+          setReplyContent("");
+          setReplyTo(null);
+        } else {
+          const { message, code } = result.payload || {};
+          console.error(`Reply failed [${code}]: ${message}`);
+          toast.error("Failed to add reply");
+        }
+      })
+      .catch((error) => {
+        console.error("Unexpected error:", error);
+        toast.error("Unexpected error occurred");
+      });
   };
 
   const loadMoreReplies = (commentId) => {
@@ -343,63 +393,93 @@ export default function CommentModal() {
                           </div>
                         ) : (
                           <>
-                            {/* Show first reply if exists */}
-                            {comment.firstReply && (
-                              <div className="flex space-x-2">
+                            {/* Show replies from the API response */}
+                            {comment.replies && comment.replies.map((reply) => (
+                              <div key={reply._id} className="flex space-x-2">
                                 <div className="flex-shrink-0">
                                   <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                                    <User className="w-4 h-4 text-green-600" />
+                                    {reply.author.profileImage ? (
+                                      <img
+                                        src={reply.author.profileImage}
+                                        alt={reply.author.userName}
+                                        className="w-8 h-8 rounded-full object-cover"
+                                      />
+                                    ) : (
+                                      <User className="w-4 h-4 text-green-600" />
+                                    )}
                                   </div>
                                 </div>
                                 <div className="flex-1">
                                   <div className="bg-white border rounded-lg p-2">
+                                    <div className="text-xs font-medium text-gray-700 mb-1">
+                                      {reply.author.userName}
+                                    </div>
                                     <p className="text-sm text-gray-800">
-                                      {comment.firstReply.content}
+                                      {reply.content}
                                     </p>
+
+                                    {/* Reply Images */}
+                                    {reply.photos && reply.photos.length > 0 && (
+                                      <div className="mt-2 flex space-x-2 overflow-x-auto">
+                                        {reply.photos.map((photo, index) => (
+                                          <img
+                                            key={index}
+                                            src={photo}
+                                            alt={`Reply image ${index + 1}`}
+                                            className="w-16 h-16 object-cover rounded cursor-pointer hover:opacity-80"
+                                            onClick={() => window.open(photo, "_blank")}
+                                          />
+                                        ))}
+                                      </div>
+                                    )}
                                   </div>
                                   <div className="text-xs text-gray-500 mt-1">
-                                    {formatDate(comment.firstReply.createdAt)}
+                                    {formatDate(reply.createdAt)}
                                   </div>
                                 </div>
                               </div>
-                            )}
+                            ))}
 
-                            {/* Show loaded replies */}
+                            {/* Show additional loaded replies */}
                             {repliesData[comment._id]?.commentList?.map(
                               (reply) => (
                                 <div key={reply._id} className="flex space-x-2">
                                   <div className="flex-shrink-0">
                                     <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                                      <User className="w-4 h-4 text-green-600" />
+                                      {reply.author.profileImage ? (
+                                        <img
+                                          src={reply.author.profileImage}
+                                          alt={reply.author.userName}
+                                          className="w-8 h-8 rounded-full object-cover"
+                                        />
+                                      ) : (
+                                        <User className="w-4 h-4 text-green-600" />
+                                      )}
                                     </div>
                                   </div>
                                   <div className="flex-1">
                                     <div className="bg-white border rounded-lg p-2">
+                                      <div className="text-xs font-medium text-gray-700 mb-1">
+                                        {reply.author.userName}
+                                      </div>
                                       <p className="text-sm text-gray-800">
                                         {reply.content}
                                       </p>
 
                                       {/* Reply Images */}
-                                      {reply.photos &&
-                                        reply.photos.length > 0 && (
-                                          <div className="mt-2 flex space-x-2 overflow-x-auto">
-                                            {reply.photos.map(
-                                              (photo, index) => (
-                                                <img
-                                                  key={index}
-                                                  src={photo}
-                                                  alt={`Reply image ${
-                                                    index + 1
-                                                  }`}
-                                                  className="w-16 h-16 object-cover rounded cursor-pointer hover:opacity-80"
-                                                  onClick={() =>
-                                                    window.open(photo, "_blank")
-                                                  }
-                                                />
-                                              )
-                                            )}
-                                          </div>
-                                        )}
+                                      {reply.photos && reply.photos.length > 0 && (
+                                        <div className="mt-2 flex space-x-2 overflow-x-auto">
+                                          {reply.photos.map((photo, index) => (
+                                            <img
+                                              key={index}
+                                              src={photo}
+                                              alt={`Reply image ${index + 1}`}
+                                              className="w-16 h-16 object-cover rounded cursor-pointer hover:opacity-80"
+                                              onClick={() => window.open(photo, "_blank")}
+                                            />
+                                          ))}
+                                        </div>
+                                      )}
                                     </div>
                                     <div className="text-xs text-gray-500 mt-1">
                                       {formatDate(reply.createdAt)}
@@ -412,8 +492,7 @@ export default function CommentModal() {
                             {/* Load more replies button */}
                             {repliesData[comment._id] &&
                               repliesData[comment._id].total >
-                                repliesData[comment._id].commentList
-                                  ?.length && (
+                                repliesData[comment._id].commentList?.length && (
                                 <button
                                   className="text-sm text-blue-600 hover:underline ml-10"
                                   onClick={() => loadMoreReplies(comment._id)}
