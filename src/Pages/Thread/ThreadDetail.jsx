@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router'
 import { fetchThreadById } from '../../features/slices/threadSlice'
 import Button from '../../Component/Atoms/Button/Button'
-import { FaHeart, FaRegHeart, FaComment, FaShare, FaLock } from 'react-icons/fa'
+import { FaHeart, FaRegHeart, FaComment, FaShare, FaLock, FaImage, FaTimes } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
 import authAxiosClient from '../../api/authAxiosClient'
 import InputField from '../../Component/Atoms/InputFields/Inputfield'
@@ -20,9 +20,15 @@ export default function ThreadDetail() {
     const [loadingComments, setLoadingComments] = useState(false)
     const [newComment, setNewComment] = useState('')
     const [selectedProducts, setSelectedProducts] = useState([])
+    const [commentImages, setCommentImages] = useState([])
+    const [previewImages, setPreviewImages] = useState([])
     const [viewingReplies, setViewingReplies] = useState(null)
     const [replies, setReplies] = useState({})
+    const [replyPages, setReplyPages] = useState({})
+    const [loadingReplies, setLoadingReplies] = useState({})
     const [isProductsModalOpen, setIsProductsModalOpen] = useState(false)
+
+    console.log('123455',replies)
 
     useEffect(() => {
         if (id) {
@@ -51,17 +57,36 @@ export default function ThreadDetail() {
         }
     }
 
-    const fetchReplies = async (commentId) => {
+    const fetchReplies = async (commentId, page = 1) => {
         try {
-            const response = await authAxiosClient.get(`/thread/getCommentByParentId/${commentId}?pageNo=1&size=10`)
+            setLoadingReplies(prev => ({ ...prev, [commentId]: true }))
+            const response = await authAxiosClient.get(`/thread/getCommentByParentId/${commentId}?pageNo=${page}&size=10`)
+            
             if (response.data.status) {
+                const { pageNo, size, total, data } = response.data.data
+                
+                setReplyPages(prev => ({
+                    ...prev,
+                    [commentId]: { pageNo, size, total }
+                }))
+
+                // Ensure data is an array and handle the nested structure
+                const replyData = Array.isArray(data) ? data : []
+                
                 setReplies(prev => ({
                     ...prev,
-                    [commentId]: response.data.data
+                    [commentId]: page === 1 ? replyData : [...(prev[commentId] || []), ...replyData]
                 }))
             }
         } catch (error) {
             console.error('Error fetching replies:', error)
+            // Initialize empty array on error
+            setReplies(prev => ({
+                ...prev,
+                [commentId]: prev[commentId] || []
+            }))
+        } finally {
+            setLoadingReplies(prev => ({ ...prev, [commentId]: false }))
         }
     }
 
@@ -83,6 +108,15 @@ export default function ThreadDetail() {
         }
     }
 
+    const handleImageChange = (e) => {
+        const files = Array.from(e.target.files)
+        setCommentImages(files)
+        
+        // Create preview URLs
+        const previews = files.map(file => URL.createObjectURL(file))
+        setPreviewImages(previews)
+    }
+
     const handleAddComment = async () => {
         try {
             const formData = new FormData()
@@ -91,10 +125,17 @@ export default function ThreadDetail() {
             selectedProducts.forEach(productId => {
                 formData.append('associatedProducts', productId)
             })
+            
+            // Append each image file
+            commentImages.forEach(image => {
+                formData.append('files', image)
+            })
 
             await authAxiosClient.post('/thread/addComment', formData)
             setNewComment('')
             setSelectedProducts([])
+            setCommentImages([])
+            setPreviewImages([])
             fetchComments(1)
             dispatch(fetchThreadById(id))
         } catch (error) {
@@ -109,13 +150,24 @@ export default function ThreadDetail() {
             formData.append('thread', id)
             formData.append('parent', parentId)
 
-            await authAxiosClient.post('/thread/addComment', formData)
-            fetchReplies(parentId)
-            dispatch(fetchThreadById(id))
+            const response = await authAxiosClient.post('/thread/addComment', formData)
+            if (response.data.status) {
+                // Refresh replies for this comment
+                fetchReplies(parentId)
+                // Refresh thread to update total comments count
+                dispatch(fetchThreadById(id))
+            }
         } catch (error) {
             console.error('Error adding reply:', error)
         }
     }
+
+    // Cleanup preview URLs on unmount
+    useEffect(() => {
+        return () => {
+            previewImages.forEach(url => URL.revokeObjectURL(url))
+        }
+    }, [previewImages])
 
     if (!thread) return <div>Loading...</div>
 
@@ -343,7 +395,7 @@ export default function ThreadDetail() {
                     {/* Add Comment */}
                     {!thread.isClosed && (
                         <div className="mb-6">
-                            <div className="flex gap-4">
+                            <div className="flex flex-col gap-4">
                                 <InputField
                                     type="text"
                                     placeholder="Add a comment..."
@@ -351,18 +403,57 @@ export default function ThreadDetail() {
                                     onChange={(e) => setNewComment(e.target.value)}
                                     className="flex-1"
                                 />
-                                <Button 
-                                    onClick={handleAddComment}
-                                    disabled={!newComment.trim()}
-                                >
-                                    Comment
-                                </Button>
+                                <div className="flex items-center gap-4">
+                                    <label className="cursor-pointer flex items-center gap-2 text-blue-500 hover:text-blue-600">
+                                        <input
+                                            type="file"
+                                            multiple
+                                            accept="image/*"
+                                            onChange={handleImageChange}
+                                            className="hidden"
+                                        />
+                                        <FaImage size={20} />
+                                        Add Images
+                                    </label>
+                                    <Button 
+                                        onClick={handleAddComment}
+                                        disabled={!newComment.trim() && commentImages.length === 0}
+                                    >
+                                        Comment
+                                    </Button>
+                                </div>
+                                {/* Image Previews */}
+                                {previewImages.length > 0 && (
+                                    <div className="flex gap-2 mt-2 flex-wrap">
+                                        {previewImages.map((preview, index) => (
+                                            <div key={index} className="relative">
+                                                <img 
+                                                    src={preview} 
+                                                    alt={`Preview ${index + 1}`} 
+                                                    className="w-20 h-20 object-cover rounded"
+                                                />
+                                                <button
+                                                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
+                                                    onClick={() => {
+                                                        const newImages = commentImages.filter((_, i) => i !== index)
+                                                        const newPreviews = previewImages.filter((_, i) => i !== index)
+                                                        setCommentImages(newImages)
+                                                        setPreviewImages(newPreviews)
+                                                        URL.revokeObjectURL(preview)
+                                                    }}
+                                                >
+                                                    <FaTimes size={12} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                        
 
                             {/* Comments List */}
                             <div className="space-y-4">
-                                {comments&&comments?.map(comment => (
+                                {comments && comments?.map(comment => (
                                     <div key={comment._id} className="border rounded-lg p-4">
                                         <div className="flex items-start gap-3">
                                             <img 
@@ -381,6 +472,21 @@ export default function ThreadDetail() {
                                                     </span>
                                                 </div>
                                                 <p className="mt-1">{comment.content}</p>
+                                                
+                                                {/* Comment Images */}
+                                                {comment.photos?.length > 0 && (
+                                                    <div className="mt-2 flex gap-2 flex-wrap">
+                                                        {comment.photos.map((photo, index) => (
+                                                            <img 
+                                                                key={index}
+                                                                src={photo}
+                                                                alt={`Comment image ${index + 1}`}
+                                                                className="w-32 h-32 object-cover rounded-lg cursor-pointer"
+                                                                onClick={() => window.open(photo, '_blank')}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                )}
                                                 
                                                 {/* Associated Products in Comment */}
                                                 {comment.associatedProducts?.length > 0 && (
@@ -429,16 +535,20 @@ export default function ThreadDetail() {
                                                     <div className="mt-2">
                                                         {viewingReplies === comment._id ? (
                                                             <div className="mt-4 space-y-4">
-                                                                {replies[comment._id]?.map(reply => (
+                                                                {/* Replies List */}
+                                                                {(Array.isArray(replies[comment._id]) ? replies[comment._id] : [])?.map(reply => (
                                                                     <div key={reply._id} className="flex items-start gap-3 pl-8">
                                                                         <img 
                                                                             src={reply.author?.profileImage} 
                                                                             alt={reply.author?.userName}
                                                                             className="w-6 h-6 rounded-full"
                                                                         />
-                                                                        <div>
+                                                                        <div className="flex-1">
                                                                             <div className="flex items-center gap-2">
                                                                                 <span className="font-medium text-sm">{reply.author?.userName}</span>
+                                                                                {reply.author?.is_Id_verified && (
+                                                                                    <span className="text-blue-500 text-xs">✓</span>
+                                                                                )}
                                                                                 <span className="text-xs text-gray-500">
                                                                                     {new Date(reply.createdAt).toLocaleDateString()}
                                                                                 </span>
@@ -447,6 +557,24 @@ export default function ThreadDetail() {
                                                                         </div>
                                                                     </div>
                                                                 ))}
+
+                                                                {/* Load More Replies */}
+                                                                {replyPages[comment._id] && 
+                                                                 replies[comment._id]?.length < replyPages[comment._id].total && (
+                                                                    <div className="pl-8">
+                                                                        <Button
+                                                                            variant="outline"
+                                                                            size="sm"
+                                                                            onClick={() => fetchReplies(comment._id, (replyPages[comment._id].pageNo || 1) + 1)}
+                                                                            disabled={loadingReplies[comment._id]}
+                                                                            className="w-full"
+                                                                        >
+                                                                            {loadingReplies[comment._id] ? 'Loading...' : 'Load More Replies'}
+                                                                        </Button>
+                                                                    </div>
+                                                                )}
+
+                                                                {/* Reply Input */}
                                                                 <div className="pl-8">
                                                                     <InputField
                                                                         type="text"
@@ -460,19 +588,52 @@ export default function ThreadDetail() {
                                                                         className="text-sm"
                                                                     />
                                                                 </div>
+
+                                                                {/* Hide Replies Button */}
+                                                                <div className="pl-8">
+                                                                    <Button 
+                                                                        variant="outline" 
+                                                                        size="sm"
+                                                                        onClick={() => {
+                                                                            setViewingReplies(null)
+                                                                            // Optionally clear replies for this comment to fetch fresh next time
+                                                                            setReplies(prev => {
+                                                                                const newReplies = { ...prev }
+                                                                                delete newReplies[comment._id]
+                                                                                return newReplies
+                                                                            })
+                                                                        }}
+                                                                    >
+                                                                        Hide Replies
+                                                                    </Button>
+                                                                </div>
                                                             </div>
                                                         ) : (
-                                                            comment.totalReplies > 0 && (
+                                                            <div className="flex items-center gap-4 mt-2">
                                                                 <button 
-                                                                    className="text-blue-500 text-sm mt-2"
+                                                                    className="text-blue-500 text-sm hover:underline"
                                                                     onClick={() => {
                                                                         setViewingReplies(comment._id)
                                                                         fetchReplies(comment._id)
                                                                     }}
                                                                 >
-                                                                    View {comment.totalReplies} replies
+                                                                    Reply
                                                                 </button>
-                                                            )
+                                                                {comment.totalReplies > 0 && (
+                                                                    <button 
+                                                                        className="text-gray-500 text-sm hover:underline flex items-center gap-1"
+                                                                        onClick={() => {
+                                                                            setViewingReplies(comment._id)
+                                                                            fetchReplies(comment._id)
+                                                                        }}
+                                                                    >
+                                                                        {/* <FaComment size={14} /> */}
+                                                                        <span>
+                                                                            {comment.totalReplies} {comment.totalReplies === 1 ? 'reply' : 'replies'}
+                                                                        </span>
+                                                                    </button>
+                                                                )}
+                                                            </div>
                                                         )}
                                                     </div>
                                                 )}
@@ -498,37 +659,80 @@ export default function ThreadDetail() {
                     )}
 
                     {/* Recommended Threads */}
-                    {thread.recommendedThreads?.length > 0 && (
+                    {thread&&thread.recommendedThreads?.length > 0 && (
                         <div className="p-6 border-t">
                             <h3 className="font-semibold mb-4">Recommended Threads</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div className="flex overflow-x-auto gap-4 pb-4 flex-wrap -mx-2 px-2 snap-x">
                                 {thread.recommendedThreads.map(rec => (
                                     <Link 
                                         key={rec._id} 
                                         to={`/thread/${rec._id}`}
-                                        className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                                        className="flex-shrink-0 w-[300px] border rounded-lg p-4 hover:bg-gray-50 transition-colors snap-start"
                                     >
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <img 
-                                                src={rec.user?.profileImage} 
-                                                alt={rec.user?.userName}
-                                                className="w-8 h-8 rounded-full"
-                                            />
-                                            <div>
-                                                <span className="font-medium">{rec.user?.userName}</span>
-                                                {rec.user?.is_Id_verified && (
-                                                    <span className="text-blue-500 text-sm ml-1">✓</span>
+                                        <div className="flex items-center gap-3 mb-3">
+                                            <div className="relative">
+                                                <img 
+                                                    src={rec.user?.profileImage} 
+                                                    alt={rec.user?.userName}
+                                                    className="w-10 h-10 rounded-full object-cover"
+                                                />
+                                                {rec.user?.isLive && (
+                                                    <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
                                                 )}
                                             </div>
+                                            <div>
+                                                <div className="flex items-center gap-1">
+                                                    <span className="font-medium text-sm">{rec.user?.userName}</span>
+                                                    {rec.user?.is_Id_verified && (
+                                                        <span className="text-blue-500 text-sm">✓</span>
+                                                    )}
+                                                </div>
+                                                <div className="text-xs text-gray-500">
+                                                    {new Date(rec.createdAt).toLocaleDateString()}
+                                                </div>
+                                            </div>
                                         </div>
-                                        <h4 className="font-medium mb-1">{rec.title}</h4>
-                                        <p className="text-sm text-gray-600 mb-2">{rec.description}</p>
-                                        <div className="flex items-center gap-4 text-sm text-gray-500">
-                                            <span>❤️ {rec.totalLikes}</span>
-                                            <span>💬 {rec.totalComments}</span>
-                                            {rec.productCount > 0 && (
-                                                <span>📦 {rec.productCount}</span>
+                                        <div className="space-y-2">
+                                            <h4 className="font-medium text-sm line-clamp-2">{rec.title}</h4>
+                                            <p className="text-sm text-gray-600 line-clamp-2">{rec.description}</p>
+                                            {rec.budgetRange && (
+                                                <div className="text-sm text-gray-900">
+                                                    Budget: ฿{rec.budgetRange.min.toLocaleString()} - ฿{rec.budgetRange.max.toLocaleString()}
+                                                </div>
                                             )}
+                                            {rec.tags?.length > 0 && (
+                                                <div className="flex flex-wrap gap-1">
+                                                    {rec.tags.slice(0, 2).map((tag, idx) => (
+                                                        <span 
+                                                            key={idx} 
+                                                            className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full"
+                                                        >
+                                                            {tag}
+                                                        </span>
+                                                    ))}
+                                                    {rec.tags.length > 2 && (
+                                                        <span className="text-xs text-gray-500">
+                                                            +{rec.tags.length - 2} more
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            )}
+                                            <div className="flex items-center gap-4 text-sm text-gray-500 pt-2">
+                                                <div className="flex items-center gap-1">
+                                                    <FaHeart className={rec.isLiked ? "text-red-500" : "text-gray-400"} size={14} />
+                                                    <span>{rec.totalLikes}</span>
+                                                </div>
+                                                <div className="flex items-center gap-1">
+                                                    <FaComment className="text-gray-400" size={14} />
+                                                    <span>{rec.totalComments}</span>
+                                                </div>
+                                                {rec.productCount > 0 && (
+                                                    <div className="flex items-center gap-1">
+                                                        <span className="text-gray-400">📦</span>
+                                                        <span>{rec.productCount}</span>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                     </Link>
                                 ))}
