@@ -204,6 +204,8 @@ console.log("formData",formData)
                 value={formData.value}
                 onChange={(e) => setFormData({ ...formData, value: e.target.value })}
                 className="w-full border rounded px-3 py-2"
+                maxLength={30}
+                placeholder="Enter name (max 30 chars)"
               />
             </div>
             {!formData.parentId && (
