@@ -82,8 +82,15 @@ export default function FeeSetting() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setEditingValues((prev) => ({ ...prev, [name]: value }));
+    if (name === "value") {
+      if (/^\d{0,2}$/.test(value)) {
+        setEditingValues((prev) => ({ ...prev, [name]: value }));
+      }
+    } else {
+      setEditingValues((prev) => ({ ...prev, [name]: value }));
+    }
   };
+
 
   const handleKeyDown = (e, row) => {
     if (e.key === "Enter") {
@@ -147,6 +154,9 @@ export default function FeeSetting() {
             onBlur={() => saveEdit(row)}
             onKeyDown={(e) => handleKeyDown(e, row)}
             className="border rounded px-1 py-0.5 w-full"
+            maxLength={2}
+            min={0}
+            max={99}
           />
         ) : (
           <div

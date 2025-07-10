@@ -109,7 +109,7 @@ export default function ChatWindow({ room, socket }) {
             if (msg.messageType === 'SYSTEM' || msg.messageType === 'ORDER_STATUS' || msg.messageType === 'PAYMENT_STATUS') {
               return [...prev, msg];
             }
-            
+
             // Mark as seen if message not sent by me
             if (msg.sender?._id !== myUserId) {
               socket.emit("markMessagesAsSeen", { roomId: msg.chatRoom });
@@ -291,11 +291,10 @@ export default function ChatWindow({ room, socket }) {
                         <a
                           key={index}
                           href={action.url}
-                          className={`px-3 py-1 rounded text-sm ${
-                            action.type === 'primary'
+                          className={`px-3 py-1 rounded text-sm ${action.type === 'primary'
                               ? 'bg-blue-500 text-white hover:bg-blue-600'
                               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                          }`}
+                            }`}
                         >
                           {action.label}
                         </a>
@@ -313,15 +312,15 @@ export default function ChatWindow({ room, socket }) {
               <div key={msg._id || idx} className={`flex ${isSentByMe ? 'justify-end' : 'justify-start'} my-2`}>
                 <div className={`rounded-lg p-3 max-w-[70%] ${isSentByMe ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}>
                   <div className="flex items-start gap-3 border rounded p-2 bg-white">
-                    <img 
-                      src={getFullMediaUrl(msg.systemMeta?.productImage)} 
+                    <img
+                      src={getFullMediaUrl(msg.systemMeta?.productImage)}
                       alt={msg.systemMeta?.productName}
                       className="w-16 h-16 object-cover rounded"
                     />
                     <div>
                       <p className="font-medium text-gray-900">{msg.systemMeta?.productName}</p>
                       <p className="text-gray-600">${msg.systemMeta?.price}</p>
-                      <button 
+                      <button
                         onClick={() => window.open(`/product/${msg.systemMeta?.productId}`, '_blank')}
                         className="mt-2 text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
                       >
@@ -345,23 +344,23 @@ export default function ChatWindow({ room, socket }) {
               <div key={msg._id || idx} className={`flex ${isSentByMe ? 'justify-end' : 'justify-start'} my-2`}>
                 <div className={`rounded-lg p-3 max-w-[70%] ${isSentByMe ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}>
                   {msg.messageType === 'IMAGE' && (
-                    <img 
-                      src={getFullMediaUrl(msg.content)} 
+                    <img
+                      src={getFullMediaUrl(msg.content)}
                       alt="Shared image"
-                      className="max-w-full rounded cursor-pointer hover:opacity-90"
+                      className="max-w-full w-52 h-52 rounded cursor-pointer hover:opacity-90"
                       onClick={() => window.open(getFullMediaUrl(msg.content), '_blank')}
                     />
                   )}
                   {msg.messageType === 'VIDEO' && (
-                    <video 
-                      controls 
+                    <video
+                      controls
                       className="max-w-full rounded"
                       src={getFullMediaUrl(msg.content)}
                     />
                   )}
                   {msg.messageType === 'AUDIO' && (
-                    <audio 
-                      controls 
+                    <audio
+                      controls
                       className="max-w-full"
                       src={getFullMediaUrl(msg.content)}
                     />
@@ -371,7 +370,7 @@ export default function ChatWindow({ room, socket }) {
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
-                      <a 
+                      <a
                         href={getFullMediaUrl(msg.content)}
                         download={msg.fileName}
                         className="underline hover:text-blue-100"
@@ -393,8 +392,10 @@ export default function ChatWindow({ room, socket }) {
           // Regular text messages
           return (
             <div key={msg._id || idx} className={`flex ${isSentByMe ? 'justify-end' : 'justify-start'} my-2`}>
-              <div className={`rounded-lg p-3 max-w-[70%] ${isSentByMe ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}>
-                <p>{msg.content}</p>
+              <div className={`rounded-lg p-3 max-w-[30%] ${isSentByMe ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}>
+                <p className="break-words whitespace-pre-wrap">
+                  {msg.content}
+                </p>
                 {isSeen && (
                   <div className="flex justify-end mt-1">
                     <TiTick className="text-blue-300" />
@@ -402,6 +403,7 @@ export default function ChatWindow({ room, socket }) {
                 )}
               </div>
             </div>
+
           );
         })}
 

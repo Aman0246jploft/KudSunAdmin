@@ -22,10 +22,10 @@ const Header = ({ toggleSidebar, isMobile }) => {
   const [showThemeDropdown, setShowThemeDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const profileDropdownRef = useRef(null);
-  const selector = useSelector(state=>state?.user?.getLoginProfiledata)
-  useEffect(()=>{
+  const selector = useSelector(state => state?.user?.getLoginProfiledata)
+  useEffect(() => {
     dispatch(getLoginProfile())
-  },[localStorage.getItem("kadSunInfo")])
+  }, [localStorage.getItem("kadSunInfo")])
 
   let userInfo = JSON.parse(localStorage.getItem("kadSunInfo"));
 
@@ -109,12 +109,16 @@ const Header = ({ toggleSidebar, isMobile }) => {
       icon: AiOutlineLogout,
       label: "Log Out",
       onClick: () => {
-        localStorage.removeItem("kadSunInfo");
-        navigate("/login");
+        const confirmed = window.confirm("Are you sure you want to log out?");
+        if (confirmed) {
+          localStorage.removeItem("kadSunInfo");
+          navigate("/login");
+        }
         setShowProfileDropdown(false);
       },
       isDestructive: true,
-    },
+    }
+
   ];
 
   return (

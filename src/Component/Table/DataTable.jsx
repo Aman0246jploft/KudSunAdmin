@@ -157,10 +157,20 @@ const DataTable = ({ columns, data = [], sortBy, sortOrder, onSort }) => {
           <div
             className="text-sm p-3 break-words whitespace-normal shadow-xl max-w-xs rounded-lg"
             style={{
+              left: `${tooltip.x}px`,
+              top: `${tooltip.y}px`,
+              maxWidth: "300px",
               backgroundColor: theme.colors.background,
+              // backgroundColor: theme.colors.backgroundSecondary,
               color: theme.colors.textPrimary,
               border: `1px solid ${theme.colors.borderLight}`,
-              boxShadow: theme.shadows.lg,
+              padding: "8px",
+              borderRadius: "4px",
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+              whiteSpace: "pre-wrap",
+              overflowY: "auto",
+              maxHeight: "5.5em", // approx. 4 lines (1.375em per line)
+              lineHeight: "1.375em",
             }}
           >
             {tooltip.content}

@@ -130,7 +130,7 @@ export default function Chat() {
   }, [activeRoom]);
 
   return (
-    <div className="flex h-full overflow-hidden">
+    <div className="flex w-full h-full  overflow-hidden">
       <ChatRoomList
         chatRooms={chatRooms}
         setActiveRoom={setActiveRoom}

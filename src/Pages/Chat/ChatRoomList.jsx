@@ -28,7 +28,7 @@ export default function ChatRoomList({ chatRooms, setActiveRoom, activeRoom, soc
   };
 
   return (
-    <div className="w-1/3 border-r p-4 overflow-y-auto">
+    <div className="w-1/3 border-r p-4  overflow-y-auto">
       <h2 className="text-xl font-semibold mb-4">Chats</h2>
       {chatRooms.map((room) => {
         const other = room.participants?.[0];
@@ -36,9 +36,8 @@ export default function ChatRoomList({ chatRooms, setActiveRoom, activeRoom, soc
           <div
             key={room._id}
             onClick={() => setActiveRoom(room)}
-            className={`cursor-pointer p-3 rounded-md ${
-              activeRoom?._id === room._id ? "bg-blue-100" : "hover:bg-gray-100"
-            }`}
+            className={`cursor-pointer p-3 rounded-md ${activeRoom?._id === room._id ? "bg-blue-100" : "hover:bg-gray-100"
+              }`}
           >
             <div className="flex items-center gap-2 relative">
               <div className="relative">
@@ -50,12 +49,13 @@ export default function ChatRoomList({ chatRooms, setActiveRoom, activeRoom, soc
                   <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full" />
                 )}
               </div>
-              <div className="flex-1 min-w-0"> {/* Added flex-1 and min-w-0 for better truncation */}
+              <div className="w-[300px]  "> {/* Limits width to 24rem */}
                 <p className="font-medium">{other?.userName}</p>
-                <p className="text-sm text-gray-500 truncate">
+                <p className="text-sm text-gray-500 truncate overflow-hidden whitespace-nowrap">
                   {getFormattedLastMessage(room.lastMessage)}
                 </p>
               </div>
+
               {room.unreadCount > 0 && (
                 <div className="bg-blue-500 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center">
                   {room.unreadCount}
