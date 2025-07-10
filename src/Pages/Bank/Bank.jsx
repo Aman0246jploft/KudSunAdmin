@@ -46,11 +46,18 @@ export default function Bank() {
 
 
   const columns = [
-    {
-      key: "name",
-      label: "Bank Name",
-      sortable: true,
-    },
+ {
+  key: "name",
+  label: "Bank Name",
+  sortable: true,
+  render: (name) =>
+    name
+      ?.toLowerCase()
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" "),
+},
+
     {
       key: "actions",
       label: "Actions",
@@ -181,6 +188,7 @@ export default function Bank() {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className="w-full border rounded px-3 py-2"
+                 maxLength={35}
               />
             </div>
             <div className="flex justify-end space-x-2">
