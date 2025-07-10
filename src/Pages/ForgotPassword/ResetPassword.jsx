@@ -8,6 +8,7 @@ import { useTheme } from "../../contexts/theme/hook/useTheme";
 import { resetPassword } from "../../features/slices/userSlice";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { IoIosArrowBack } from "react-icons/io";
+import logo from "../../Component/Sidebar/logo.png";
 
 export default function ResetPassword() {
   const { theme } = useTheme();
@@ -96,11 +97,15 @@ export default function ResetPassword() {
           type="button"
           variant="ghost"
           size="sm"
-          onClick={() => navigate(-1)}
-          className="mb-4"
+          onClick={() => !loading && navigate(-1)}
+          className={`mb-4 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+          disabled={loading}
         >
           <IoIosArrowBack />
         </Button>
+        <div className="flex justify-center mb-8">
+          <img src={logo} alt="Logo" className="h-16 w-auto" />
+        </div>
         <h2 className="text-2xl font-bold mb-6 text-center">Reset Password</h2>
         <form onSubmit={handleReset} className="space-y-4" noValidate>
           <Input
@@ -112,12 +117,14 @@ export default function ResetPassword() {
             fullWidth
             placeholder='New Password'
             error={errors.newPassword}
+            disabled={loading}
             endAdornment={
               <button
                 type="button"
-                onClick={() => setShowNewPassword((show) => !show)}
-                className="text-xl text-black-500"
-                tabIndex={-1}
+                onClick={() => !loading && setShowNewPassword((show) => !show)}
+                className={`text-xl ${loading ? 'text-gray-400 cursor-not-allowed' : 'text-black-500 cursor-pointer'}`}
+                tabIndex={loading ? -1 : 0}
+                disabled={loading}
                 aria-label={showNewPassword ? "Hide password" : "Show password"}
               >
                 {showNewPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
@@ -132,14 +139,15 @@ export default function ResetPassword() {
             onChange={handleChange}
             fullWidth
             placeholder='Confirm Password'
-
             error={errors.confirmPassword}
+            disabled={loading}
             endAdornment={
               <button
                 type="button"
-                onClick={() => setShowConfirmPassword((show) => !show)}
-                className="text-xl text-black-500"
-                tabIndex={-1}
+                onClick={() => !loading && setShowConfirmPassword((show) => !show)}
+                className={`text-xl ${loading ? 'text-gray-400 cursor-not-allowed' : 'text-black-500 cursor-pointer'}`}
+                tabIndex={loading ? -1 : 0}
+                disabled={loading}
                 aria-label={showConfirmPassword ? "Hide password" : "Show password"}
               >
                 {showConfirmPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}

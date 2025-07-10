@@ -7,6 +7,7 @@ import { login } from "../../features/slices/userSlice";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import logo from "../../Component/Sidebar/logo.png";
 
 
 // You can use an icon library or SVG for the eye icon. Here's a simple inline SVG example:
@@ -27,6 +28,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false); // <-- new state for toggling password
   const dispatch = useDispatch();
   const selector = useSelector((state) => state.user);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -49,6 +51,7 @@ export default function Login() {
       return;
     }
 
+    setLoading(true);
     dispatch(login({ email: form.email, password: form.password }))
       .then((result) => {
         if (login.fulfilled.match(result)) {
@@ -57,15 +60,17 @@ export default function Login() {
         } else {
           const { message, code } = result.payload || {};
           console.error(`Login failed [${code}]: ${message}`);
+          toast.error(message || "Login failed");
         }
       })
       .catch((error) => {
         console.error("Unexpected error:", error);
         toast.error("Unexpected error occurred");
-      });
+      })
+      .finally(() => setLoading(false));
   };
 
-  let { loading, error } = selector ? selector : {};
+  let { loading: selectorLoading, error } = selector ? selector : {};
 
   return (
     <div
@@ -81,6 +86,9 @@ export default function Login() {
           border: `1px solid ${theme.colors.borderLight}`,
         }}
       >
+        <div className="flex justify-center mb-8">
+          <img src={logo} alt="Logo" className="h-16 w-auto" />
+        </div>
         <h2 className="text-2xl font-bold mb-6 text-center">Sign In</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -93,6 +101,7 @@ export default function Login() {
             placeholder="Enter your email"
             error={errors.email}
             fullWidth
+            disabled={loading}
           />
 
           {/* Password input with eye icon */}
@@ -106,13 +115,14 @@ export default function Login() {
               placeholder="Enter your password"
               error={errors.password}
               fullWidth
+              disabled={loading}
             />
             <div
-              className="absolute top-[38px] right-3 text-xl text-black-500"
-              onClick={togglePassword}
+              className={`absolute top-[38px] right-3 text-xl ${loading ? 'text-gray-400' : 'text-black-500 cursor-pointer'}`}
+              onClick={!loading ? togglePassword : undefined}
               role="button"
-              tabIndex={0}
-              onKeyDown={(e) => e.key === "Enter" && togglePassword()}
+              tabIndex={loading ? -1 : 0}
+              onKeyDown={(e) => !loading && e.key === "Enter" && togglePassword()}
             >
               <EyeIcon open={showPassword} />
             </div>
@@ -126,6 +136,7 @@ export default function Login() {
             loading={loading}
             loaderText="Signing in..."
             className="w-full"
+            disabled={loading}
           >
             Login
           </Button>
@@ -137,9 +148,10 @@ export default function Login() {
         >
           <button
             type="button"
-            onClick={() => navigate("/forgot-password")}
-            className="font-medium hover:underline"
+            onClick={() => !loading && navigate("/forgot-password")}
+            className={`font-medium hover:underline ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
             style={{ color: theme.colors.textSecondary }}
+            disabled={loading}
           >
             Forgot Password?
           </button>

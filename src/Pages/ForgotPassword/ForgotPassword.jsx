@@ -7,6 +7,8 @@ import { useTheme } from "../../contexts/theme/hook/useTheme";
 import { useDispatch } from "react-redux";
 import { requestResetOtp } from "../../features/slices/userSlice";
 import { IoIosArrowBack } from "react-icons/io";
+import logo from "../../Component/Sidebar/logo.png";
+
 export default function ForgotPassword() {
   const { theme } = useTheme();
   const navigate = useNavigate();
@@ -77,11 +79,15 @@ export default function ForgotPassword() {
           type="button"
           variant="ghost"
           size="sm"
-          onClick={() => navigate(-1)}
-          className="mb-4"
+          onClick={() => !loading && navigate(-1)}
+          className={`mb-4 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+          disabled={loading}
         >
           <IoIosArrowBack/>
         </Button>
+        <div className="flex justify-center mb-8">
+          <img src={logo} alt="Logo" className="h-16 w-auto" />
+        </div>
         <h2 className="text-2xl font-bold mb-6 text-center">Forgot Password</h2>
         <form onSubmit={handleRequestOtp} className="space-y-4">
           <Input
@@ -93,6 +99,7 @@ export default function ForgotPassword() {
             placeholder="Enter your email address"
             error={emailError}
             fullWidth
+            disabled={loading}
           />
           <Button
             type="submit"
@@ -101,6 +108,7 @@ export default function ForgotPassword() {
             fullWidth
             loading={loading}
             loaderText="Sending OTP..."
+            disabled={loading || !!emailError || !email}
           >
             Send OTP
           </Button>

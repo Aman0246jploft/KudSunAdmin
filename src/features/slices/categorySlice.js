@@ -176,7 +176,6 @@ export const acceptParameterValueByAdmin = createAsyncThunk(
 export const addSubCategory = createAsyncThunk(
     'category/addSubCategory',
     async ({ categoryId, formData } = {}, thunkAPI) => {
-
         try {
             const res = await authAxiosClient.post(`/category/addSubCategory/${categoryId}`, formData, {
                 headers: {
@@ -275,9 +274,6 @@ export const deleteParameterFromSubCategory = createAsyncThunk(
     }
 );
 
-
-
-
 const CategorySlice = createSlice({
     name: 'category',
     initialState: {
@@ -321,9 +317,6 @@ const CategorySlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
-
-
-
     },
 });
 

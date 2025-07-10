@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
 import { resendResetOtps, verifyResetOtps } from "../../features/slices/userSlice";
 import { IoIosArrowBack } from "react-icons/io";
+import logo from "../../Component/Sidebar/logo.png";
 
 export default function VerifyResetOtp() {
   const { theme } = useTheme();
@@ -87,8 +88,7 @@ export default function VerifyResetOtp() {
   return (
     <div
       className="min-h-screen flex items-center justify-center px-4"
-         style={{ backgroundColor: "#bdd5fc" }}
-
+      style={{ backgroundColor: "#bdd5fc" }}
     >
       <div
         className="w-full bg-white max-w-md p-6 md:p-8 rounded-xl shadow-2xl"
@@ -102,12 +102,16 @@ export default function VerifyResetOtp() {
           type="button"
           variant="ghost"
           size="sm"
-          onClick={() => navigate(-1)}
-          className="mb-4"
+          onClick={() => !loading && navigate(-1)}
+          className={`mb-4 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+          disabled={loading}
         >
           <IoIosArrowBack className="text-lg" />
         </Button>
 
+        <div className="flex justify-center mb-8">
+          <img src={logo} alt="Logo" className="h-16 w-auto" />
+        </div>
         <h2 className="text-2xl font-bold text-center mb-6">Verify OTP</h2>
 
         <form onSubmit={handleVerify} className="space-y-6">
@@ -123,7 +127,8 @@ export default function VerifyResetOtp() {
                 value={digit}
                 onChange={(e) => handleChange(idx, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(idx, e)}
-                className="w-12 h-12 md:w-14 md:h-14 text-xl text-center border rounded-lg focus:outline-none focus:ring-2 transition-all"
+                disabled={loading}
+                className={`w-12 h-12 md:w-14 md:h-14 text-xl text-center border rounded-lg focus:outline-none focus:ring-2 transition-all ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 style={{
                   backgroundColor: theme.colors.input,
                   color: theme.colors.textPrimary,
@@ -141,6 +146,7 @@ export default function VerifyResetOtp() {
               className="w-full h-12 text-base"
               loading={loading}
               loaderText="Verifying..."
+              disabled={loading || otp.join('').length !== 6}
             >
               Verify
             </Button>
@@ -148,9 +154,9 @@ export default function VerifyResetOtp() {
             <Button
               type="button"
               variant="outline"
-              className="w-full h-12 text-base"
+              className={`w-full h-12 text-base ${(resendTimer > 0 || loading) ? 'opacity-50 cursor-not-allowed' : ''}`}
               onClick={handleResendOtp}
-              disabled={resendTimer > 0}
+              disabled={resendTimer > 0 || loading}
             >
               {resendTimer > 0 ? `Resend in ${resendTimer}s` : "Resend"}
             </Button>
