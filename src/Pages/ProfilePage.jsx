@@ -2,8 +2,15 @@ import React, { useState, useEffect } from 'react';
 import authAxiosClient from '../api/authAxiosClient';
 import { useDispatch } from 'react-redux';
 import { getLoginProfile } from '../features/slices/userSlice';
+import { Pencil } from 'lucide-react'; // or any icon library
+import { useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+
 
 const ProfilePage = () => {
+    const fileInputRef = useRef(null);
+    const navigate = useNavigate()
     const [formData, setFormData] = useState({
         image: null, // File object or null
         userName: '',
@@ -89,12 +96,17 @@ const ProfilePage = () => {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-
             setSuccessMsg('Profile updated successfully!');
-            setFormData((prev) => ({ ...prev, image: null })); // reset selected file
-            await fetchProfile(); // reload profile data to reset form with updated data
+            setFormData((prev) => ({ ...prev, image: null }));
+            await fetchProfile();
+            dispatch(getLoginProfile());
 
-            dispatch(getLoginProfile())
+            // Delay for 1s then navigate
+            setTimeout(() => {
+                setSuccessMsg("");
+                navigate('/dashboard');
+            }, 1000);
+
         } catch (error) {
             console.error('Update profile error:', error);
             setError(
@@ -102,6 +114,9 @@ const ProfilePage = () => {
             );
         } finally {
             setSubmitLoading(false);
+            setTimeout(() => {
+                setSuccessMsg("");
+            }, 1000);
         }
     };
 
@@ -109,7 +124,7 @@ const ProfilePage = () => {
 
     return (
         <div className="max-w-md mx-auto p-6 bg-white rounded-2xl shadow-md mt-10">
-            <h2 className="text-2xl font-semibold mb-4 text-center">Profile Page</h2>
+            <h2 className="text-2xl font-semibold mb-4 text-center">Update Profile</h2>
 
             {error && (
                 <div className="mb-4 text-red-600 text-center font-medium">{error}</div>
@@ -120,23 +135,42 @@ const ProfilePage = () => {
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 {preview && (
-                    <div className="mb-4">
-                        <img
-                            src={preview}
-                            alt="Profile Preview"
-                            className="w-32 h-32 object-cover rounded-full mx-auto border"
+                    <div className="mb-4 relative w-fit mx-auto">
+                        {preview && (
+                            <img
+                                src={preview}
+                                alt="Profile Preview"
+                                className="w-32 h-32 object-cover rounded-full border"
+                            />
+                        )}
+                        <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="absolute bottom-2 right-2 bg-white p-1 rounded-full shadow-md hover:bg-gray-100"
+                        >
+                            <Pencil size={16} />
+                        </button>
+
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            name="profileImage"
+                            accept="image/*"
+                            onChange={handleChange}
+                            className="hidden"
                         />
                     </div>
+
                 )}
 
                 <div>
-                    <label className="block mb-1 font-medium">Profile Image</label>
+                    <label className="block mb-1 hidden font-medium">Profile Image</label>
                     <input
                         type="file"
                         name="profileImage" // MUST match backend multer.single('profileImage')
                         accept="image/*"
                         onChange={handleChange}
-                        className="block w-full text-sm file:mr-4 file:py-2 file:px-4
+                        className="block w-full hidden text-sm file:mr-4 file:py-2 file:px-4
               file:rounded-full file:border-0
               file:text-sm file:font-semibold
               file:bg-blue-50 file:text-blue-700
@@ -177,7 +211,7 @@ const ProfilePage = () => {
                             : 'bg-blue-600 hover:bg-blue-700'
                             }`}
                     >
-                        {submitLoading ? 'Submitting...' : 'Submit'}
+                        {submitLoading ? 'Updating...' : 'Update'}
                     </button>
                 </div>
             </form>

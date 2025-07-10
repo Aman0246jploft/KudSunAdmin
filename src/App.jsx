@@ -23,6 +23,10 @@ import StaticSettings from "./Pages/Setting/StaticSettings";
 import Thread from "./Pages/Thread/Thread";
 import EditThread from "./Pages/Thread/EditThread";
 import ThreadDetail from "./Pages/Thread/ThreadDetail";
+import VideoSection from "./Pages/VideoSection/VideoSection";
+import TermsOfService from "./Pages/TermsOfService/TermsOfService";
+import PrivacyPolicy from "./Pages/PrivacyPolicy/PrivacyPolicy";
+import AuctionRules from "./Pages/AuctionRules/AuctionRules";
 
 
 
@@ -95,6 +99,11 @@ function App() {
                 path="/subcategoryParameter/:id"
                 element={<SubCategoryParemeter />}
               />
+
+              <Route path="/video-section" element={<VideoSection />} />
+              <Route path="/terms-of-service" element={<TermsOfService />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/auction-rules" element={<AuctionRules />} />
             </Route>
           </Route>
         </Routes>

@@ -13,6 +13,9 @@ import {
   AiOutlineTag,
   AiOutlineQuestionCircle,
 } from "react-icons/ai";
+import { RiAuctionLine } from "react-icons/ri";
+import { BsBoxSeam } from "react-icons/bs";
+import { CiViewList } from "react-icons/ci";
 import { MdOutlineIndeterminateCheckBox } from "react-icons/md";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
 import clsx from "clsx";
@@ -28,40 +31,38 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
     { name: "Users", href: "/user", icon: AiOutlineTeam },
     {
       name: "Items",
-      icon: AiOutlineShop,
+      icon: BsBoxSeam,
       isParent: true,
       children: [
         { name: "Products", href: "/sellProduct", icon: AiOutlineTag },
-        { name: "Auctions", href: "/auctionProduct", icon: AiOutlineBell },
-        { name: "Thread", href: "/thread", icon: AiOutlineBell },
+        { name: "Auctions", href: "/auctionProduct", icon: RiAuctionLine },
+        { name: "Thread", href: "/thread", icon: CiViewList },
 
       ],
     },
 
     {
-      name: "Cms Management",
+      name: "CMS Management",
       icon: AiOutlineShop,
       isParent: true,
       children: [
-        {
-          name: "Rules",
-          href: "/Setting",
-          icon: MdOutlineIndeterminateCheckBox,
-        },
-        { name: "FAQ", href: "/faq", icon: AiOutlineQuestionCircle },
-        { name: "ContactUs", href: "/contact_us", icon: AiOutlineQuestionCircle },
-        // { name: "Into Video", href: "/StaticSettings", icon: AiOutlineQuestionCircle },
+        { name: "Video Section", href: "/video-section", icon: AiOutlineShop },
+        { name: "Terms of Service", href: "/terms-of-service", icon: AiOutlineShop },
+        { name: "Privacy Policy", href: "/privacy-policy", icon: AiOutlineShop },
+        { name: "Auction Rules", href: "/auction-rules", icon: AiOutlineShop },
+        { name: "FAQs", href: "/faq", icon: AiOutlineShop },
+        { name: "ContactUs", href: "/contact_us", icon: AiOutlineShop },
       ],
     },
 
     {
-      name: "Setting",
+      name: "Settings",
       icon: AiOutlineSetting,
       isParent: true,
       children: [
-        { name: "FeeSetting", href: "/feeSetting", icon: AiOutlineQuestionCircle },
-        { name: "Bank", href: "/bank", icon: AiOutlineQuestionCircle },
-        { name: "LocationSetting", href: "/location", icon: AiOutlineQuestionCircle },
+        { name: "FeeSettings", href: "/feeSetting", icon: AiOutlineSetting },
+        { name: "Bank", href: "/bank", icon: AiOutlineSetting },
+        { name: "Location Management", href: "/location", icon: AiOutlineSetting },
 
       ],
     },

@@ -453,7 +453,7 @@ export default function User() {
             className="font-semibold text-xl"
             style={{ color: theme.colors.textPrimary }}
           >
-            User List
+            Users List
           </div>
           <div className="flex flex-wrap  justify-end items-end gap-3">
             <label className="flex items-center space-x-2 cursor-pointer select-none">
