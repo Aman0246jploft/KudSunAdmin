@@ -1,7 +1,8 @@
 import React from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, Routes, Route } from "react-router-dom";
 import { useAuth } from "../auth/useAuth";
 import EditThread from "../Pages/Thread/EditThread";
+import DisputeManagement from '../Pages/Dispute/DisputeManagement';
 
 export default function PrivateRoute() {
   const { user } = useAuth();
@@ -14,6 +15,10 @@ const routes = [
   {
     path: "/thread/edit/:id",
     element: <EditThread />,
+  },
+  {
+    path: "/disputes",
+    element: <DisputeManagement />,
   },
   // ... other routes ...
 ];

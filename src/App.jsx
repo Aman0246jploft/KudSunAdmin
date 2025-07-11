@@ -27,6 +27,7 @@ import VideoSection from "./Pages/VideoSection/VideoSection";
 import TermsOfService from "./Pages/TermsOfService/TermsOfService";
 import PrivacyPolicy from "./Pages/PrivacyPolicy/PrivacyPolicy";
 import AuctionRules from "./Pages/AuctionRules/AuctionRules";
+import DisputeManagement from "./Pages/Dispute/DisputeManagement";
 
 
 
@@ -104,6 +105,10 @@ function App() {
               <Route path="/terms-of-service" element={<TermsOfService />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/auction-rules" element={<AuctionRules />} />
+
+              <Route path="/disputeManagement" element={<DisputeManagement />} />
+
+              
             </Route>
           </Route>
         </Routes>
