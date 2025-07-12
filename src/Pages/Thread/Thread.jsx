@@ -10,10 +10,13 @@ import { FaEye } from "react-icons/fa6";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
+import { useTheme } from "../../contexts/theme/hook/useTheme";
+import Pagination from "../../Component/Atoms/Pagination/Pagination";
 
 export default function Thread() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { theme } = useTheme();
 
   const { threads, loading, error, totalPages, totalRecords } = useSelector((state) => state.thread);
   const { categoryList } = useSelector((state) => state.category);
@@ -101,11 +104,7 @@ export default function Thread() {
     handleFilterChange('tags', newTags);
   };
 
-
-
-  const handleDelete = (product) => {
-    // Create FormData
-    const formData = new FormData();
+  const handleDelete = (threadId) => {
     confirmAlert({
       title: "Confirm to submit",
       message: "Are you sure to delete this.",
@@ -113,14 +112,13 @@ export default function Thread() {
         {
           label: "Yes",
           onClick: () => {
-             dispatch(deleteThread(threadId))
+            dispatch(deleteThread(threadId))
               .unwrap()
-              .then((res) => {
-                fetchThreadsData(); // Refresh data after delete
-
+              .then(() => {
+                fetchThreadsData();
               })
               .catch((err) => {
-                console.error("Failed to update product status:", err);
+                console.error("Failed to delete thread:", err);
               });
           },
         },
@@ -132,18 +130,10 @@ export default function Thread() {
     });
   };
 
-
-
-
-
-
-
-
   const handleToggleStatus = async (threadId) => {
     try {
       dispatch(toggleThreadStatus(threadId)).then(() => {
-
-        fetchThreadsData(); // Refresh data after status change
+        fetchThreadsData();
       })
     } catch (error) {
       console.error("Failed to update thread status:", error);
@@ -178,301 +168,228 @@ export default function Thread() {
     {
       key: "serial",
       label: "S.No",
-      width: "5%",
+      width: "10%",
       render: (_, __, rowIndex) =>
         (filters.pageNo - 1) * filters.size + rowIndex + 1,
     },
     {
       key: "title",
-      label: "Title & Description",
-      width: "30%",
-      render: (_, row) => (
-        <div className="flex items-start gap-2">
-          {row?.photos?.[0] && (
-            <img
-              src={row.photos[0]}
-              alt={row.title}
-              className="w-12 h-12 rounded object-cover"
-            />
-          )}
-          <div>
-            <div className="font-medium">{row.title || '-'}</div>
-            <div className="text-sm text-gray-500 mt-1">{row?.description || '-'}</div>
-     
-          </div>
-        </div>
-      )
+      label: "Title",
+      width: "25%",
     },
-    // {
-    //   key: "userId",
-    //   label: "Author",
-    //   width: "15%",
-    //   render: (_, row) => {
-    //     const user = row.userId;
-    //     return user ? (
-    //       <div className="flex items-center gap-2">
-    //         {user?.profileImage && (
-    //           <img 
-    //             src={user.profileImage} 
-    //             alt={user.userName} 
-    //             className="w-8 h-8 rounded-full object-cover"
-    //           />
-    //         )}
-    //         <div>
-    //           <div className="font-medium flex items-center gap-1">
-    //             {user?.userName || '-'}
-    //             {user?.isLive && (
-    //               <span className="w-2 h-2 bg-green-500 rounded-full" title="Online"></span>
-    //             )}
-    //           </div>
-    //           <div className="flex gap-1 text-xs">
-    //             {user?.is_Id_verified && (
-    //               <span className="text-blue-500">✓ ID Verified</span>
-    //             )}
-    //             {user?.is_Preferred_seller && (
-    //               <span className="text-green-500">★ Preferred</span>
-    //             )}
-    //           </div>
-    //         </div>
-    //       </div>
-    //     ) : '-';
-    //   }
-    // },
+    {
+      key: "description",
+      label: "Description",
+      width: "25%",
+    },
     {
       key: "category",
-      label: "Category/Subcategory",
-      width: "15%",
+      label: "Category/SubCategory",
+      width: "25%",
       render: (_, row) => {
         const cat = row?.categoryId?.name || "N/A";
         const subCat = row?.subCategoryId || "N/A";
-        return `${cat.charAt(0).toUpperCase() + cat.slice(1)} / ${subCat.charAt(0).toUpperCase() + subCat.slice(1)}`;
+        return `${cat} / ${subCat}`;
       }
-    },
-    {
-      key: "budgetRange",
-      label: "Budget",
-      width: "10%",
-      render: (_, row) => row?.budgetFlexible ? (
-        <span className="text-gray-500">Flexible</span>
-      ) : row?.budgetRange?.min != null && row?.budgetRange?.max != null ? (
-        <span className="font-medium">฿{row.budgetRange.min.toLocaleString()} - ฿{row.budgetRange.max.toLocaleString()}</span>
-      ) : '-'
-    },
-    {
-      key: "stats",
-      label: "Product Count",
-      width: "10%",
-      render: (_, row) => (
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2 text-sm">
-            <span title="Products" className="flex items-center gap-1">
-              <span className="text-gray-500"></span> {row?.totalAssociatedProducts || 0}
-            </span>
-          </div>
-        </div>
-      )
     },
     {
       key: "status",
       label: "Status",
-      width: "7%",
+      width: "25%",
       render: (_, row) => (
-        <div className="flex flex-col gap-1">
+        <div className="flex gap-2">
           <select
-            className="border rounded-md px-2 py-1 text-sm"
-            value={row?.isDisable ? "disabled" : (row?.isClosed ? "closed" : "active")}
-            onChange={(e) => {
-              const newStatus = e.target.value;
-              if (newStatus === "disabled" || newStatus === "active") {
-                handleToggleStatus(row._id);
-              }
+            value={row?.isDisable ? "disabled" : "enabled"}
+            onChange={() => handleToggleStatus(row._id)}
+            className="border rounded px-2 py-1 text-sm focus:outline-none"
+            style={{
+              color: row?.isDisable ? "#4b5563" : "#166534",
             }}
           >
-            <option value="active">Active</option>
+            <option value="enabled">Enabled</option>
             <option value="disabled">Disabled</option>
-            {/* <option value="closed" disabled>Closed</option> */}
           </select>
-          {/* {row?.isTrending && (
-            <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs text-center mt-1">
-              🔥 Trending
-            </span>
-          )}
-          {row?.createdAt && (
-            <span className="text-xs text-gray-500 text-center mt-1">
-              {new Date(row.createdAt).toLocaleDateString()}
-            </span>
-          )} */}
         </div>
-      )
+      ),
     },
     {
       key: "actions",
       label: "Actions",
-      width: "8%",
-      render: (_, row) => row && (
-        <div className="flex  gap-2">
-
-
-
+      width: "10%",
+      render: (_, row) => (
+        <div className="flex gap-2">
           <button
-            title="View"
             onClick={() => navigate(`/thread/${row._id}`)}
             className="p-1 rounded hover:bg-gray-200"
-
-
+            style={{ color: theme.colors.textPrimary }}
           >
             <FaEye size={18} />
           </button>
-
-
-
-          <>
-            <button
-              variant="secondary"
-              size="sm"
-              onClick={() => navigate(`/thread/edit/${row._id}`)}
-              className="w-full"
-              title="Edit"
-            >
-
-              <FiEdit size={18} />
-
-            </button>
-
-
-            <button
-
-              onClick={() => handleDelete(row._id)}
-              className="p-1 text-red-500 rounded hover:bg-gray-200"
-
-              title="Delete"
-            >
-              <FiTrash2 size={18} />
-            </button>
-
-
-
-
-          </>
-
+          <button
+            onClick={() => navigate(`/thread/edit/${row._id}`)}
+            className="p-1 rounded hover:bg-gray-200"
+            style={{ color: theme.colors.textPrimary }}
+          >
+            <FiEdit size={18} />
+          </button>
+          <button
+            onClick={() => handleDelete(row._id)}
+            className="p-1 rounded hover:bg-gray-200"
+            style={{ color: theme.colors.error }}
+          >
+            <FiTrash2 size={18} />
+          </button>
         </div>
-      )
+      ),
     },
   ];
 
-  return (
-    <div className="p-6">
-      {/* Header Section */}
-     
+  const rowHeight = 40;
+  const headerHeight = 56;
+  const fixedRows = filters.size;
+  const minTableHeight = headerHeight + rowHeight * fixedRows;
 
-      {/* Data Table */}
-      <div className="bg-white rounded-lg shadow">
-      <div className=" rounded-lg shadow p-4 mb-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-semibold text-gray-800">Thread List</h2>
-          <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              onClick={resetAllFilters}
-              className="px-4 py-2 text-sm"
-            >
-              Reset Filters
-            </Button>
+  return (
+    <div style={{ backgroundColor: theme.colors.background }}>
+      <div
+        className="rounded-lg shadow-sm border overflow-hidden"
+        style={{
+          borderColor: theme.colors.border,
+          backgroundColor: theme.colors.backgroundSecondary,
+          color: theme.colors.textPrimary,
+        }}
+      >
+        <div
+          className="flex justify-between items-center px-2 py-2"
+          style={{ borderBottom: `1px solid ${theme.colors.borderLight}` }}
+        >
+          <div
+            className="font-semibold text-xl"
+            style={{ color: theme.colors.textPrimary }}
+          >
+            Thread List
           </div>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {/* Search Input - Full Width */}
-          <div className="col-span-full mb-4">
-            <InputField
+
+          <div className="flex justify-center items-center gap-3">
+            <div className="flex gap-2">
+              <input
+                type="number"
+                min="0"
+                placeholder="Min Budget"
+                value={filters.minBudget}
+                onChange={(e) => handleFilterChange("minBudget", e.target.value)}
+                className="px-2 py-1 border rounded w-24"
+              />
+              <span className="mx-1">-</span>
+              <input
+                type="number"
+                min="0"
+                placeholder="Max Budget"
+                value={filters.maxBudget}
+                onChange={(e) => handleFilterChange("maxBudget", e.target.value)}
+                className="px-2 py-1 border rounded w-24"
+              />
+
+              <select
+                value={selectedCategory}
+                onChange={(e) => {
+                  const categoryId = e.target.value;
+                  setSelectedCategory(categoryId);
+                  setSelectedSubCategory("");
+                  handleFilterChange("categoryId", categoryId);
+                  handleFilterChange("subCategoryId", "");
+                }}
+                className="px-3 py-2 border rounded-md"
+              >
+                <option value="">All Categories</option>
+                {categoryList?.data?.map((cat) => (
+                  <option key={cat._id} value={cat._id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={selectedSubCategory}
+                onChange={(e) => {
+                  const subCategoryId = e.target.value;
+                  setSelectedSubCategory(subCategoryId);
+                  handleFilterChange("subCategoryId", subCategoryId);
+                }}
+                className="px-3 py-2 border rounded-md"
+                disabled={!selectedCategory}
+              >
+                <option value="">All Subcategories</option>
+                {subCategories?.map((sub) => (
+                  <option key={sub._id} value={sub._id}>
+                    {sub.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <input
+              className="p-1 outline-none border"
               type="text"
               placeholder="Search thread title or keyword"
-              className="w-full"
               value={filters.keyWord}
               onChange={(e) => handleFilterChange("keyWord", e.target.value)}
             />
           </div>
+        </div>
 
-          {/* Price Range */}
-          <div className="flex items-center gap-2">
-            <InputField
-              type="number"
-              placeholder="Min Price"
-              className="w-full"
-              value={filters.minBudget}
-              onChange={(e) => handleFilterChange("minBudget", e.target.value)}
-            />
-            <span className="text-gray-500">-</span>
-            <InputField
-              type="number"
-              placeholder="Max Price"
-              className="w-full"
-              value={filters.maxBudget}
-              onChange={(e) => handleFilterChange("maxBudget", e.target.value)}
-            />
-          </div>
-
-          {/* Category Dropdown */}
-          <div>
-            <select
-              className="w-full border rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={selectedCategory}
-              onChange={(e) => {
-                const categoryId = e.target.value;
-                setSelectedCategory(categoryId);
-                setSelectedSubCategory("");
-                handleFilterChange("categoryId", categoryId);
-                handleFilterChange("subCategoryId", "");
-              }}
+        <div className="relative" style={{ minHeight: `${minTableHeight}px` }}>
+          {loading ? (
+            <div
+              className="absolute inset-0 flex items-center justify-center"
+              style={{ backgroundColor: theme.colors.backgroundSecondary }}
             >
-              <option value="">All Categories</option>
-              {categoryList?.data?.map((cat) => (
-                <option key={cat._id} value={cat._id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Subcategory Dropdown */}
-          <div>
-            <select
-              className="w-full border rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={selectedSubCategory}
-              onChange={(e) => {
-                const subCategoryId = e.target.value;
-                setSelectedSubCategory(subCategoryId);
-                handleFilterChange("subCategoryId", subCategoryId);
-              }}
-              disabled={!selectedCategory}
+              <div className="text-center">
+                <div
+                  className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto"
+                  style={{ borderColor: theme.colors.primary }}
+                ></div>
+                <p
+                  className="mt-2"
+                  style={{ color: theme.colors.textSecondary }}
+                >
+                  Loading threads...
+                </p>
+              </div>
+            </div>
+          ) : error ? (
+            <div
+              className="absolute inset-0 flex items-center justify-center"
+              style={{ backgroundColor: theme.colors.backgroundSecondary }}
             >
-              <option value="">All Subcategories</option>
-              {subCategories?.map((sub) => (
-                <option key={sub._id} value={sub._id}>
-                  {sub.name}
-                </option>
-              ))}
-            </select>
+              <div
+                className="text-center font-semibold"
+                style={{ color: theme.colors.error }}
+              >
+                Error: {error}
+              </div>
+            </div>
+          ) : (
+            <div className="px-1 pt-1">
+              <DataTable columns={columns} data={threads} />
+            </div>
+          )}
+        </div>
+
+        <div
+          className="py-2 px-2 border-t"
+          style={{ borderColor: theme.colors.borderLight }}
+        >
+          <div className="flex justify-end">
+            <Pagination
+              pageNo={filters.pageNo}
+              size={filters.size}
+              total={totalRecords}
+              onChange={(page) => handleFilterChange("pageNo", page)}
+              theme={theme}
+            />
           </div>
         </div>
-      </div>
-        <DataTable
-          data={threads}
-          columns={columns}
-          loading={loading}
-          error={error}
-          onSort={handleSort}
-          sortBy={filters.sortBy}
-          sortOrder={filters.sortOrder}
-          pagination={{
-            currentPage: filters.pageNo,
-            totalPages: totalPages,
-            totalRecords: totalRecords,
-            pageSize: filters.size,
-            onPageChange: (page) => handleFilterChange("pageNo", page),
-            onPageSizeChange: (size) => handleFilterChange("size", size)
-          }}
-        />
       </div>
     </div>
   );

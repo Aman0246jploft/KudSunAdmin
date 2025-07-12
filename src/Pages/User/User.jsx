@@ -131,10 +131,21 @@ export default function User() {
   };
 
   const handleToggleStatus = (user) => {
-    dispatch(update({ id: user._id, isDisable: !user?.isDisable })) // Rename this action if it's misleading (e.g. it's toggling, not deleting)
+    dispatch(update({ id: user._id, isDisable: !user?.isDisable })) 
       .unwrap()
       .then(() => {
-        dispatch(fetchUserList(pagination)); // Fetch updated user list
+        // Include all parameters when refetching
+        const isDisable = userStatusFilter === "enabled" ? false : userStatusFilter === "disabled" ? true : undefined;
+        dispatch(fetchUserList({
+          ...pagination,
+          showSellerRequests,
+          reported: showReportedRequests,
+          registrationDateStart,
+          registrationDateEnd,
+          sortBy,
+          sortOrder,
+          ...(isDisable !== undefined && { isDisable })
+        }));
       })
       .catch((err) => {
         console.error("Failed to toggle user status:", err);
@@ -331,18 +342,19 @@ export default function User() {
       key: "status",
       label: "Status",
       render: (value, row) => (
-        <button
-          onClick={() => handleToggleStatus(row)}
-          className="p-1 rounded hover:bg-gray-200"
-          title={row.isDisable ? "Enable User" : "Disable User"}
-          style={{ color: row.isDisable ? "gray" : "green" }}
+        <select
+          value={row.isDisable ? "disabled" : "enabled"}
+          onChange={(e) => handleToggleStatus(row)}
+          className="border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          style={{
+            // backgroundColor: row.isDisable ? "#f3f4f6" : "#dcfce7",
+            color: row.isDisable ? "#4b5563" : "#166534",
+            // borderColor: row.isDisable ? "#d1d5db" : "#86efac"
+          }}
         >
-          {!row.isDisable ? (
-            <FiCheckCircle color="green" size={18} />
-          ) : (
-            <FiSlash color="gray" size={18} />
-          )}
-        </button>
+          <option value="enabled">Enabled</option>
+          <option value="disabled">Disabled</option>
+        </select>
       ),
     },
 

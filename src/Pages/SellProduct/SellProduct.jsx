@@ -106,7 +106,14 @@ export default function SellProduct() {
     dispatch(toggleProductDisable({ id: product._id, formData }))
       .unwrap()
       .then((res) => {
-        dispatch(productList(pagination));
+        // Include all parameters when refetching
+        dispatch(productList({
+          ...pagination,
+          ...filters,
+          deliveryFilter: shippingType,
+          minPrice: filters.minPrice || undefined,
+          maxPrice: filters.maxPrice || undefined,
+        }));
       })
       .catch((err) => {
         console.error("Failed to update product status:", err);
@@ -181,6 +188,26 @@ export default function SellProduct() {
       width: "25%",
     },
     {
+      key: "status",
+      label: "Status",
+      width: "25%",
+      render: (_, row) => (
+        <div className="flex gap-2">
+            <select
+            value={row.isDisable ? "disabled" : "enabled"}
+            onChange={() => handleToggleStatus(row)}
+            className="border rounded px-2 py-1 text-sm focus:outline-none "
+            style={{
+              color: row.isDisable ? "#4b5563" : "#166534",
+            }}
+          >
+            <option value="enabled">Enabled</option>
+            <option value="disabled">Disabled</option>
+          </select>
+        </div>
+      ),
+    },
+    {
       key: "actions",
       label: "Actions",
       width: "10%",
@@ -208,18 +235,7 @@ export default function SellProduct() {
             <FiTrash2 size={18} />
           </button>
 
-          <button
-            onClick={() => handleToggleStatus(row)}
-            className="p-1 rounded hover:bg-gray-200"
-            title={row.isDisable ? "Disable Product" : "Enable Product"}
-            style={{ color: row.isDisable ? "green" : "gray" }}
-          >
-            {!row.isDisable ? (
-              <FiCheckCircle color="green" size={18} />
-            ) : (
-              <FiSlash color="gray" size={18} />
-            )}
-          </button>
+     
         </div>
       ),
     },

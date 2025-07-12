@@ -7,22 +7,26 @@ import DataTable from "../../Component/Table/DataTable";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
 import { FiTrash2, FiCheckCircle, FiSlash } from "react-icons/fi";
 import Modal from "./Modal";
+import AdvancedRichTextEditor from "../../Component/RichTextEditor/AdvancedRichTextEditor";
 
-export default function Faqs() {
+export default function ContactUs() {
   const dispatch = useDispatch();
   const { theme } = useTheme();
 
   const [pagination, setPagination] = useState({ pageNo: 1, size: 10 });
   const [faqs, setFaqs] = useState([]);
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
+  const [selectedFaq, setSelectedFaq] = useState(null);
+  const [replyData, setReplyData] = useState({
+    subject: "",
+    body: "",
+    to: ""
+  });
 
   const selector = useSelector((state) => state?.setting);
   const { error, loading, contactUs } = selector || {};
   const { data, total } = contactUs ? contactUs : {};
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedFaq, setSelectedFaq] = useState(null);
-
-
 
   useEffect(() => {
     dispatch(contactUsList(pagination))
@@ -40,20 +44,36 @@ export default function Faqs() {
     setPagination((prev) => ({ ...prev, pageNo: newPage }));
   };
 
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const openDetailModal = (faq) => {
     setSelectedFaq(faq);
     setIsModalOpen(true);
   };
 
+  const openReplyModal = (faq) => {
+    setSelectedFaq(faq);
+    setReplyData({
+      subject: `Re: ${faq.type} Inquiry`,
+      body: "",
+      to: faq.contact
+    });
+    setIsReplyModalOpen(true);
+  };
 
+  const handleReplySubmit = async () => {
+    // This will be implemented later when backend is ready
+    console.log("Reply Data:", replyData);
+    toast.info("Reply functionality will be implemented soon");
+    setIsReplyModalOpen(false);
+  };
 
   const handleToggleRead = async (id, currentStatus) => {
     try {
-      // TODO: Call your API to update isRead status
       dispatch(markAsreadContactUs({ id, isRead: !currentStatus }))
-
-
-      // Refresh list after update
       dispatch(contactUsList(pagination))
         .unwrap()
         .then((faqResult) => {
@@ -61,10 +81,8 @@ export default function Faqs() {
         });
     } catch (err) {
       console.error("Failed to toggle read status", err);
-
     }
   };
-
 
   const columns = [
     {
@@ -141,15 +159,25 @@ export default function Faqs() {
     ,
     {
       key: "view",
-      label: "View",
-      width: "10%",
+      label: "Actions",
+      width: "15%",
       render: (_, row) => (
-        <button
-          onClick={() => openDetailModal(row)}
-          className="text-blue-600 hover:underline"
-        >
-          View
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => openDetailModal(row)}
+            className="text-blue-600 hover:underline"
+          >
+            View
+          </button>
+         {isValidEmail(row.contact)&& <button
+            onClick={() => openReplyModal(row)}
+            className="text-green-600 hover:underline"
+            disabled={!isValidEmail(row.contact)}
+            title={!isValidEmail(row.contact) ? "Invalid email address" : ""}
+          >
+            Reply
+          </button>}
+        </div>
       ),
     },
 
@@ -161,23 +189,23 @@ export default function Faqs() {
         new Date(row.createdAt).toLocaleDateString("en-IN"),
     },
     {
-      key: "actions",
+      key: "status",
       label: "Status",
-      width: "10%",
+      width: "25%",
       render: (_, row) => (
-        <button
-          onClick={() => handleToggleRead(row._id, row.isRead)}
-          className="p-1 rounded hover:bg-gray-200"
-          title={row.isRead ? "Mark as Unread" : "Mark as Read"}
-          style={{ color: row.isRead ? "green" : "gray" }}
-        >
-          {row.isRead ? (
-            <span className=" text-green-800"> Connected </span>
-          ) : (
-            <span> Not Connected </span>
-
-          )}
-        </button>
+        <div className="flex gap-2">
+          <select
+            value={row.isRead ? "connected" : "notconnected"}
+            onChange={() => handleToggleRead(row._id, row.isRead)}
+            className="border rounded px-2 py-1 text-sm focus:outline-none"
+            style={{
+              color: row.isRead ? "#166534" : "#4b5563",
+            }}
+          >
+            <option value="connected">Resolved</option>
+            <option value="notconnected">Unresolved</option>
+          </select>
+        </div>
       ),
     }
 
@@ -265,8 +293,8 @@ export default function Faqs() {
                 wordBreak: "break-word",
                 whiteSpace: "normal",
                 maxWidth: "100%",
-                maxHeight: "150px",    // set max height as needed
-                overflowY: "auto",     // enable vertical scrollbar when content overflows
+                maxHeight: "150px",
+                overflowY: "auto",
               }}
             >
               <strong>Description:</strong> {selectedFaq.desc}
@@ -308,12 +336,65 @@ export default function Faqs() {
                 <div>No media</div>
               )}
             </div>
-
-
           </div>
         )}
       </Modal>
 
+      <Modal isOpen={isReplyModalOpen} onClose={() => setIsReplyModalOpen(false)}>
+        {isReplyModalOpen && (
+          <div className="space-y-4 p-4" style={{ minWidth: '600px' }}>
+            <h2 className="text-xl font-semibold mb-6">Reply to Contact</h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">To:</label>
+                <input
+                  type="email"
+                  value={replyData.to}
+                  readOnly
+                  className="w-full px-3 py-2 border rounded-md bg-gray-50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Subject:</label>
+                <input
+                  type="text"
+                  value={replyData.subject}
+                  onChange={(e) => setReplyData(prev => ({ ...prev, subject: e.target.value }))}
+                  className="w-full px-3 py-2 border rounded-md"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Message:</label>
+                <div className="border rounded-md">
+                  <AdvancedRichTextEditor
+                    value={replyData.body}
+                    onChange={(content) => setReplyData(prev => ({ ...prev, body: content }))}
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  onClick={() => setIsReplyModalOpen(false)}
+                  className="px-4 py-2 border rounded-md hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleReplySubmit}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  disabled={!replyData.subject || !replyData.body}
+                >
+                  Send Reply
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }
