@@ -3,6 +3,7 @@ import EmojiPicker from 'emoji-picker-react';
 import { BsEmojiSmile } from 'react-icons/bs';
 import { IoMdImages } from 'react-icons/io';
 import { FaBox } from 'react-icons/fa';
+import { IoSend } from 'react-icons/io5';
 import { useSelector } from 'react-redux';
 
 export default function MessageInput({ socket, room }) {
@@ -128,93 +129,135 @@ export default function MessageInput({ socket, room }) {
   };
 
   return (
-    <div className="p-4 border-t">
-      {/* Message input area */}
-      <div className="flex gap-2 items-end">
-        <div className="flex-1 relative">
-          <input
-            className="w-full border rounded-md p-2 pr-24"
-            value={text}
-            onChange={handleTyping}
-            onKeyDown={e => e.key === 'Enter' && handleSend()}
-            placeholder="Type a message..."
-          />
-          
-          {/* Action buttons */}
-          <div className="absolute right-2 bottom-2 flex gap-2">
-            <button 
-              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              <BsEmojiSmile size={20} />
-            </button>
-            <button 
-              onClick={() => fileInputRef.current?.click()}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              <IoMdImages size={20} />
-            </button>
-            <button 
-              onClick={() => setShowProductPicker(!showProductPicker)}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              <FaBox size={20} />
-            </button>
-          </div>
-        </div>
-        <button 
-          onClick={handleSend} 
-          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
-        >
-          Send
-        </button>
-      </div>
-
-      {/* Hidden file input */}
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileUpload}
-        className="hidden"
-        accept="image/*,video/*,audio/*,.pdf,.doc,.docx"
-      />
-
+    <div className="relative">
       {/* Emoji picker */}
       {showEmojiPicker && (
-        <div className="absolute bottom-20 right-4">
-          <EmojiPicker onEmojiClick={handleEmojiClick} />
+        <div className="absolute bottom-full left-0 right-0 mb-2 z-50 flex justify-center">
+          <div className="shadow-lg rounded-lg overflow-hidden max-w-xs sm:max-w-sm">
+            <EmojiPicker 
+              onEmojiClick={handleEmojiClick}
+              width={window.innerWidth > 640 ? 300 : 280}
+              height={350}
+            />
+          </div>
         </div>
       )}
 
       {/* Product picker */}
       {showProductPicker && (
-        <div className="absolute bottom-20 right-4 bg-white rounded-lg shadow-lg p-4 w-72 max-h-80 overflow-y-auto">
-          <h3 className="font-medium mb-2">Your Products</h3>
-          {userProducts.length === 0 ? (
-            <p className="text-gray-500">No products found</p>
-          ) : (
-            <div className="space-y-2">
-              {userProducts.map(product => (
-                <div 
-                  key={product._id}
-                  onClick={() => handleProductShare(product)}
-                  className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer"
-                >
-                  <img 
-                    src={product.image} 
-                    alt={product.name} 
-                    className="w-12 h-12 object-cover rounded"
-                  />
-                  <div>
-                    <p className="font-medium">{product.name}</p>
-                    <p className="text-sm text-gray-500">${product.price}</p>
-                  </div>
-                </div>
-              ))}
+        <div className="absolute bottom-full left-0 right-0 mb-2 z-50 px-2">
+          <div className="bg-white rounded-lg shadow-lg p-4 w-full max-w-sm mx-auto max-h-80 overflow-y-auto">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="font-medium text-gray-900">Your Products</h3>
+              <button 
+                onClick={() => setShowProductPicker(false)}
+                className="text-gray-400 hover:text-gray-600 text-xl leading-none"
+              >
+                ×
+              </button>
             </div>
-          )}
+            
+            {userProducts.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <FaBox size={32} className="mx-auto mb-2 opacity-50" />
+                <p>No products found</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {userProducts.map(product => (
+                  <div 
+                    key={product._id}
+                    onClick={() => handleProductShare(product)}
+                    className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
+                  >
+                    <img 
+                      src={product.image} 
+                      alt={product.name} 
+                      className="w-12 h-12 object-cover rounded-lg border border-gray-200 flex-shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 truncate text-sm">{product.name}</p>
+                      <p className="text-xs text-gray-500">${product.price}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
+
+      {/* Message input area */}
+      <div className="p-3 border-t bg-white">
+        <div className="flex gap-2 items-end">
+          <div className="flex-1 relative">
+            <div className="flex items-center bg-gray-50 rounded-2xl border border-gray-200 focus-within:border-blue-500 focus-within:bg-white transition-all">
+              <input
+                className="flex-1 bg-transparent px-4 py-3 pr-24 sm:pr-28 focus:outline-none resize-none text-sm placeholder-gray-500"
+                value={text}
+                onChange={handleTyping}
+                onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
+                placeholder="Type a message..."
+              />
+              
+              {/* Action buttons */}
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
+                <button 
+                  onClick={() => {
+                    setShowEmojiPicker(!showEmojiPicker);
+                    setShowProductPicker(false);
+                  }}
+                  className="text-gray-400 hover:text-gray-600 transition-colors p-1.5 rounded-full hover:bg-gray-100"
+                  title="Add emoji"
+                >
+                  <BsEmojiSmile size={16} />
+                </button>
+                <button 
+                  onClick={() => fileInputRef.current?.click()}
+                  className="text-gray-400 hover:text-gray-600 transition-colors p-1.5 rounded-full hover:bg-gray-100"
+                  title="Upload media"
+                >
+                  <IoMdImages size={16} />
+                </button>
+                <button 
+                  onClick={() => {
+                    setShowProductPicker(!showProductPicker);
+                    setShowEmojiPicker(false);
+                  }}
+                  className="text-gray-400 hover:text-gray-600 transition-colors p-1.5 rounded-full hover:bg-gray-100"
+                  title="Share product"
+                >
+                  <FaBox size={14} />
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <button 
+            onClick={handleSend}
+            disabled={!text.trim()}
+            className={`
+              p-3 rounded-full flex items-center justify-center flex-shrink-0
+              transition-all duration-200 ease-in-out
+              ${text.trim() 
+                ? 'bg-blue-500 hover:bg-blue-600 text-white transform hover:scale-105' 
+                : 'bg-gray-200 text-gray-400 cursor-not-allowed'}
+            `}
+            title="Send message"
+          >
+            <IoSend size={18} />
+          </button>
+        </div>
+
+        {/* Hidden file input */}
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileUpload}
+          className="hidden"
+          accept="image/*,video/*,audio/*,.pdf,.doc,.docx"
+        />
+      </div>
     </div>
   );
 }
