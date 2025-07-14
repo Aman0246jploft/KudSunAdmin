@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import EmojiPicker from 'emoji-picker-react';
 import { BsEmojiSmile } from 'react-icons/bs';
 import { IoMdImages } from 'react-icons/io';
@@ -12,9 +12,25 @@ export default function MessageInput({ socket, room }) {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showProductPicker, setShowProductPicker] = useState(false);
   const fileInputRef = useRef(null);
+  const emojiButtonRef = useRef(null);
   
   // Get user's products from Redux store
   const userProducts = useSelector(state => state.product.userProducts) || [];
+
+  // Close emoji picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showEmojiPicker && !event.target.closest('.emoji-picker-container') && !event.target.closest('.emoji-button')) {
+        setShowEmojiPicker(false);
+      }
+      if (showProductPicker && !event.target.closest('.product-picker-container') && !event.target.closest('.product-button')) {
+        setShowProductPicker(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [showEmojiPicker, showProductPicker]);
 
   const handleSend = () => {
     if (!text.trim()) return;
@@ -130,28 +146,38 @@ export default function MessageInput({ socket, room }) {
 
   return (
     <div className="relative">
-      {/* Emoji picker */}
+      {/* Emoji picker with popup positioning */}
       {showEmojiPicker && (
-        <div className="absolute bottom-full left-0 right-0 mb-2 z-50 flex justify-center">
-          <div className="shadow-lg rounded-lg overflow-hidden max-w-xs sm:max-w-sm">
-            <EmojiPicker 
-              onEmojiClick={handleEmojiClick}
-              width={window.innerWidth > 640 ? 300 : 280}
-              height={350}
-            />
+        <div className="emoji-picker-container absolute bottom-full right-0 mb-2 z-50">
+          <div className="relative">
+            <div className="bg-white shadow-2xl rounded-lg border border-gray-200 overflow-hidden">
+              <EmojiPicker 
+                onEmojiClick={handleEmojiClick}
+                width={350}
+                height={400}
+                skinTonesDisabled={false}
+                searchDisabled={false}
+                previewConfig={{
+                  showPreview: true
+                }}
+                lazyLoadEmojis={true}
+              />
+            </div>
+            {/* Close button overlay */}
+         
           </div>
         </div>
       )}
 
-      {/* Product picker */}
+      {/* Product picker with improved positioning */}
       {showProductPicker && (
-        <div className="absolute bottom-full left-0 right-0 mb-2 z-50 px-2">
-          <div className="bg-white rounded-lg shadow-lg p-4 w-full max-w-sm mx-auto max-h-80 overflow-y-auto">
+        <div className="product-picker-container absolute bottom-full left-0 right-0 mb-2 z-50 px-2">
+          <div className="bg-white rounded-lg shadow-xl border border-gray-200 p-4 w-full max-w-sm mx-auto max-h-80 overflow-y-auto">
             <div className="flex justify-between items-center mb-3">
               <h3 className="font-medium text-gray-900">Your Products</h3>
               <button 
                 onClick={() => setShowProductPicker(false)}
-                className="text-gray-400 hover:text-gray-600 text-xl leading-none"
+                className="text-gray-400 hover:text-gray-600 text-xl leading-none w-6 h-6 flex items-center justify-center"
               >
                 ×
               </button>
@@ -203,11 +229,12 @@ export default function MessageInput({ socket, room }) {
               {/* Action buttons */}
               <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
                 <button 
+                  ref={emojiButtonRef}
                   onClick={() => {
                     setShowEmojiPicker(!showEmojiPicker);
                     setShowProductPicker(false);
                   }}
-                  className="text-gray-400 hover:text-gray-600 transition-colors p-1.5 rounded-full hover:bg-gray-100"
+                  className="emoji-button text-gray-400 hover:text-gray-600 transition-colors p-1.5 rounded-full hover:bg-gray-100"
                   title="Add emoji"
                 >
                   <BsEmojiSmile size={16} />
@@ -224,7 +251,7 @@ export default function MessageInput({ socket, room }) {
                     setShowProductPicker(!showProductPicker);
                     setShowEmojiPicker(false);
                   }}
-                  className="text-gray-400 hover:text-gray-600 transition-colors p-1.5 rounded-full hover:bg-gray-100"
+                  className="product-button text-gray-400 hover:text-gray-600 transition-colors p-1.5 rounded-full hover:bg-gray-100"
                   title="Share product"
                 >
                   <FaBox size={14} />

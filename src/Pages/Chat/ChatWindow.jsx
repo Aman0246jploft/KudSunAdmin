@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import MessageInput from "./MessageInput";
 import { TiTick } from "react-icons/ti";
 import Image from "../../Component/Atoms/Image/Image";
@@ -10,10 +10,12 @@ export default function ChatWindow({ room, socket }) {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
 
   const messagesEndRef = useRef();
   const messageContainerRef = useRef();
-
+  const scrollPositionRef = useRef(0);
 
   let myUserId = JSON.parse(localStorage.getItem("kadSunInfo"))?.userId;
 
@@ -26,12 +28,37 @@ export default function ChatWindow({ room, socket }) {
     return `${socketURL}${url}`;
   };
 
+  // Smooth scroll to bottom function
+  const scrollToBottom = useCallback((smooth = true) => {
+    if (messageContainerRef.current) {
+      const container = messageContainerRef.current;
+      const scrollOptions = {
+        top: container.scrollHeight,
+        behavior: smooth ? 'smooth' : 'auto'
+      };
+      container.scrollTo(scrollOptions);
+    }
+  }, []);
+
+  // Check if user is near bottom of chat
+  const isNearBottom = useCallback(() => {
+    if (!messageContainerRef.current) return false;
+    const container = messageContainerRef.current;
+    const threshold = 100;
+    return container.scrollHeight - container.clientHeight <= container.scrollTop + threshold;
+  }, []);
+
   // Scroll handler to trigger loading older messages on scroll near top
-  const handleScroll = () => {
+  const handleScroll = useCallback(() => {
     if (!messageContainerRef.current || loadingMore || !hasMore) return;
 
-    if (messageContainerRef.current.scrollTop < 10) {
+    const container = messageContainerRef.current;
+    
+    // Load more messages when scrolled to top
+    if (container.scrollTop < 100) {
       setLoadingMore(true);
+      scrollPositionRef.current = container.scrollHeight - container.scrollTop;
+      
       socket.emit("getMessagesWithUser", {
         otherUserId: room.participants[0]?._id,
         pageNo: page + 1,
@@ -39,7 +66,20 @@ export default function ChatWindow({ room, socket }) {
       });
       setPage((prev) => prev + 1);
     }
-  };
+
+    // Update scroll to bottom state based on scroll position
+    setShouldScrollToBottom(isNearBottom());
+  }, [loadingMore, hasMore, page, room, socket, isNearBottom]);
+
+  // Restore scroll position after loading older messages
+  const restoreScrollPosition = useCallback(() => {
+    if (messageContainerRef.current && scrollPositionRef.current > 0) {
+      const container = messageContainerRef.current;
+      const newScrollTop = container.scrollHeight - scrollPositionRef.current;
+      container.scrollTop = newScrollTop;
+      scrollPositionRef.current = 0;
+    }
+  }, []);
 
   useEffect(() => {
     if (!room) {
@@ -47,6 +87,7 @@ export default function ChatWindow({ room, socket }) {
       setCurrentRoomId(null);
       setPage(1);
       setHasMore(true);
+      setShouldScrollToBottom(true);
       return;
     }
 
@@ -56,6 +97,8 @@ export default function ChatWindow({ room, socket }) {
       setMessages([]);
       setPage(1);
       setHasMore(true);
+      setIsInitialLoad(true);
+      setShouldScrollToBottom(true);
 
       socket.emit("getMessagesWithUser", {
         otherUserId: room.participants[0]?._id,
@@ -70,18 +113,22 @@ export default function ChatWindow({ room, socket }) {
         if (page === 1) {
           // Initial load, replace messages
           setMessages(data.messages || []);
+          setIsInitialLoad(false);
+          // Scroll to bottom immediately for initial load
+          requestAnimationFrame(() => {
+            scrollToBottom(false);
+          });
         } else {
           // Pagination: prepend older messages
           setMessages((prev) => [...data.messages, ...prev]);
+          // Restore scroll position after loading older messages
+          requestAnimationFrame(() => {
+            restoreScrollPosition();
+          });
         }
 
         // If fewer messages than page size received, no more messages to load
-        if (data.messages.length < 20) {
-          setHasMore(false);
-        } else {
-          setHasMore(true);
-        }
-
+        setHasMore(data.messages.length >= 20);
         setLoadingMore(false);
 
         // Mark messages as seen for this room
@@ -104,25 +151,27 @@ export default function ChatWindow({ room, socket }) {
                 Math.abs(new Date(m.createdAt) - new Date(msg.createdAt)) <
                 1000)
           );
+          
           if (!exists) {
-            // For system messages, no need to mark as seen
-            if (msg.messageType === 'SYSTEM' || msg.messageType === 'ORDER_STATUS' || msg.messageType === 'PAYMENT_STATUS') {
-              return [...prev, msg];
-            }
-
             // Mark as seen if message not sent by me
-            if (msg.sender?._id !== myUserId) {
+            if (msg.sender?._id !== myUserId && 
+                msg.messageType !== 'SYSTEM' && 
+                msg.messageType !== 'ORDER_STATUS' && 
+                msg.messageType !== 'PAYMENT_STATUS') {
               socket.emit("markMessagesAsSeen", { roomId: msg.chatRoom });
             }
+            
             return [...prev, msg];
           }
           return prev;
         });
 
-        // Scroll to bottom for new messages
-        setTimeout(() => {
-          messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-        }, 100);
+        // Auto-scroll to bottom for new messages if user is near bottom
+        requestAnimationFrame(() => {
+          if (shouldScrollToBottom || msg.sender?._id === myUserId) {
+            scrollToBottom(true);
+          }
+        });
       }
     };
 
@@ -152,12 +201,7 @@ export default function ChatWindow({ room, socket }) {
       socket.off("newMessage", handleNewMessage);
       socket.off("messagesSeen", handleMessagesSeen);
     };
-  }, [room, socket, currentRoomId, page, myUserId]);
-
-  // Scroll to bottom when messages update (new messages)
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [room, socket, currentRoomId, page, myUserId, shouldScrollToBottom, scrollToBottom, restoreScrollPosition]);
 
   if (!room) {
     return (
@@ -201,7 +245,8 @@ export default function ChatWindow({ room, socket }) {
       <div
         ref={messageContainerRef}
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-4 bg-gray-50 scroll-smooth"
+        className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-4 bg-gray-50"
+        style={{ scrollBehavior: 'smooth' }}
       >
         {loadingMore && (
           <div className="text-center py-2">
