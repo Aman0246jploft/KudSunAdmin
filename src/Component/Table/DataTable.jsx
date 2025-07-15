@@ -70,13 +70,17 @@ const DataTable = ({ columns, data = [], sortBy, sortOrder, onSort }) => {
                   key={col.key}
                   className="p-2 font-medium border-b"
                   style={{
+                
                     color: theme.colors.textPrimary,
                     borderColor: theme.colors.borderLight,
                     width: col.width || "auto",
+                    ...col.headerStyle,
                   }}
                 >
                   <div
-                    className="flex items-center gap-1 select-none"
+                    className={`flex items-center gap-1 select-none ${
+                      col.headerStyle?.textAlign === "right" ? "justify-end" : ""
+                    }`}
                     onClick={() => handleSort(col)}
                     style={{ cursor: col.sortable ? "pointer" : "default" }}
                   >
@@ -117,6 +121,9 @@ const DataTable = ({ columns, data = [], sortBy, sortOrder, onSort }) => {
                       <td
                         key={col.key}
                         className="p-2 max-w-[200px] truncate align-top"
+                        style={{
+                          ...col.cellStyle,
+                        }}
                         onMouseEnter={(e) => {
                           if (!col.disableTooltip) handleMouseEnter(e, row[col.key]);
                         }}

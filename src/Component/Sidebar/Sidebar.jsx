@@ -63,6 +63,7 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
         { name: "FeeSettings", href: "/feeSetting", icon: AiOutlineSetting },
         { name: "Bank", href: "/bank", icon: AiOutlineSetting },
         { name: "Location Management", href: "/location", icon: AiOutlineSetting },
+        { name: "Carrier Management", href: "/carrier", icon: AiOutlineSetting },
 
       ],
     },

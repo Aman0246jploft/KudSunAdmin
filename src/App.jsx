@@ -40,6 +40,7 @@ const ContactUs = lazy(() => import("./Pages/ContactUs/ContactUs"));
 const FeeSetting = lazy(() => import("./Pages/FeeSetting/FeeSetting"));
 const Location = lazy(() => import("./Pages/Location/Location"));
 const Bank = lazy(() => import("./Pages/Bank/Bank"));
+const Carrier = lazy(() => import("./Pages/Carrier/Carrier"));
 
 
 
@@ -84,6 +85,7 @@ function App() {
               <Route path="/feeSetting" element={<FeeSetting />} />
               <Route path="/location" element={<Location />} />
               <Route path="/bank" element={<Bank />} />
+              <Route path="/carrier" element={<Carrier />} />
 
               <Route path="/StaticSettings" element={<StaticSettings />} />
 
