@@ -305,7 +305,7 @@ const AdminTransactions = () => {
 
         return (
           <div className="flex flex-col">
-            <span className="font-medium">${payout?.sellerPayout?.payoutAmount?.toFixed(2) || '0.00'}</span>
+            <span className="font-medium">฿{payout?.sellerPayout?.payoutAmount?.toFixed(2) || '0.00'}</span>
             <span className={`text-sm px-2 py-1 rounded-full ${payout?.sellerPayout?.isPaidToSeller
               ? 'bg-green-100 text-green-800'
               : 'bg-yellow-100 text-yellow-800'
