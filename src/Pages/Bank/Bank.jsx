@@ -30,7 +30,6 @@ export default function Bank() {
       setLoading(false);
     }
   };
-  console.log("resres", banks)
 
   useEffect(() => {
     fetchAllBanks();

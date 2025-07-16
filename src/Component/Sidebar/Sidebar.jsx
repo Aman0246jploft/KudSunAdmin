@@ -71,6 +71,8 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
     { name: "Category", href: "/category", icon: AiOutlineTag },
     { name: "Chat", href: "/chat", icon: AiOutlineTag },
     { name: "Disputes", href: "/disputeManagement", icon: AiOutlineTag },
+    { name: "Tnx", href: "/admin/transactions", icon: AiOutlineTag },
+
 
  
 

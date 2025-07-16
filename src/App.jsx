@@ -28,6 +28,7 @@ import TermsOfService from "./Pages/TermsOfService/TermsOfService";
 import PrivacyPolicy from "./Pages/PrivacyPolicy/PrivacyPolicy";
 import AuctionRules from "./Pages/AuctionRules/AuctionRules";
 import DisputeManagement from "./Pages/Dispute/DisputeManagement";
+import AdminTransactions from "./Pages/Admin/AdminTransactions";
 
 
 
@@ -109,6 +110,7 @@ function App() {
               <Route path="/auction-rules" element={<AuctionRules />} />
 
               <Route path="/disputeManagement" element={<DisputeManagement />} />
+              <Route path="/admin/transactions" element={<AdminTransactions />} />
 
               
             </Route>

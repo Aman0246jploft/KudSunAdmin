@@ -34,7 +34,7 @@ const DataTable = ({ columns, data = [], sortBy, sortOrder, onSort }) => {
 
   const handleMouseLeave = (e) => {
     const related = e.relatedTarget;
-    if (!related || !related.closest(".custom-tooltip")) {
+    if (!related || !related?.closest(".custom-tooltip")) {
       setTooltip({ visible: false, content: "", x: 0, y: 0 });
     }
   };
