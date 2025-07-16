@@ -373,73 +373,7 @@ const AdminTransactions = () => {
       </div>
 
       {/* Filters Section */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border">
-        <h2 className="text-lg font-semibold mb-4">Filters</h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-
-          {/* Status Filters */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Order Status</label>
-            <select
-              name="status"
-              value={filters.status}
-              onChange={handleFilterChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All Statuses</option>
-              <option value="PENDING">Pending</option>
-              <option value="CONFIRMED">Confirmed</option>
-              <option value="SHIPPED">Shipped</option>
-              <option value="DELIVERED">Delivered</option>
-              <option value="CANCELLED">Cancelled</option>
-            </select>
-          </div>
-
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Payment Status</label>
-            <select
-              name="paymentStatus"
-              value={filters.paymentStatus}
-              onChange={handleFilterChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All Payment Status</option>
-              <option value="PENDING">Pending</option>
-              <option value="COMPLETED">Completed</option>
-              <option value="FAILED">Failed</option>
-            </select>
-          </div>
-
-
-
-          {/* Seller Payment Status */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Seller Paid</label>
-            <select
-              name="paidToSeller"
-              value={filters.paidToSeller}
-              onChange={handleFilterChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All</option>
-              <option value="true">Paid</option>
-              <option value="false">Unpaid</option>
-            </select>
-          </div>
-        </div>
-
-        {errors.amount && <p className="text-red-500 text-sm mt-2">{errors.amount}</p>}
-
-        <div className="flex space-x-4 mt-6">
-          <Button variant="primary" onClick={applyFilters}>
-            Apply Filters
-          </Button>
-          <Button variant="outline" onClick={clearFilters}>
-            Clear Filters
-          </Button>
-        </div>
-      </div>
 
       {/* Transactions Table */}
       <div className="bg-white rounded-lg shadow-sm border">
@@ -469,7 +403,7 @@ const AdminTransactions = () => {
           <div className="p-4 border-t">
             <div className="flex justify-between items-center">
               <p className="text-sm text-gray-700">
-                Showing {((pagination.pageNo - 1) * pagination.size) + 1} to {Math.min(pagination.pageNo * pagination.size, totalRecords)} of {totalRecords} results
+               
               </p>
               <Pagination
                 currentPage={pagination.pageNo}
