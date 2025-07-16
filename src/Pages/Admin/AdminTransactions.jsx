@@ -528,30 +528,30 @@ const AdminTransactions = () => {
                     <div className="space-y-2">
                       <div className="flex justify-between">
                         <span>Product Cost:</span>
-                        <span>${calculationModal.data.payoutCalculation?.productCost?.toFixed(2)}</span>
+                        <span>฿{calculationModal.data.payoutCalculation?.productCost?.toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between text-red-600">
                         <span>Service Charge:</span>
-                        <span>-${calculationModal.data.payoutCalculation?.serviceCharge?.toFixed(2)}</span>
+                        <span>-฿{calculationModal.data.payoutCalculation?.serviceCharge?.toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between text-red-600">
                         <span>Tax Charge:</span>
-                        <span>-${calculationModal.data.payoutCalculation?.taxCharge?.toFixed(2)}</span>
+                        <span>-฿{calculationModal.data.payoutCalculation?.taxCharge?.toFixed(2)}</span>
                       </div>
                       <hr />
                       <div className="flex justify-between font-medium">
                         <span>Net Amount:</span>
-                        <span>${calculationModal.data.payoutCalculation?.netAmount?.toFixed(2)}</span>
+                        <span>฿{calculationModal.data.payoutCalculation?.netAmount?.toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between text-red-600">
                         <span>Withdrawal Fee:</span>
-                        <span>-${calculationModal.data.payoutCalculation?.withdrawalFee?.toFixed(2)}</span>
+                        <span>-฿{calculationModal.data.payoutCalculation?.withdrawalFee?.toFixed(2)}</span>
                       </div>
                       <hr />
                       <div className="flex justify-between font-bold text-lg">
                         <span>Final Payout:</span>
                         <span className="text-green-600">
-                          ${calculationModal.data.payoutCalculation?.netAmountAfterWithdrawalFee?.toFixed(2)}
+                          ฿{calculationModal.data.payoutCalculation?.netAmountAfterWithdrawalFee?.toFixed(2)}
                         </span>
                       </div>
                     </div>
