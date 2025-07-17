@@ -290,6 +290,92 @@ export default function ChatWindow({ room, socket }) {
             );
           }
 
+          // Handle product messages
+          if (msg.messageType === 'PRODUCT') {
+            return (
+              <div
+                key={msg._id || idx}
+                className={`flex ${isSentByMe ? 'justify-end' : 'justify-start'} px-2`}
+              >
+                <div className={`
+                  max-w-[95%] sm:max-w-[85%] md:max-w-[75%] lg:max-w-[65%] 
+                  flex flex-col 
+                  ${isSentByMe ? 'items-end' : 'items-start'}
+                `}>
+                  <div className={`
+                    rounded-lg p-3 shadow-sm
+                    ${isSentByMe 
+                      ? 'bg-blue-500 text-white rounded-br-sm' 
+                      : 'bg-white text-gray-900 rounded-bl-sm border border-gray-200'
+                    }
+                  `}>
+                    {/* Product Card */}
+                    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden max-w-sm">
+                      {/* Product Image */}
+                      <div className="aspect-square bg-gray-100">
+                        <img
+                          src={msg.systemMeta?.productImage || msg.systemMeta?.productId?.productImages?.[0]}
+                          alt={msg.systemMeta?.productName || msg.systemMeta?.productId?.title}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.src = '/placeholder-product.png';
+                          }}
+                        />
+                      </div>
+                      
+                      {/* Product Info */}
+                      <div className="p-3">
+                        <h4 className="font-medium text-gray-900 text-sm mb-1 line-clamp-2">
+                          {msg.systemMeta?.productName || msg.systemMeta?.productId?.title}
+                        </h4>
+                        
+                        {/* Price */}
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-lg font-bold text-green-600">
+                            ${msg.systemMeta?.price || msg.systemMeta?.productId?.fixedPrice || 'N/A'}
+                          </span>
+                          {msg.systemMeta?.productId?.saleType === 'auction' && (
+                            <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full">
+                              Auction
+                            </span>
+                          )}
+                        </div>
+                        
+                        {/* Action Buttons */}
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleViewProduct(msg.systemMeta?.productId?._id || msg.systemMeta?.productId)}
+                            className="flex-1 bg-blue-600 text-white text-xs py-2 px-3 rounded-md hover:bg-blue-700 transition-colors"
+                          >
+                            View Product
+                          </button>
+                                                      <button
+                              onClick={() => handleAddToCart(msg.systemMeta)}
+                              className="flex-1 bg-green-600 text-white text-xs py-2 px-3 rounded-md hover:bg-green-700 transition-colors"
+                            >
+                              {msg.systemMeta?.saleType === 'auction' ? 'View Auction' : 'Add to Cart'}
+                            </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center mt-1 space-x-1">
+                    <span className="text-xs text-gray-500">
+                      {new Date(msg.createdAt).toLocaleTimeString([], { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      })}
+                    </span>
+                    {isSentByMe && isSeen && (
+                      <TiTick className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
           // Regular messages
           return (
             <div
@@ -386,32 +472,69 @@ const getStatusColor = (theme) => {
 
 const getStatusIcon = (theme) => {
   switch (theme) {
-    case 'success':
-      return <svg className="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-      </svg>;
-    case 'warning':
-      return <svg className="h-5 w-5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-      </svg>;
-    case 'error':
-      return <svg className="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-      </svg>;
-    default:
-      return <svg className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>;
+    case 'success': return '✅';
+    case 'warning': return '⚠️';
+    case 'error': return '❌';
+    case 'info': return 'ℹ️';
+    default: return '📢';
   }
 };
 
 const getSystemMessageTitle = (statusType) => {
   switch (statusType) {
-    case 'ORDER': return 'Order Status Update';
-    case 'PAYMENT': return 'Payment Status Update';
-    case 'SHIPPING': return 'Shipping Status Update';
-    case 'SYSTEM': return 'System Notification';
-    case 'PRODUCT': return 'Product Update';
+    case 'ORDER': return 'Order Update';
+    case 'PAYMENT': return 'Payment Update';
+    case 'SHIPPING': return 'Shipping Update';
+    case 'SYSTEM': return 'System Message';
     default: return 'Notification';
+  }
+};
+
+// Product message action handlers
+const handleViewProduct = (productId) => {
+  if (!productId) {
+    console.error('No product ID provided');
+    return;
+  }
+  
+  // Navigate to product page
+  window.open(`/product/${productId}`, '_blank');
+};
+
+const handleAddToCart = async (productData) => {
+  try {
+    // Check if product is available
+    if (productData.isSold && productData.saleType === 'fixed') {
+      alert('This product is already sold');
+      return;
+    }
+
+    if (!productData.isActive) {
+      alert('This product is not currently available');
+      return;
+    }
+
+    // For auction products, redirect to product page instead
+    if (productData.saleType === 'auction') {
+      handleViewProduct(productData.productId);
+      return;
+    }
+
+    // Add to cart logic here
+    // You can integrate with your cart system
+    console.log('Adding to cart:', productData);
+    
+    // Example cart integration:
+    // const cartItem = {
+    //   productId: productData.productId,
+    //   quantity: 1,
+    //   price: productData.price
+    // };
+    // dispatch(addToCart(cartItem));
+    
+    alert('Product added to cart!');
+  } catch (error) {
+    console.error('Error adding to cart:', error);
+    alert('Failed to add product to cart');
   }
 };

@@ -11,11 +11,21 @@ export default function MessageInput({ socket, room }) {
   const [isTyping, setIsTyping] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showProductPicker, setShowProductPicker] = useState(false);
+  const [productSearchTerm, setProductSearchTerm] = useState('');
   const fileInputRef = useRef(null);
   const emojiButtonRef = useRef(null);
   
   // Get user's products from Redux store
   const userProducts = useSelector(state => state.product.userProducts) || [];
+
+  // Filter products based on search term and availability
+  const filteredProducts = userProducts.filter(product => {
+    const matchesSearch = product.title?.toLowerCase().includes(productSearchTerm.toLowerCase()) ||
+                         product.description?.toLowerCase().includes(productSearchTerm.toLowerCase());
+    const isAvailable = !product.isSold || product.saleType === 'auction';
+    const isActive = product.isActive !== false;
+    return matchesSearch && isAvailable && isActive;
+  });
 
   // Close emoji picker when clicking outside
   useEffect(() => {
@@ -116,15 +126,46 @@ export default function MessageInput({ socket, room }) {
   };
 
   const handleProductShare = (product) => {
+    // Validate product before sharing
+    if (!product._id) {
+      alert('Invalid product data');
+      return;
+    }
+
+    // Check if product is available
+    if (product.isSold && product.saleType === 'fixed') {
+      alert('This product is already sold and cannot be shared');
+      return;
+    }
+
+    if (!product.isActive) {
+      alert('This product is not currently active');
+      return;
+    }
+
     socket.emit('sendMessage', {
       roomId: room._id,
       type: 'PRODUCT',
-      content: `Product: ${product.name}`,
+      content: `Product: ${product.title}`,
       systemMeta: {
         productId: product._id,
-        productName: product.name,
-        productImage: product.image,
-        price: product.price
+        productName: product.title,
+        productImage: product.productImages?.[0] || product.image,
+        price: product.fixedPrice || product.auctionSettings?.startingBid || 0,
+        saleType: product.saleType,
+        condition: product.condition,
+        category: product.categoryId?.name,
+        subCategory: product.subCategoryId?.name,
+        description: product.description,
+        isSold: product.isSold,
+        isActive: product.isActive,
+        // Auction specific data
+        ...(product.saleType === 'auction' && {
+          currentBid: product.auctionSettings?.currentBid,
+          startingBid: product.auctionSettings?.startingBid,
+          endTime: product.auctionSettings?.endTime,
+          bidCount: product.auctionSettings?.bidCount || 0
+        })
       }
     });
     setShowProductPicker(false);
@@ -174,7 +215,7 @@ export default function MessageInput({ socket, room }) {
         <div className="product-picker-container absolute bottom-full left-0 right-0 mb-2 z-50 px-2">
           <div className="bg-white rounded-lg shadow-xl border border-gray-200 p-4 w-full max-w-sm mx-auto max-h-80 overflow-y-auto">
             <div className="flex justify-between items-center mb-3">
-              <h3 className="font-medium text-gray-900">Your Products</h3>
+              <h3 className="font-medium text-gray-900">Share Product</h3>
               <button 
                 onClick={() => setShowProductPicker(false)}
                 className="text-gray-400 hover:text-gray-600 text-xl leading-none w-6 h-6 flex items-center justify-center"
@@ -182,28 +223,72 @@ export default function MessageInput({ socket, room }) {
                 ×
               </button>
             </div>
+
+            {/* Search Input */}
+            <div className="mb-3">
+              <input
+                type="text"
+                placeholder="Search your products..."
+                value={productSearchTerm}
+                onChange={(e) => setProductSearchTerm(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
             
-            {userProducts.length === 0 ? (
+            {filteredProducts.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
                 <FaBox size={32} className="mx-auto mb-2 opacity-50" />
-                <p>No products found</p>
+                <p>{productSearchTerm ? 'No products found' : 'No products available'}</p>
+                {productSearchTerm && (
+                  <button
+                    onClick={() => setProductSearchTerm('')}
+                    className="text-blue-500 text-sm mt-2 hover:underline"
+                  >
+                    Clear search
+                  </button>
+                )}
               </div>
             ) : (
               <div className="space-y-2">
-                {userProducts.map(product => (
+                {filteredProducts.map(product => (
                   <div 
                     key={product._id}
                     onClick={() => handleProductShare(product)}
-                    className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
+                    className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-gray-200"
                   >
                     <img 
-                      src={product.image} 
-                      alt={product.name} 
+                      src={product.productImages?.[0] || product.image} 
+                      alt={product.title} 
                       className="w-12 h-12 object-cover rounded-lg border border-gray-200 flex-shrink-0"
+                      onError={(e) => {
+                        e.target.src = '/placeholder-product.png';
+                      }}
                     />
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-900 truncate text-sm">{product.name}</p>
-                      <p className="text-xs text-gray-500">${product.price}</p>
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="font-medium text-gray-900 truncate text-sm">{product.title}</p>
+                        {product.saleType === 'auction' && (
+                          <span className="text-xs bg-orange-100 text-orange-800 px-1.5 py-0.5 rounded-full">
+                            Auction
+                          </span>
+                        )}
+                        {product.isSold && product.saleType === 'fixed' && (
+                          <span className="text-xs bg-red-100 text-red-800 px-1.5 py-0.5 rounded-full">
+                            Sold
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-500 mb-1">
+                        ${product.fixedPrice || product.auctionSettings?.startingBid || 'N/A'}
+                        {product.saleType === 'auction' && product.auctionSettings?.currentBid && (
+                          <span className="ml-1 text-green-600">
+                            (Current: ${product.auctionSettings.currentBid})
+                          </span>
+                        )}
+                      </p>
+                      <p className="text-xs text-gray-400 capitalize">
+                        {product.condition} • {product.categoryId?.name || 'Uncategorized'}
+                      </p>
                     </div>
                   </div>
                 ))}

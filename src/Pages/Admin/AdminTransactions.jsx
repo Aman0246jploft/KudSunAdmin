@@ -318,7 +318,7 @@ const AdminTransactions = () => {
     },
     {
       key: 'Status',
-      label: 'status',
+      label: 'Order Status',
       render: (_, status) => (
         // <span className={`px-2 py-1  rounded-full text-sm ${status?.status === 'DELIVERED' ? 'bg-green-100 text-green-800' :
         //   status?.status  === 'shipped' ? 'bg-blue-100 text-blue-800' :
@@ -369,7 +369,7 @@ const AdminTransactions = () => {
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Admin Transactions</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Transactions</h1>
       </div>
 
       {/* Filters Section */}
@@ -392,26 +392,30 @@ const AdminTransactions = () => {
           />
         )}
 
-        {loading && (
+        {/* {loading && (
           <div className="p-8 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
             <p className="mt-2 text-gray-500">Loading transactions...</p>
           </div>
-        )}
+        )} */}
 
-        {totalRecords > 0 && (
-          <div className="p-4 border-t">
+
+        {totalRecords > 0 && totalRecords > pagination.size && (
+          <div className=" p-1 bg-[#F9FAFB] border-t">
             <div className="flex justify-between items-center">
               <p className="text-sm text-gray-700">
-               
+
               </p>
+
+
               <Pagination
-                currentPage={pagination.pageNo}
-                totalPages={Math.ceil(totalRecords / pagination.size)}
-                onPageChange={handlePageChange}
-                showPageInfo={false}
-                totalRecords={totalRecords}
+                pageNo={pagination.pageNo}
+                size={pagination.size}
+                total={totalRecords}
+                onChange={handlePageChange}
+                // theme={theme}
               />
+
             </div>
           </div>
         )}

@@ -13,6 +13,10 @@ import {
   AiOutlineTag,
   AiOutlineQuestionCircle,
 } from "react-icons/ai";
+import { MdOutlineCategory } from "react-icons/md";
+import { IoChatboxEllipsesOutline } from "react-icons/io5";
+import { VscPreview } from "react-icons/vsc";
+import { GrTransaction } from "react-icons/gr";
 import { RiAuctionLine } from "react-icons/ri";
 import { BsBoxSeam } from "react-icons/bs";
 import { CiViewList } from "react-icons/ci";
@@ -68,10 +72,10 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
       ],
     },
 
-    { name: "Category", href: "/category", icon: AiOutlineTag },
-    { name: "Chat", href: "/chat", icon: AiOutlineTag },
-    { name: "Disputes", href: "/disputeManagement", icon: AiOutlineTag },
-    { name: "Tnx", href: "/admin/transactions", icon: AiOutlineTag },
+    { name: "Category", href: "/category", icon: MdOutlineCategory },
+    { name: "Chat", href: "/chat", icon: IoChatboxEllipsesOutline },
+    { name: "Disputes", href: "/disputeManagement", icon: VscPreview },
+    { name: "Transactions", href: "/admin/transactions", icon: GrTransaction },
 
 
  
