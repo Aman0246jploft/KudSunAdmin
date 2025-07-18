@@ -65,7 +65,6 @@ const ProductInfo = () => {
   let { product, loading, error } = selector ? selector : {};
   const productData = selector?.product?.productInfo;
 
-  console.log("0000011111", productData);
 
   // Check if it's an auction or fixed price product
   const isAuction = productData?.saleType === "auction";

@@ -354,7 +354,7 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
     <div className="overflow-auto py-8">
       <div className="max-w-4xl mx-auto px-4">
         <div className="rounded-xl shadow-lg overflow-auto">
-          <div className="p-8 space-y-8 h-[50rem]">
+          <div className="p-8 space-y-8 h-[30rem]">
             {/* Category Selection */}
             <div className="grid md:grid-cols-2 gap-6">
               <div>

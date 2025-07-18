@@ -28,8 +28,6 @@ export default function ThreadDetail() {
     const [loadingReplies, setLoadingReplies] = useState({})
     const [isProductsModalOpen, setIsProductsModalOpen] = useState(false)
 
-    console.log('123455',replies)
-
     useEffect(() => {
         if (id) {
             dispatch(fetchThreadById(id))
@@ -663,7 +661,9 @@ export default function ThreadDetail() {
                         <div className="p-6 border-t">
                             <h3 className="font-semibold mb-4">Recommended Threads</h3>
                             <div className="flex overflow-x-auto gap-4 pb-4 flex-wrap -mx-2 px-2 snap-x">
-                                {thread.recommendedThreads.map(rec => (
+                                {thread.recommendedThreads.map(rec => { 
+                                    console.log(rec)
+                                    return(
                                     <Link 
                                         key={rec._id} 
                                         to={`/thread/${rec._id}`}
@@ -695,9 +695,9 @@ export default function ThreadDetail() {
                                         <div className="space-y-2">
                                             <h4 className="font-medium text-sm line-clamp-2">{rec.title}</h4>
                                             <p className="text-sm text-gray-600 line-clamp-2">{rec.description}</p>
-                                            {rec.budgetRange && (
+                                            {rec?.budgetRange && (
                                                 <div className="text-sm text-gray-900">
-                                                    Budget: ฿{rec.budgetRange.min.toLocaleString()} - ฿{rec.budgetRange.max.toLocaleString()}
+                                                    Budget: ฿{rec?.budgetRange?.min?.toLocaleString()} - ฿{rec?.budgetRange?.max?.toLocaleString()}
                                                 </div>
                                             )}
                                             {rec.tags?.length > 0 && (
@@ -735,7 +735,7 @@ export default function ThreadDetail() {
                                             </div>
                                         </div>
                                     </Link>
-                                ))}
+                                )})}
                             </div>
                         </div>
                     )}

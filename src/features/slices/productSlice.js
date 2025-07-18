@@ -37,7 +37,7 @@ export const productList = createAsyncThunk(
     'product/showNormalProducts',
     async (queryParams, thunkAPI) => {
         try {
-            const res = await authAxiosClient.get('/product/showNormalProducts', { params: { ...queryParams, includeSold: true } });
+            const res = await authAxiosClient.get('/product/showNormalProducts', { params: { ...queryParams, includeSold: false } });
             return res.data;
         } catch (err) {
             console.error(`Add Product [${err.response?.status || 500}]: ${err.message}`);

@@ -304,7 +304,7 @@ const EditProductForm = ({
             <p className="text-green-100 mt-2">Update your product details</p>
           </div>
 
-          <div className="p-8 space-y-8 h-[50rem]">
+          <div className="p-8 space-y-8 h-[30rem]">
             {/* Category Selection - Same as AddProductForm */}
             <div className="grid md:grid-cols-2 gap-6">
               <div>
