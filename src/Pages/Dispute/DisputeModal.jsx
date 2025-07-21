@@ -42,7 +42,11 @@ const FileLinks = ({ files = [], label = 'View' }) =>
 
 const DisputeModal = ({ dispute, onClose, onUpdate }) => {
   const [loading, setLoading] = useState(false);
-  const [adminDecision, setAdminDecision] = useState({ decision: '', decisionNote: '' });
+  const [adminDecision, setAdminDecision] = useState({ 
+    decision: '', 
+    decisionNote: '', 
+    disputeAmountPercent: 0 
+  });
 
   /* ------------------------------ API handlers ----------------------------- */
   const handleAdminDecision = async (e) => {
@@ -178,6 +182,12 @@ const DisputeModal = ({ dispute, onClose, onUpdate }) => {
               </header>
               <div className="bg-gray-50  p-4 rounded-lg space-y-2">
                 <InfoRow label="Decision" value={`In favor of ${dispute.adminReview.decision}`} />
+                {dispute.adminReview.decision === 'BUYER' && dispute.adminReview.disputeAmountPercent > 0 && (
+                  <InfoRow 
+                    label="Refund Amount" 
+                    value={`${dispute.adminReview.disputeAmountPercent}% of order total`} 
+                  />
+                )}
                 <div>
                   <p className="text-xs font-medium text-gray-500  mb-[2px]">Decision Note</p>
                   <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-900 ">
@@ -191,9 +201,8 @@ const DisputeModal = ({ dispute, onClose, onUpdate }) => {
             </section>
           )}
         </div>
-
         {/* ─────────────────── Footer / Admin Actions ─────────────────── */}
-        {!dispute.adminReview && dispute.status !== 'RESOLVED' && (
+        {dispute.status !== 'RESOLVED' && (
           <form onSubmit={handleAdminDecision} className="border-t border-gray-200  pt-4 mt-4 space-y-4">
             <h3 className="font-semibold text-lg text-gray-700 ">Make Decision</h3>
             <div className="grid sm:grid-cols-2 gap-4">
@@ -210,6 +219,53 @@ const DisputeModal = ({ dispute, onClose, onUpdate }) => {
                   <option value="SELLER">In Favor of Seller</option>
                 </select>
               </div>
+              
+              {/* Show refund percentage field only when decision is in favor of buyer */}
+              {adminDecision.decision === 'BUYER' && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-500  mb-1">
+                    Refund Percentage (%)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={adminDecision.disputeAmountPercent}
+                    onChange={(e) => setAdminDecision((p) => ({ 
+                      ...p, 
+                      disputeAmountPercent: Math.min(100, Math.max(0, parseInt(e.target.value) || 0))
+                    }))}
+                    className="w-full border rounded-md px-3 py-2 bg-white   focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    placeholder="Enter percentage (0-100)"
+                  />
+                  
+                  {/* Quick percentage buttons */}
+                  <div className="flex gap-2 mt-2">
+                    {[25, 50, 75, 100].map((percentage) => (
+                      <button
+                        key={percentage}
+                        type="button"
+                        onClick={() => setAdminDecision((p) => ({ 
+                          ...p, 
+                          disputeAmountPercent: percentage 
+                        }))}
+                        className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
+                          adminDecision.disputeAmountPercent === percentage
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        {percentage}%
+                      </button>
+                    ))}
+                  </div>
+                  
+                  <p className="text-xs text-gray-500 mt-1">
+                    Percentage of order total to refund to buyer
+                  </p>
+                </div>
+              )}
+              
               <div className="sm:col-span-2">
                 <label className="block text-xs font-medium text-gray-500  mb-1">Decision Note</label>
                 <textarea
