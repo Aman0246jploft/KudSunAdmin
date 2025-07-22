@@ -32,7 +32,18 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
 
   const menuItems = [
     { name: "Dashboard", href: "/dashboard", icon: AiOutlineDashboard },
-    { name: "Users", href: "/user", icon: AiOutlineTeam },
+
+    {
+      name: "Users",
+      icon: BsBoxSeam,
+      isParent: true,
+      children: [
+        { name: "Account List", href: "/user", icon: AiOutlineTeam },
+        { name: "Seller Verification", href: "/seller-verification-requests", icon: RiAuctionLine },
+      ],
+    },
+
+
     {
       name: "Items",
       icon: BsBoxSeam,
@@ -78,7 +89,7 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
     { name: "Transactions", href: "/admin/transactions", icon: GrTransaction },
 
 
- 
+
 
   ];
 

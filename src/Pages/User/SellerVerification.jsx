@@ -5,8 +5,10 @@ import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 
 export default function SellerVerification({ onClose, data, onActionComplete }) {
+
   const verification = data?.sellerVerification?.[0];
   const dispatch = useDispatch();
+  console.log("STATus",verification?.verificationStatus)
 
   if (!verification) {
     return (
@@ -125,7 +127,7 @@ export default function SellerVerification({ onClose, data, onActionComplete }) 
           )}
         </div>
 
-        <div className="mt-4 flex justify-end gap-3">
+   {verification?.verificationStatus=='Pending'&&     <div className="mt-4 flex justify-end gap-3">
           <button
             onClick={onClose}
             className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
@@ -148,7 +150,7 @@ export default function SellerVerification({ onClose, data, onActionComplete }) 
           >
             Reject
           </button>
-        </div>
+        </div>}
       </div>
     </div>
   );

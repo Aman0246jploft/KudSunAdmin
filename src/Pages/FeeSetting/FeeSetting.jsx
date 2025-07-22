@@ -23,6 +23,9 @@ export default function FeeSetting() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedFaq, setSelectedFaq] = useState(null);
 
+  
+
+
   useEffect(() => {
     dispatch(feeSettingList(pagination))
       .unwrap()
@@ -111,6 +114,7 @@ export default function FeeSetting() {
       toast.error("Failed to update type");
     }
   };
+
 
   const columns = [
     {
@@ -235,7 +239,7 @@ export default function FeeSetting() {
             </div>
           ) : (
             <div className="px-1 pt-1">
-              <DataTable columns={columns} data={data} />
+              <DataTable columns={columns} data={data&&data?.filter((e)=>e.name !== "TAX")} />
             </div>
           )}
         </div>
