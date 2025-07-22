@@ -14,6 +14,7 @@ import UpdateCategoryForm from "./UpdateCategoryForm";
 import { confirmAlert } from "react-confirm-alert";
 import { toast } from "react-toastify";
 import "react-confirm-alert/src/react-confirm-alert.css";
+import { IoArrowBackSharp } from "react-icons/io5";
 
 export default function SubCategory() {
   const dispatch = useDispatch();
@@ -191,7 +192,7 @@ export default function SubCategory() {
             className="font-semibold text-xl"
             style={{ color: theme.colors.textPrimary }}
           >
-            SubCategory
+           <IoArrowBackSharp onClick={()=>navigate(-1)} /> SubCategory
           </div>
 
           <Button

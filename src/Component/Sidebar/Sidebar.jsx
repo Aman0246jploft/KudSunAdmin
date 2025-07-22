@@ -17,6 +17,7 @@ import { MdOutlineCategory } from "react-icons/md";
 import { IoChatboxEllipsesOutline } from "react-icons/io5";
 import { VscPreview } from "react-icons/vsc";
 import { GrTransaction } from "react-icons/gr";
+import { MdRateReview } from "react-icons/md";
 import { RiAuctionLine } from "react-icons/ri";
 import { BsBoxSeam } from "react-icons/bs";
 import { CiViewList } from "react-icons/ci";
@@ -88,6 +89,7 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
     { name: "Disputes", href: "/disputeManagement", icon: VscPreview },
     { name: "Transactions", href: "/admin/transactions", icon: GrTransaction },
     { name: "Financial Analytics", href: "/admin/financial-dashboard", icon: AiOutlineDashboard },
+    { name: "Review Management", href: "/admin/review-management", icon: MdRateReview },
 
 
 

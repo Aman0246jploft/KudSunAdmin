@@ -32,6 +32,7 @@ import AdminTransactions from "./Pages/Admin/AdminTransactions";
 
 import SellerVerificationRequests from "./Pages/User/SellerVerificationRequests";
 import AdminFinancialDashboard from "./Pages/Admin/AdminFinancialDashboard";
+import AdminReviewManagement from "./Pages/Admin/AdminReviewManagement";
 
 
 
@@ -114,6 +115,7 @@ function App() {
               <Route path="/disputeManagement" element={<DisputeManagement />} />
               <Route path="/admin/transactions" element={<AdminTransactions />} />
               <Route path="/admin/financial-dashboard" element={<AdminFinancialDashboard/>} />
+              <Route path="/admin/review-management" element={<AdminReviewManagement/>} />
               <Route path="/seller-verification-requests" element={<SellerVerificationRequests/>} />
               
             </Route>
