@@ -29,7 +29,9 @@ import PrivacyPolicy from "./Pages/PrivacyPolicy/PrivacyPolicy";
 import AuctionRules from "./Pages/AuctionRules/AuctionRules";
 import DisputeManagement from "./Pages/Dispute/DisputeManagement";
 import AdminTransactions from "./Pages/Admin/AdminTransactions";
+
 import SellerVerificationRequests from "./Pages/User/SellerVerificationRequests";
+import AdminFinancialDashboard from "./Pages/Admin/AdminFinancialDashboard";
 
 
 
@@ -111,6 +113,7 @@ function App() {
 
               <Route path="/disputeManagement" element={<DisputeManagement />} />
               <Route path="/admin/transactions" element={<AdminTransactions />} />
+              <Route path="/admin/financial-dashboard" element={<AdminFinancialDashboard/>} />
               <Route path="/seller-verification-requests" element={<SellerVerificationRequests/>} />
               
             </Route>

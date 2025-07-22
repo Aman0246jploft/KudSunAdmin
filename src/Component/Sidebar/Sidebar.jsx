@@ -87,6 +87,7 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
     { name: "Chat", href: "/chat", icon: IoChatboxEllipsesOutline },
     { name: "Disputes", href: "/disputeManagement", icon: VscPreview },
     { name: "Transactions", href: "/admin/transactions", icon: GrTransaction },
+    { name: "Financial Analytics", href: "/admin/financial-dashboard", icon: AiOutlineDashboard },
 
 
 

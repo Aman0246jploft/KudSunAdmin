@@ -10,6 +10,7 @@ import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import { FaEye, FaMoneyBillWave, FaCalculator, FaExclamationTriangle, FaFilter, FaCalendar } from 'react-icons/fa';
 import { MdPayment, MdInfo } from 'react-icons/md';
+import { FaChartLine } from "react-icons/fa";
 
 const AdminTransactions = () => {
   const { theme } = useTheme();
@@ -461,15 +462,28 @@ const AdminTransactions = () => {
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Transaction Management</h1>
-        <Button
-          variant="outline"
-          onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center space-x-2"
-        >
-          <FaFilter className="w-4 h-4" />
-          <span>Filters</span>
-        </Button>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Transaction Management</h1>
+          <p className="text-gray-600 mt-1">Manage individual transactions and payouts</p>
+        </div>
+        <div className="flex space-x-3">
+          <Button
+            variant="primary"
+            onClick={() => window.location.href = '/admin/financial-dashboard'}
+            className="flex items-center space-x-2"
+          >
+            <FaChartLine className="w-4 h-4" />
+            <span>Financial Analytics</span>
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center space-x-2"
+          >
+            <FaFilter className="w-4 h-4" />
+            <span>Filters</span>
+          </Button>
+        </div>
       </div>
 
       {/* Enhanced Filters Section */}
@@ -687,7 +701,7 @@ const AdminTransactions = () => {
                 </div>
 
                 {/* Dispute Information (if any) */}
-                {calculationModal.data.dispute && (
+                {calculationModal.data.disputeInfo && (
                   <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
                     <h3 className="font-semibold text-orange-800 mb-2 flex items-center">
                       <FaExclamationTriangle className="w-4 h-4 mr-2" />
@@ -695,17 +709,108 @@ const AdminTransactions = () => {
                     </h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
-                        <span>Status:</span>
-                        <span className="font-medium">{calculationModal.data.dispute.status}</span>
+                        <span>Dispute ID:</span>
+                        <span className="font-medium">{calculationModal.data.disputeInfo.disputeId}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Type:</span>
-                        <span className="font-medium">{calculationModal.data.dispute.type}</span>
+                        <span>Status:</span>
+                        <span className={`font-medium px-2 py-1 rounded text-xs ${
+                          calculationModal.data.disputeInfo.status === 'RESOLVED' 
+                            ? 'bg-green-100 text-green-800' 
+                            : calculationModal.data.disputeInfo.status === 'PENDING'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {calculationModal.data.disputeInfo.status}
+                        </span>
                       </div>
-                      {calculationModal.data.dispute.decision && (
-                        <div className="flex justify-between">
-                          <span>Decision:</span>
-                          <span className="font-medium">{calculationModal.data.dispute.decision} favor</span>
+                      <div className="flex justify-between">
+                        <span>Reason:</span>
+                        <span className="font-medium">{calculationModal.data.disputeInfo.disputeReason}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Created:</span>
+                        <span className="font-medium">
+                          {new Date(calculationModal.data.disputeInfo.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                      
+                      {calculationModal.data.disputeInfo.hasResolution && (
+                        <>
+                          <hr className="border-orange-200 my-2" />
+                          <div className="bg-orange-100 p-3 rounded">
+                            <h4 className="font-semibold text-orange-900 mb-2">Resolution Details</h4>
+                            <div className="space-y-1">
+                              <div className="flex justify-between">
+                                <span>Decision:</span>
+                                <span className={`font-medium px-2 py-1 rounded text-xs ${
+                                  calculationModal.data.disputeInfo.decision === 'SELLER' 
+                                    ? 'bg-blue-100 text-blue-800' 
+                                    : 'bg-purple-100 text-purple-800'
+                                }`}>
+                                  {calculationModal.data.disputeInfo.decision} FAVOR
+                                </span>
+                              </div>
+                              {calculationModal.data.disputeInfo.disputeAmountPercent > 0 && (
+                                <div className="flex justify-between">
+                                  <span>Dispute Amount:</span>
+                                  <span className="font-medium">{calculationModal.data.disputeInfo.disputeAmountPercent}%</span>
+                                </div>
+                              )}
+                              {calculationModal.data.disputeInfo.decisionNote && (
+                                <div className="mt-2">
+                                  <span className="font-medium">Note:</span>
+                                  <p className="text-gray-700 mt-1">{calculationModal.data.disputeInfo.decisionNote}</p>
+                                </div>
+                              )}
+                              <div className="flex justify-between">
+                                <span>Resolved:</span>
+                                <span className="font-medium">
+                                  {new Date(calculationModal.data.disputeInfo.resolvedAt).toLocaleDateString()}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Dispute Adjustment Details */}
+                {calculationModal.data.disputeAdjustment && (
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h3 className="font-semibold text-blue-800 mb-2">Payment Adjustment Due to Dispute</h3>
+                    <div className="space-y-2 text-sm">
+                      <p className="text-blue-700">{calculationModal.data.disputeAdjustment.description}</p>
+                      <div className="grid grid-cols-2 gap-4 mt-3">
+                        <div className="space-y-1">
+                          <div className="flex justify-between">
+                            <span>Original Amount:</span>
+                            <span className="font-medium">฿{calculationModal.data.disputeAdjustment.originalAmount.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Adjusted Amount:</span>
+                            <span className="font-medium">฿{calculationModal.data.disputeAdjustment.adjustedAmount.toFixed(2)}</span>
+                          </div>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex justify-between">
+                            <span>Seller Receives:</span>
+                            <span className="font-medium text-green-600">{calculationModal.data.disputeAdjustment.sellerReceivePercent}%</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Buyer Refund:</span>
+                            <span className="font-medium text-blue-600">{calculationModal.data.disputeAdjustment.buyerRefundPercent}%</span>
+                          </div>
+                        </div>
+                      </div>
+                      {calculationModal.data.disputeAdjustment.adjustmentAmount > 0 && (
+                        <div className="mt-2 p-2 bg-blue-100 rounded">
+                          <div className="flex justify-between">
+                            <span className="font-medium">Refund Amount:</span>
+                            <span className="font-bold text-blue-800">฿{calculationModal.data.disputeAdjustment.adjustmentAmount.toFixed(2)}</span>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -714,13 +819,42 @@ const AdminTransactions = () => {
 
                 {/* Payout Breakdown */}
                 <div className="space-y-3">
-                  <h3 className="font-semibold">Payout Calculation Breakdown</h3>
+                  <div className="flex justify-between items-center">
+                    <h3 className="font-semibold">Payout Calculation Breakdown</h3>
+                    {calculationModal.data.payoutCalculation?.isEstimated && (
+                      <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded">
+                        Estimated
+                      </span>
+                    )}
+                    {!calculationModal.data.payoutCalculation?.isEstimated && (
+                      <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">
+                        Processed
+                      </span>
+                    )}
+                  </div>
+                  
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <div className="space-y-3">
-                      <div className="flex justify-between items-center">
-                        <span>Original Product Cost:</span>
-                        <span className="font-medium">฿{calculationModal.data.payoutCalculation?.productCost?.toFixed(2)}</span>
-                      </div>
+                      {/* Show original amount if different from product cost (due to dispute) */}
+                      {calculationModal.data.payoutCalculation?.originalProductCost !== calculationModal.data.payoutCalculation?.productCost && (
+                        <>
+                          <div className="flex justify-between items-center text-gray-600">
+                            <span>Original Order Amount:</span>
+                            <span className="font-medium">฿{calculationModal.data.payoutCalculation?.originalProductCost?.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span>Amount After Dispute Adjustment:</span>
+                            <span className="font-medium text-blue-600">฿{calculationModal.data.payoutCalculation?.productCost?.toFixed(2)}</span>
+                          </div>
+                        </>
+                      )}
+                      
+                      {calculationModal.data.payoutCalculation?.originalProductCost === calculationModal.data.payoutCalculation?.productCost && (
+                        <div className="flex justify-between items-center">
+                          <span>Product Cost:</span>
+                          <span className="font-medium">฿{calculationModal.data.payoutCalculation?.productCost?.toFixed(2)}</span>
+                        </div>
+                      )}
                       
                       <hr className="border-gray-200" />
                       
@@ -738,7 +872,7 @@ const AdminTransactions = () => {
                       
                       <div className="flex justify-between items-center font-medium text-lg">
                         <span>Net Amount (Before Withdrawal):</span>
-                        <span>฿{calculationModal.data.payoutCalculation?.netAmount?.toFixed(2)}</span>
+                        <span className="text-blue-600">฿{calculationModal.data.payoutCalculation?.netAmount?.toFixed(2)}</span>
                       </div>
                       
                       <div className="flex justify-between items-center text-red-600">
@@ -752,16 +886,62 @@ const AdminTransactions = () => {
                         <span>Final Payout Amount:</span>
                         <span>฿{calculationModal.data.payoutCalculation?.netAmountAfterWithdrawalFee?.toFixed(2)}</span>
                       </div>
+                      
+                      {/* Fee Settings Info */}
+                      {calculationModal.data.payoutCalculation?.feeSettings && (
+                        <div className="mt-4 pt-3 border-t border-gray-200">
+                          <details className="text-sm text-gray-600">
+                            <summary className="cursor-pointer font-medium hover:text-gray-800">
+                              View Fee Settings Details
+                            </summary>
+                            <div className="mt-2 space-y-1 pl-4">
+                              {calculationModal.data.payoutCalculation.feeSettings.serviceCharge && (
+                                <div>Service Charge: {calculationModal.data.payoutCalculation.feeSettings.serviceCharge.value}{calculationModal.data.payoutCalculation.feeSettings.serviceCharge.type === 'PERCENTAGE' ? '%' : ' ฿'}</div>
+                              )}
+                              {calculationModal.data.payoutCalculation.feeSettings.tax && (
+                                <div>Tax: {calculationModal.data.payoutCalculation.feeSettings.tax.value}{calculationModal.data.payoutCalculation.feeSettings.tax.type === 'PERCENTAGE' ? '%' : ' ฿'}</div>
+                              )}
+                              {calculationModal.data.payoutCalculation.feeSettings.withdrawalFee && (
+                                <div>Withdrawal Fee: {calculationModal.data.payoutCalculation.feeSettings.withdrawalFee.value}{calculationModal.data.payoutCalculation.feeSettings.withdrawalFee.type === 'PERCENTAGE' ? '%' : ' ฿'}</div>
+                              )}
+                            </div>
+                          </details>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
 
                 {/* Additional Information */}
                 <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
-                  <p><strong>Note:</strong> The final payout amount is what the seller will receive after all platform fees and charges.</p>
-                  {calculationModal.data.dispute && (
-                    <p className="mt-2"><strong>Dispute Impact:</strong> This calculation includes adjustments based on the dispute resolution.</p>
-                  )}
+                  <div className="space-y-2">
+                    <p><strong>Note:</strong> The final payout amount is what the seller will receive after all platform fees and charges.</p>
+                    
+                    {calculationModal.data.payoutCalculation?.isEstimated && (
+                      <p className="text-yellow-700">
+                        <strong>Estimated Calculation:</strong> These amounts are estimated based on current fee settings. Actual amounts may vary when payment is processed.
+                      </p>
+                    )}
+                    
+                    {!calculationModal.data.payoutCalculation?.isEstimated && (
+                      <p className="text-green-700">
+                        <strong>Processed Payment:</strong> These amounts reflect the actual processed payment transaction.
+                      </p>
+                    )}
+                    
+                    {calculationModal.data.disputeInfo && (
+                      <p className="text-orange-700">
+                        <strong>Dispute Impact:</strong> This calculation includes adjustments based on the dispute resolution. 
+                        {calculationModal.data.disputeInfo.status === 'RESOLVED' ? ' The dispute has been resolved.' : ' The dispute is still pending resolution.'}
+                      </p>
+                    )}
+                    
+                    {calculationModal.data.payoutCalculation?.hasDispute && !calculationModal.data.payoutCalculation?.isDisputeResolved && (
+                      <p className="text-red-700">
+                        <strong>Pending Dispute:</strong> This order has an unresolved dispute. Final payout amounts may change based on dispute resolution.
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
