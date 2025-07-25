@@ -42,6 +42,7 @@ export default function User() {
   const [sortBy, setSortBy] = useState("userName");
   const [sortOrder, setSortOrder] = useState("asc");
   const [userStatusFilter, setUserStatusFilter] = useState(""); // "", "enabled", "disabled"
+  const [keyWord, setKeyword] = useState(""); // New keyword state
 
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [reportLoading, setReportLoading] = useState(false);
@@ -71,6 +72,7 @@ export default function User() {
         registrationDateEnd,
         sortBy,
         sortOrder,
+        keyWord, // Add keyword parameter
         ...(isDisable !== undefined && { isDisable }), // only include if defined
       })
     )
@@ -92,13 +94,12 @@ export default function User() {
     sortBy,
     showReportedRequests,
     sortOrder,
+    keyWord, // Add keyword to dependency array
   ]);
 
   const handlePageChange = (newPage) => {
     setPagination((prev) => ({ ...prev, pageNo: newPage }));
   };
-
-
 
   const handleApproveSeller = (user) => {
     setSelectedUser(user);
@@ -131,7 +132,7 @@ export default function User() {
   };
 
   const handleToggleStatus = (user) => {
-    dispatch(update({ id: user._id, isDisable: !user?.isDisable })) 
+    dispatch(update({ id: user._id, isDisable: !user?.isDisable }))
       .unwrap()
       .then(() => {
         // Include all parameters when refetching
@@ -144,11 +145,36 @@ export default function User() {
           registrationDateEnd,
           sortBy,
           sortOrder,
+          keyWord, // Add keyword parameter
           ...(isDisable !== undefined && { isDisable })
         }));
       })
       .catch((err) => {
         console.error("Failed to toggle user status:", err);
+      });
+  };
+
+  const handleTogglePreferredSeller = (user) => {
+    dispatch(update({ id: user._id, is_Preferred_seller: !user?.is_Preferred_seller }))
+      .unwrap()
+      .then(() => {
+        // Include all parameters when refetching
+        const isDisable = userStatusFilter === "enabled" ? false : userStatusFilter === "disabled" ? true : undefined;
+        dispatch(fetchUserList({
+          ...pagination,
+          showSellerRequests,
+          reported: showReportedRequests,
+          registrationDateStart,
+          registrationDateEnd,
+          sortBy,
+          sortOrder,
+          keyWord, // Add keyword parameter
+          ...(isDisable !== undefined && { isDisable })
+        }));
+      })
+      .catch((err) => {
+        console.error("Failed to toggle preferred seller status:", err);
+        toast.error("Failed to update preferred seller status");
       });
   };
 
@@ -170,7 +196,10 @@ export default function User() {
             dispatch(softDelete({ id: product._id }))
               .unwrap()
               .then((res) => {
-                dispatch(fetchUserList(pagination));
+                dispatch(fetchUserList({
+                  ...pagination,
+                  keyWord, // Add keyword parameter
+                }));
               })
               .catch((err) => {
                 console.error("Failed to update product status:", err);
@@ -248,6 +277,7 @@ export default function User() {
           registrationDateEnd,
           sortBy,
           sortOrder,
+          keyWord, // Add keyword parameter
           ...(userStatusFilter === "enabled" ? { isDisable: false } :
             userStatusFilter === "disabled" ? { isDisable: true } : {})
         }));
@@ -291,17 +321,38 @@ export default function User() {
       setIsModalOpen(false);
       setSelectedUser(null);
       setSellerRequestDetails(null);
-      dispatch(fetchUserList({ ...pagination, showSellerRequests: true }));
+      dispatch(fetchUserList({
+        ...pagination,
+        showSellerRequests: true,
+        keyWord, // Add keyword parameter
+      }));
     } catch (err) {
       toast.error(err.message || 'Failed to update status');
     }
   };
 
   const columns = [
+
+    {
+      key: "is_Preferred_seller",
+      label: "",
+      width: "1%",
+      render: (value, row) => (
+        <div className="flex items-center justify-center">
+          <input
+            type="checkbox"
+            checked={row.is_Preferred_seller || false}
+            onChange={() => handleTogglePreferredSeller(row)}
+            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
+            title={row.is_Preferred_seller ? "Remove from preferred sellers" : "Mark as preferred seller"}
+          />
+        </div>
+      ),
+    },
     {
       key: "serial",
       label: "S.No",
-      width: "10%",
+      width: "1%",
       render: (_, __, rowIndex) =>
         (pagination.pageNo - 1) * pagination.size + rowIndex + 1,
     },
@@ -319,17 +370,7 @@ export default function User() {
       label: "Gender",
       render: (value) => (value && value.trim() ? value : "-"),
     },
-    // {
-    //   key: "userAddress",
-    //   label: "Location",
-    //   sortable: true,
-    //   sortKey: "userAddress.city", // backend expects this
-    //   render: (value) => {
-    //     if (!value) return "-";
-    //     const { city, state, country } = value;
-    //     return [city, state, country].filter(Boolean).join(", ");
-    //   },
-    // },
+
 
     {
       key: "dob",
@@ -468,6 +509,9 @@ export default function User() {
             Users List
           </div>
           <div className="flex flex-wrap  justify-end items-end gap-3">
+            {/* Keyword Search Input */}
+
+
             <label className="flex items-center space-x-2 cursor-pointer select-none">
               <input
                 type="checkbox"
@@ -548,6 +592,28 @@ export default function User() {
                 onChange={(e) => setRegistrationDateEnd(e.target.value)}
                 className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 style={{ minWidth: "140px" }}
+              />
+            </div>
+
+
+            <div className="flex flex-col">
+              <label
+                htmlFor="keyword-search"
+                className="mb-1 text-sm font-medium text-gray-700 select-none"
+              >
+                Search:
+              </label>
+              <input
+                id="keyword-search"
+                type="text"
+                value={keyWord}
+                onChange={(e) => {
+                  setKeyword(e.target.value);
+                  setPagination((prev) => ({ ...prev, pageNo: 1 })); // Reset to page 1 on search
+                }}
+                placeholder="Search users..."
+                className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={{ minWidth: "160px" }}
               />
             </div>
           </div>
@@ -670,117 +736,117 @@ export default function User() {
               </div>
             </div>
           )}
-       
 
 
-       {selectedUser && isModalOpen === 'seller-request' && (
-  <div className="p-0 bg-white  rounded-lg shadow-sm border border-gray-200  w-full max-w-md sm:max-w-lg mx-auto flex flex-col max-h-[80vh]">
-    {/* Header */}
-    <div className="sticky top-0 z-10 bg-white  rounded-t-lg px-4 sm:px-6 pt-4 pb-2 border-b border-gray-200 ">
-      <h2 className="text-2xl font-bold text-gray-900 -1">Seller Request Details</h2>
-      <p className="text-sm text-gray-600 ">
-        Request for: <span className="font-medium text-gray-800 ">{selectedUser.userName}</span>
-      </p>
-    </div>
 
-    {/* Scrollable Body */}
-    <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4">
-      {sellerRequestLoading ? (
-        <div className="text-center py-4">Loading seller request...</div>
-      ) : sellerRequestDetails ? (
-        <div className="mb-4 space-y-2">
-          <p><span className="font-medium">Legal Name:</span> {sellerRequestDetails.legalFullName || '-'}</p>
-          <p><span className="font-medium">ID Number:</span> {sellerRequestDetails.idNumber || '-'}</p>
-          <p><span className="font-medium">Payment Payout Method:</span> {sellerRequestDetails.paymentPayoutMethod || '-'}</p>
-
-          {/* Conditional payout info */}
-          {sellerRequestDetails.paymentPayoutMethod === 'BankTransfer' && sellerRequestDetails.bankDetails ? (
-            <div className="pl-2 space-y-1">
-              <p><span className="font-medium">Bank Name:</span> {sellerRequestDetails.bankDetails.bankName || '-'}</p>
-              <p><span className="font-medium">Account Number:</span> {sellerRequestDetails.bankDetails.accountNumber || '-'}</p>
-              <p><span className="font-medium">Account Holder Name:</span> {sellerRequestDetails.bankDetails.accountHolderName || '-'}</p>
-              <p><span className="font-medium">Bank Book Image:</span> {sellerRequestDetails.bankDetails.bankBookUrl ? (
-                <a href={sellerRequestDetails.bankDetails.bankBookUrl} target="_blank" rel="noopener noreferrer">
-                  <img
-                    src={sellerRequestDetails.bankDetails.bankBookUrl}
-                    alt="Bank Book"
-                    className="max-w-full h-auto w-24 sm:w-32 object-cover border rounded mt-1 inline-block hover:shadow-lg cursor-pointer"
-                  />
-                </a>
-              ) : ('-')}
-              </p>
-            </div>
-          ) : sellerRequestDetails.paymentPayoutMethod === 'PromptPay' ? (
-            <p><span className="font-medium">PromptPay ID:</span> {sellerRequestDetails.promptPayId || '-'}</p>
-          ) : null}
-
-          <p><span className="font-medium">Verification Status:</span> {sellerRequestDetails.verificationStatus || '-'}</p>
-          <p><span className="font-medium">Created At:</span> {sellerRequestDetails.createdAt ? new Date(sellerRequestDetails.createdAt).toLocaleString() : '-'}</p>
-          <p><span className="font-medium">Updated At:</span> {sellerRequestDetails.updatedAt ? new Date(sellerRequestDetails.updatedAt).toLocaleString() : '-'}</p>
-
-          {/* User Info */}
-          <div className="pt-2">
-            <h3 className="font-semibold text-gray-800 ">User Info</h3>
-            <p><span className="font-medium">User ID:</span> {sellerRequestDetails.userId?._id || '-'}</p>
-            <p><span className="font-medium">Email:</span> {sellerRequestDetails.userId?.email || '-'}</p>
-            <p><span className="font-medium">Phone:</span> {selectedUser.phoneNumber || '-'}</p>
-          </div>
-
-          {/* Images */}
-          <div className="pt-2">
-            <h3 className="font-semibold text-gray-800 ">Documents</h3>
-            <div className="flex flex-col sm:flex-row gap-2">
-              <div>
-                <span className="font-medium">ID Document Front:</span>{' '}
-                {sellerRequestDetails.idDocumentFrontUrl ? (
-                  <a href={sellerRequestDetails.idDocumentFrontUrl} target="_blank" rel="noopener noreferrer">
-                    <img
-                      src={sellerRequestDetails.idDocumentFrontUrl}
-                      alt="ID Document Front"
-                      className="max-w-full h-auto w-24 sm:w-32 object-cover border rounded mt-1 inline-block hover:shadow-lg cursor-pointer"
-                    />
-                  </a>
-                ) : ('-')}
+          {selectedUser && isModalOpen === 'seller-request' && (
+            <div className="p-0 bg-white  rounded-lg shadow-sm border border-gray-200  w-full max-w-md sm:max-w-lg mx-auto flex flex-col max-h-[80vh]">
+              {/* Header */}
+              <div className="sticky top-0 z-10 bg-white  rounded-t-lg px-4 sm:px-6 pt-4 pb-2 border-b border-gray-200 ">
+                <h2 className="text-2xl font-bold text-gray-900 -1">Seller Request Details</h2>
+                <p className="text-sm text-gray-600 ">
+                  Request for: <span className="font-medium text-gray-800 ">{selectedUser.userName}</span>
+                </p>
               </div>
-              <div>
-                <span className="font-medium">Selfie With ID:</span>{' '}
-                {sellerRequestDetails.selfieWithIdUrl ? (
-                  <a href={sellerRequestDetails.selfieWithIdUrl} target="_blank" rel="noopener noreferrer">
-                    <img
-                      src={sellerRequestDetails.selfieWithIdUrl}
-                      alt="Selfie With ID"
-                      className="max-w-full h-auto w-24 sm:w-32 object-cover border rounded mt-1 inline-block hover:shadow-lg cursor-pointer"
-                    />
-                  </a>
-                ) : ('-')}
+
+              {/* Scrollable Body */}
+              <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4">
+                {sellerRequestLoading ? (
+                  <div className="text-center py-4">Loading seller request...</div>
+                ) : sellerRequestDetails ? (
+                  <div className="mb-4 space-y-2">
+                    <p><span className="font-medium">Legal Name:</span> {sellerRequestDetails.legalFullName || '-'}</p>
+                    <p><span className="font-medium">ID Number:</span> {sellerRequestDetails.idNumber || '-'}</p>
+                    <p><span className="font-medium">Payment Payout Method:</span> {sellerRequestDetails.paymentPayoutMethod || '-'}</p>
+
+                    {/* Conditional payout info */}
+                    {sellerRequestDetails.paymentPayoutMethod === 'BankTransfer' && sellerRequestDetails.bankDetails ? (
+                      <div className="pl-2 space-y-1">
+                        <p><span className="font-medium">Bank Name:</span> {sellerRequestDetails.bankDetails.bankName || '-'}</p>
+                        <p><span className="font-medium">Account Number:</span> {sellerRequestDetails.bankDetails.accountNumber || '-'}</p>
+                        <p><span className="font-medium">Account Holder Name:</span> {sellerRequestDetails.bankDetails.accountHolderName || '-'}</p>
+                        <p><span className="font-medium">Bank Book Image:</span> {sellerRequestDetails.bankDetails.bankBookUrl ? (
+                          <a href={sellerRequestDetails.bankDetails.bankBookUrl} target="_blank" rel="noopener noreferrer">
+                            <img
+                              src={sellerRequestDetails.bankDetails.bankBookUrl}
+                              alt="Bank Book"
+                              className="max-w-full h-auto w-24 sm:w-32 object-cover border rounded mt-1 inline-block hover:shadow-lg cursor-pointer"
+                            />
+                          </a>
+                        ) : ('-')}
+                        </p>
+                      </div>
+                    ) : sellerRequestDetails.paymentPayoutMethod === 'PromptPay' ? (
+                      <p><span className="font-medium">PromptPay ID:</span> {sellerRequestDetails.promptPayId || '-'}</p>
+                    ) : null}
+
+                    <p><span className="font-medium">Verification Status:</span> {sellerRequestDetails.verificationStatus || '-'}</p>
+                    <p><span className="font-medium">Created At:</span> {sellerRequestDetails.createdAt ? new Date(sellerRequestDetails.createdAt).toLocaleString() : '-'}</p>
+                    <p><span className="font-medium">Updated At:</span> {sellerRequestDetails.updatedAt ? new Date(sellerRequestDetails.updatedAt).toLocaleString() : '-'}</p>
+
+                    {/* User Info */}
+                    <div className="pt-2">
+                      <h3 className="font-semibold text-gray-800 ">User Info</h3>
+                      <p><span className="font-medium">User ID:</span> {sellerRequestDetails.userId?._id || '-'}</p>
+                      <p><span className="font-medium">Email:</span> {sellerRequestDetails.userId?.email || '-'}</p>
+                      <p><span className="font-medium">Phone:</span> {selectedUser.phoneNumber || '-'}</p>
+                    </div>
+
+                    {/* Images */}
+                    <div className="pt-2">
+                      <h3 className="font-semibold text-gray-800 ">Documents</h3>
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <div>
+                          <span className="font-medium">ID Document Front:</span>{' '}
+                          {sellerRequestDetails.idDocumentFrontUrl ? (
+                            <a href={sellerRequestDetails.idDocumentFrontUrl} target="_blank" rel="noopener noreferrer">
+                              <img
+                                src={sellerRequestDetails.idDocumentFrontUrl}
+                                alt="ID Document Front"
+                                className="max-w-full h-auto w-24 sm:w-32 object-cover border rounded mt-1 inline-block hover:shadow-lg cursor-pointer"
+                              />
+                            </a>
+                          ) : ('-')}
+                        </div>
+                        <div>
+                          <span className="font-medium">Selfie With ID:</span>{' '}
+                          {sellerRequestDetails.selfieWithIdUrl ? (
+                            <a href={sellerRequestDetails.selfieWithIdUrl} target="_blank" rel="noopener noreferrer">
+                              <img
+                                src={sellerRequestDetails.selfieWithIdUrl}
+                                alt="Selfie With ID"
+                                className="max-w-full h-auto w-24 sm:w-32 object-cover border rounded mt-1 inline-block hover:shadow-lg cursor-pointer"
+                              />
+                            </a>
+                          ) : ('-')}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-4 text-red-500">No seller request found.</div>
+                )}
+              </div>
+
+              {/* Sticky Footer (Actions) */}
+              <div className="sticky bottom-0 z-10 bg-white  rounded-b-lg px-4 sm:px-6 py-3 border-t border-gray-200  flex flex-col sm:flex-row gap-2">
+                <button
+                  className="flex-1 bg-green-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
+                  onClick={() => handleSellerRequestAction('Approved')}
+                  disabled={sellerRequestLoading || !sellerRequestDetails}
+                >
+                  Accept
+                </button>
+                <button
+                  className="flex-1 bg-red-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
+                  onClick={() => handleSellerRequestAction('Rejected')}
+                  disabled={sellerRequestLoading || !sellerRequestDetails}
+                >
+                  Reject
+                </button>
               </div>
             </div>
-          </div>
-        </div>
-      ) : (
-        <div className="text-center py-4 text-red-500">No seller request found.</div>
-      )}
-    </div>
-
-    {/* Sticky Footer (Actions) */}
-    <div className="sticky bottom-0 z-10 bg-white  rounded-b-lg px-4 sm:px-6 py-3 border-t border-gray-200  flex flex-col sm:flex-row gap-2">
-      <button
-        className="flex-1 bg-green-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
-        onClick={() => handleSellerRequestAction('Approved')}
-        disabled={sellerRequestLoading || !sellerRequestDetails}
-      >
-        Accept
-      </button>
-      <button
-        className="flex-1 bg-red-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
-        onClick={() => handleSellerRequestAction('Rejected')}
-        disabled={sellerRequestLoading || !sellerRequestDetails}
-      >
-        Reject
-      </button>
-    </div>
-  </div>
-)}
+          )}
 
 
         </Modal>
@@ -843,8 +909,8 @@ export default function User() {
                             </div>
                           </div>
                           <span className={`px-2 py-1 rounded text-xs font-medium ${report.isDisable
-                              ? 'bg-red-100 text-red-800'
-                              : 'bg-green-100 text-green-800'
+                            ? 'bg-red-100 text-red-800'
+                            : 'bg-green-100 text-green-800'
                             }`}>
                             {report.isDisable ? 'Disabled' : 'Active'}
                           </span>

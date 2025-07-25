@@ -1859,7 +1859,7 @@ const AdminTransactions = () => {
                           </div>
                           <div>
                             <span className="text-green-700">Account Number:</span>
-                            <span className="font-medium ml-2">****{method.accountNumber.slice(-4)}</span>
+                            <span className="font-medium ml-2">{method.accountNumber}</span>
                           </div>
                           <div>
                             <span className="text-green-700">Account Holder:</span>

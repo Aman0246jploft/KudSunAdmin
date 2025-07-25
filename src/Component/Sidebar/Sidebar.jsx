@@ -193,7 +193,7 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
             className={clsx(
               "overflow-hidden transition-all duration-300 ease-in-out",
               !isOpen && !isMobile && "md:hidden", // Hide sub-items when sidebar is collapsed on desktop
-              isExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+              isExpanded ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
             )}
           >
             <ul className="mt-1 space-y-1">
@@ -310,7 +310,7 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
           color: theme.colors.textPrimary,
         }}
         className={clsx(
-          "fixed left-0 top-0 h-full border-r z-40 transition-all duration-300 ease-in-out",
+          "fixed left-0 top-0 h-full border-r z-40 transition-all duration-300 ease-in-out flex flex-col",
           // Mobile behavior
           isMobile ? [
             "w-64",
@@ -351,7 +351,7 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
         {/* Logo Section */}
         <div
           className={clsx(
-            "flex items-center p-4 border-b transition-all duration-300",
+            "flex items-center p-4 border-b transition-all duration-300 flex-shrink-0",
             !isOpen && !isMobile && "md:justify-center md:px-2"
           )}
           style={{
@@ -384,8 +384,14 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
         </div>
 
         {/* Navigation Menu */}
-        <nav className="flex-1 py-6 overflow-y-auto">
-          <ul className="space-y-2 px-3">{menuItems.map(renderMenuItem)}</ul>
+        <nav 
+          className="flex-1 py-6 overflow-y-auto min-h-0 scrollbar-thin sidebar-scroll"
+          style={{
+            scrollbarWidth: 'thin',
+            scrollbarColor: `${theme.colors.border} transparent`,
+          }}
+        >
+          <ul className="space-y-2 px-3 pb-4">{menuItems.map(renderMenuItem)}</ul>
         </nav>
       </div>
     </>
