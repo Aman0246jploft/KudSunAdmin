@@ -14,14 +14,14 @@ export default function MessageInput({ socket, room }) {
   const [productSearchTerm, setProductSearchTerm] = useState('');
   const fileInputRef = useRef(null);
   const emojiButtonRef = useRef(null);
-  
+
   // Get user's products from Redux store
   const userProducts = useSelector(state => state.product.userProducts) || [];
 
   // Filter products based on search term and availability
   const filteredProducts = userProducts.filter(product => {
     const matchesSearch = product.title?.toLowerCase().includes(productSearchTerm.toLowerCase()) ||
-                         product.description?.toLowerCase().includes(productSearchTerm.toLowerCase());
+      product.description?.toLowerCase().includes(productSearchTerm.toLowerCase());
     const isAvailable = !product.isSold || product.saleType === 'auction';
     const isActive = product.isActive !== false;
     return matchesSearch && isAvailable && isActive;
@@ -44,6 +44,13 @@ export default function MessageInput({ socket, room }) {
 
   const handleSend = () => {
     if (!text.trim()) return;
+
+
+
+
+
+
+
 
     // Determine message type based on content
     let messageType = 'TEXT';
@@ -77,6 +84,8 @@ export default function MessageInput({ socket, room }) {
       messageType = 'FILE';
     }
 
+
+
     // Send the message with appropriate type
     socket.emit('sendMessage', {
       roomId: room._id,
@@ -104,10 +113,23 @@ export default function MessageInput({ socket, room }) {
     reader.onload = (event) => {
       const fileType = file.type.split('/')[0];
       let messageType = 'FILE';
-      
+
       if (fileType === 'image') messageType = 'IMAGE';
       else if (fileType === 'video') messageType = 'VIDEO';
       else if (fileType === 'audio') messageType = 'AUDIO';
+
+
+      console.log("77777700007777777",
+        {
+          roomId: room._id,
+        type: messageType,
+        content: event.target.result,
+        fileName: file.name,
+        systemMeta: null
+        }
+
+      )
+
 
       socket.emit('sendMessage', {
         roomId: room._id,
@@ -117,6 +139,12 @@ export default function MessageInput({ socket, room }) {
         systemMeta: null
       });
     };
+
+
+
+
+
+
     reader.readAsDataURL(file);
     e.target.value = null; // Reset file input
   };
@@ -192,7 +220,7 @@ export default function MessageInput({ socket, room }) {
         <div className="emoji-picker-container absolute bottom-full right-0 mb-2 z-50">
           <div className="relative">
             <div className="bg-white shadow-2xl rounded-lg border border-gray-200 overflow-hidden">
-              <EmojiPicker 
+              <EmojiPicker
                 onEmojiClick={handleEmojiClick}
                 width={350}
                 height={400}
@@ -205,7 +233,7 @@ export default function MessageInput({ socket, room }) {
               />
             </div>
             {/* Close button overlay */}
-         
+
           </div>
         </div>
       )}
@@ -216,7 +244,7 @@ export default function MessageInput({ socket, room }) {
           <div className="bg-white rounded-lg shadow-xl border border-gray-200 p-4 w-full max-w-sm mx-auto max-h-80 overflow-y-auto">
             <div className="flex justify-between items-center mb-3">
               <h3 className="font-medium text-gray-900">Share Product</h3>
-              <button 
+              <button
                 onClick={() => setShowProductPicker(false)}
                 className="text-gray-400 hover:text-gray-600 text-xl leading-none w-6 h-6 flex items-center justify-center"
               >
@@ -234,7 +262,7 @@ export default function MessageInput({ socket, room }) {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
-            
+
             {filteredProducts.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
                 <FaBox size={32} className="mx-auto mb-2 opacity-50" />
@@ -251,14 +279,14 @@ export default function MessageInput({ socket, room }) {
             ) : (
               <div className="space-y-2">
                 {filteredProducts.map(product => (
-                  <div 
+                  <div
                     key={product._id}
                     onClick={() => handleProductShare(product)}
                     className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-gray-200"
                   >
-                    <img 
-                      src={product.productImages?.[0] || product.image} 
-                      alt={product.title} 
+                    <img
+                      src={product.productImages?.[0] || product.image}
+                      alt={product.title}
                       className="w-12 h-12 object-cover rounded-lg border border-gray-200 flex-shrink-0"
                       onError={(e) => {
                         e.target.src = '/placeholder-product.png';
@@ -310,10 +338,10 @@ export default function MessageInput({ socket, room }) {
                 onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
                 placeholder="Type a message..."
               />
-              
+
               {/* Action buttons */}
               <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
-                <button 
+                <button
                   ref={emojiButtonRef}
                   onClick={() => {
                     setShowEmojiPicker(!showEmojiPicker);
@@ -324,14 +352,14 @@ export default function MessageInput({ socket, room }) {
                 >
                   <BsEmojiSmile size={16} />
                 </button>
-                <button 
+                <button
                   onClick={() => fileInputRef.current?.click()}
                   className="text-gray-400 hover:text-gray-600 transition-colors p-1.5 rounded-full hover:bg-gray-100"
                   title="Upload media"
                 >
                   <IoMdImages size={16} />
                 </button>
-                <button 
+                <button
                   onClick={() => {
                     setShowProductPicker(!showProductPicker);
                     setShowEmojiPicker(false);
@@ -344,15 +372,15 @@ export default function MessageInput({ socket, room }) {
               </div>
             </div>
           </div>
-          
-          <button 
+
+          <button
             onClick={handleSend}
             disabled={!text.trim()}
             className={`
               p-3 rounded-full flex items-center justify-center flex-shrink-0
               transition-all duration-200 ease-in-out
-              ${text.trim() 
-                ? 'bg-blue-500 hover:bg-blue-600 text-white transform hover:scale-105' 
+              ${text.trim()
+                ? 'bg-blue-500 hover:bg-blue-600 text-white transform hover:scale-105'
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'}
             `}
             title="Send message"

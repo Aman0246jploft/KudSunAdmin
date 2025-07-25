@@ -147,6 +147,24 @@ export const updateFee = createAsyncThunk(
 );
 
 
+export const sendContactUsReply = createAsyncThunk(
+    'contactUs/sendReply',
+    async (payload, thunkAPI) => {
+        try {
+            const res = await authAxiosClient.post(`/contactUs/sendReply`, payload);
+            return res.data;
+        } catch (err) {
+            let message = capitalizeFirstLetter(err.response?.data?.message || err.message);
+            toast.error(message);
+            return thunkAPI.rejectWithValue({
+                message: err.response?.data?.message || err.message,
+                code: err.response?.status || 500,
+            });
+        }
+    }
+);
+
+
 
 
 

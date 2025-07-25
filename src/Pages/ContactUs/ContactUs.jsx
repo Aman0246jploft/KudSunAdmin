@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { contactUsList, markAsreadContactUs } from "../../features/slices/settingSlice";
+import { contactUsList, markAsreadContactUs, sendContactUsReply } from "../../features/slices/settingSlice";
 import Pagination from "../../Component/Atoms/Pagination/Pagination";
 import DataTable from "../../Component/Table/DataTable";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
@@ -65,10 +65,32 @@ export default function ContactUs() {
   };
 
   const handleReplySubmit = async () => {
-    // This will be implemented later when backend is ready
-    console.log("Reply Data:", replyData);
-    toast.info("Reply functionality will be implemented soon");
-    setIsReplyModalOpen(false);
+    if (!replyData.subject.trim() || !replyData.body.trim()) {
+      toast.error("Subject and message are required");
+      return;
+    }
+
+    try {
+      const payload = {
+        contactUsId: selectedFaq._id,
+        subject: replyData.subject.trim(),
+        body: replyData.body.trim()
+      };
+
+      await dispatch(sendContactUsReply(payload)).unwrap();
+      toast.success("Reply sent successfully!");
+      setIsReplyModalOpen(false);
+      
+      // Refresh the contact us list to update the status
+      dispatch(contactUsList(pagination))
+        .unwrap()
+        .then((faqResult) => {
+          setFaqs(faqResult.data || []);
+        });
+    } catch (error) {
+      console.error("Failed to send reply:", error);
+      toast.error("Failed to send reply. Please try again.");
+    }
   };
 
   const handleToggleRead = async (id, currentStatus) => {
