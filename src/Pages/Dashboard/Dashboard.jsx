@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getDashboardCount } from "../../features/slices/userSlice";
 import { useTheme } from "../../contexts/theme/hook/useTheme"; // import theme hook
+import MonthlyDashboardCharts from "./MonthlyDashboardCharts";
 
 export default function Dashboard() {
   const dispatch = useDispatch();
@@ -61,6 +62,10 @@ export default function Dashboard() {
           </div>
         ))}
       </div>
+
+
+
+      <MonthlyDashboardCharts/>
     </div>
   );
 }
