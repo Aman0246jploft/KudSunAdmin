@@ -33,6 +33,7 @@ import AdminTransactions from "./Pages/Admin/AdminTransactions";
 import SellerVerificationRequests from "./Pages/User/SellerVerificationRequests";
 import AdminFinancialDashboard from "./Pages/Admin/AdminFinancialDashboard";
 import AdminReviewManagement from "./Pages/Admin/AdminReviewManagement";
+import UserInfo from "./Pages/UserInfo/UserInfo";
 
 
 
@@ -74,6 +75,7 @@ function App() {
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/user" element={<User />} />
+              <Route path="/user/:id" element={<UserInfo />} />
               <Route path="/sellProduct" element={<SellProduct />} />
               <Route path="/auctionProduct" element={<AuctionProduct />} />
               <Route path="/thread" element={<Thread />} />

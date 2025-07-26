@@ -4,6 +4,7 @@ import { FiCheckCircle, FiEdit, FiSlash, FiTrash2, FiLock } from "react-icons/fi
 import { useDispatch, useSelector } from "react-redux";
 import { IoEyeOutline } from "react-icons/io5";
 import { FaRegEyeSlash } from "react-icons/fa6";
+import { IoInformationCircle } from "react-icons/io5";
 import {
   adminChangeUserPassword,
   userList as fetchUserList,
@@ -23,9 +24,12 @@ import { FaEye } from "react-icons/fa";
 import { RiTriangularFlagLine } from "react-icons/ri";
 import { toast } from "react-toastify";
 import { byUser } from "../../features/slices/settingSlice";
+import { useNavigate } from 'react-router-dom';
+
 
 export default function User() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { theme } = useTheme();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -106,7 +110,6 @@ export default function User() {
     setIsModalOpen(true);
   };
 
-  console.log("reportsreports", reports);
 
   const handleChangePassword = () => {
     dispatch(
@@ -333,22 +336,7 @@ export default function User() {
 
   const columns = [
 
-    {
-      key: "is_Preferred_seller",
-      label: "",
-      width: "1%",
-      render: (value, row) => (
-        <div className="flex items-center justify-center">
-          <input
-            type="checkbox"
-            checked={row.is_Preferred_seller || false}
-            onChange={() => handleTogglePreferredSeller(row)}
-            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
-            title={row.is_Preferred_seller ? "Remove from preferred sellers" : "Mark as preferred seller"}
-          />
-        </div>
-      ),
-    },
+
     {
       key: "serial",
       label: "S.No",
@@ -371,12 +359,37 @@ export default function User() {
       render: (value) => (value && value.trim() ? value : "-"),
     },
 
+    {
+      key: "Location",
+      label: "Location",
+      render: (_, value) => {
+        return `${value?.userAddress?.province?.name} / ${value?.userAddress?.district?.name}` || "-";
+      }
+    },
+
 
     {
       key: "dob",
       label: "DOB",
       render: (value) =>
         value ? new Date(value).toLocaleDateString("en-GB") : "-",
+    },
+
+    {
+      key: "is_Preferred_seller",
+      label: "Preferred Seller",
+      width: "7%",
+      render: (value, row) => (
+        <div className="flex items-center justify-center">
+          <input
+            type="checkbox"
+            checked={row.is_Preferred_seller || false}
+            onChange={() => handleTogglePreferredSeller(row)}
+            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
+            title={row.is_Preferred_seller ? "Remove from preferred sellers" : "Mark as preferred seller"}
+          />
+        </div>
+      ),
     },
 
     {
@@ -440,6 +453,9 @@ export default function User() {
                 >
                   <FaEye size={18} />
                 </button>
+
+
+                <IoInformationCircle />
               </>
             ) : (
               <>
@@ -461,6 +477,15 @@ export default function User() {
                 >
                   <FiTrash2 size={18} />
                 </button>
+                <button
+                  onClick={() => navigate(row?._id)}
+                  title="Info"
+                  className="p-1 rounded hover:bg-gray-200"
+                  style={{ color: "black" }}
+                >
+                  <IoInformationCircle size={18} />
+                </button>
+           
                 {showReportedRequests && isReported && (
                   <button
                     onClick={() => {
