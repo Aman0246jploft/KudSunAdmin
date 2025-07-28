@@ -7,6 +7,7 @@ import DataTable from "../../Component/Table/DataTable";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
 import { FiTrash2, FiCheckCircle, FiSlash } from "react-icons/fi";
 import Modal from "./Modal";
+import Button from '../../Component/Atoms/Button/Button'
 import AdvancedRichTextEditor from "../../Component/RichTextEditor/AdvancedRichTextEditor";
 
 export default function ContactUs() {
@@ -15,6 +16,7 @@ export default function ContactUs() {
 
   const [pagination, setPagination] = useState({ pageNo: 1, size: 10 });
   const [faqs, setFaqs] = useState([]);
+  const [isSending, setIsSending] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
   const [selectedFaq, setSelectedFaq] = useState(null);
@@ -69,6 +71,7 @@ export default function ContactUs() {
       toast.error("Subject and message are required");
       return;
     }
+    setIsSending(true);
 
     try {
       const payload = {
@@ -80,7 +83,7 @@ export default function ContactUs() {
       await dispatch(sendContactUsReply(payload)).unwrap();
       toast.success("Reply sent successfully!");
       setIsReplyModalOpen(false);
-      
+
       // Refresh the contact us list to update the status
       dispatch(contactUsList(pagination))
         .unwrap()
@@ -90,12 +93,14 @@ export default function ContactUs() {
     } catch (error) {
       console.error("Failed to send reply:", error);
       toast.error("Failed to send reply. Please try again.");
+    } finally {
+      setIsSending(false);
     }
   };
 
   const handleToggleRead = async (id, currentStatus) => {
     try {
-      dispatch(markAsreadContactUs({ id, isRead: !currentStatus }))
+      dispatch(markAsreadContactUs({ id, isRead: !currentStatus })).unwrap()
       dispatch(contactUsList(pagination))
         .unwrap()
         .then((faqResult) => {
@@ -191,7 +196,7 @@ export default function ContactUs() {
           >
             View
           </button>
-         {isValidEmail(row.contact)&& <button
+          {isValidEmail(row.contact) && <button
             onClick={() => openReplyModal(row)}
             className="text-green-600 hover:underline"
             disabled={!isValidEmail(row.contact)}
@@ -305,7 +310,7 @@ export default function ContactUs() {
       </div>
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         {selectedFaq && (
-          <div className="space-y-4">
+          <div className="space-y-4 p-3">
             <h2 className="text-lg font-semibold">Contact Detail</h2>
             <div><strong>Name:</strong> {selectedFaq.name}</div>
             <div><strong>Contact:</strong> {selectedFaq.contact}</div>
@@ -366,7 +371,7 @@ export default function ContactUs() {
         {isReplyModalOpen && (
           <div className="space-y-4 p-4" style={{ minWidth: '600px' }}>
             <h2 className="text-xl font-semibold mb-6">Reply to Contact</h2>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-1">To:</label>
@@ -405,13 +410,14 @@ export default function ContactUs() {
                 >
                   Cancel
                 </button>
-                <button
+                <Button
+                  loading={isSending}
                   onClick={handleReplySubmit}
                   className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                   disabled={!replyData.subject || !replyData.body}
                 >
                   Send Reply
-                </button>
+                </Button>
               </div>
             </div>
           </div>

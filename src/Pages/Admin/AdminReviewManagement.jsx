@@ -223,30 +223,30 @@ const AdminReviewManagement = () => {
     {
       key: 'reviewDetails',
       label: 'reviewDetails',
-      render: (_,row) => {
+      render: (_, row) => {
 
-        return(
-        <div className="space-y-1">
-          <div className="flex items-center space-x-2">
-            <RatingDisplay rating={row?.rating} />
-            <span className="text-sm font-medium">{row?.rating}/5</span>
+        return (
+          <div className="space-y-1">
+            <div className="flex items-center space-x-2">
+              <RatingDisplay rating={row?.rating} />
+              <span className="text-sm font-medium">{row?.rating}/5</span>
+            </div>
+            <p className="text-sm text-gray-600 max-w-xs truncate">
+              {row.reviewText}
+            </p>
+            <div className="flex items-center space-x-2 text-xs text-gray-500">
+              <FaCalendar className="w-3 h-3" />
+              {new Date(row.createdAt).toLocaleDateString()}
+            </div>
           </div>
-          <p className="text-sm text-gray-600 max-w-xs truncate">
-            {row.reviewText}
-          </p>
-          <div className="flex items-center space-x-2 text-xs text-gray-500">
-            <FaCalendar className="w-3 h-3" />
-            {new Date(row.createdAt).toLocaleDateString()}
-          </div>
-        </div>
-      )
+        )
       }
-        
+
     },
     {
       key: 'reviewer',
       label: 'reviewer',
-      render: (_,row) => (
+      render: (_, row) => (
         <div className="flex items-center space-x-3">
           <img
             src={row.reviewer?.profileImage || '/default-avatar.png'}
@@ -272,8 +272,8 @@ const AdminReviewManagement = () => {
     {
       key: 'Reviewed User',
       label: 'reviewedUser',
-      render: (_,row) => {
-        
+      render: (_, row) => {
+
         return (
           <div className="flex items-center space-x-3">
             <img
@@ -307,7 +307,7 @@ const AdminReviewManagement = () => {
     {
       key: 'Product',
       label: 'product',
-      render: (_,row) => (
+      render: (_, row) => (
         <div className="flex items-center space-x-3">
           <img
             src={row.product?.productImages?.[0] || '/default-product.png'}
@@ -329,7 +329,7 @@ const AdminReviewManagement = () => {
     {
       key: 'Actions',
       label: 'actions',
-      render: (_,row) => (
+      render: (_, row) => (
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"
@@ -460,7 +460,7 @@ const AdminReviewManagement = () => {
             </div>
 
             {/* Seller Rating Range */}
-            <div>
+            {/* <div>
               <label className="text-sm font-medium text-gray-700 mb-2 block">Seller Rating Range</label>
               <div className="flex space-x-2">
                 <InputField
@@ -482,10 +482,10 @@ const AdminReviewManagement = () => {
                   onChange={(e) => handleFilterChange('sellerRatingMax', e.target.value)}
                 />
               </div>
-            </div>
+            </div> */}
 
             {/* Buyer Rating Range */}
-            <div>
+            {/* <div>
               <label className="text-sm font-medium text-gray-700 mb-2 block">Buyer Rating Range</label>
               <div className="flex space-x-2">
                 <InputField
@@ -507,10 +507,10 @@ const AdminReviewManagement = () => {
                   onChange={(e) => handleFilterChange('buyerRatingMax', e.target.value)}
                 />
               </div>
-            </div>
+            </div> */}
 
             {/* Sort Options */}
-            <div>
+            {/* <div>
               <label className="text-sm font-medium text-gray-700 mb-2 block">Sort By</label>
               <div className="flex space-x-2">
                 <select
@@ -531,7 +531,7 @@ const AdminReviewManagement = () => {
                   {filters.sortOrder === 'desc' ? <FaSortAmountDown /> : <FaSortAmountUp />}
                 </button>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Filter Actions */}
@@ -606,8 +606,8 @@ const AdminReviewManagement = () => {
                         <RatingDisplay rating={detailModal.data.rating} size="lg" />
                         <span className="text-2xl font-bold">{detailModal.data.rating}/5</span>
                         <span className={`px-3 py-1 rounded-full text-sm ${detailModal.data.raterRole === 'buyer'
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-green-100 text-green-800'
+                          ? 'bg-blue-100 text-blue-800'
+                          : 'bg-green-100 text-green-800'
                           }`}>
                           {detailModal.data.raterRole === 'buyer' ? 'Buyer Rating Seller' : 'Seller Rating Buyer'}
                         </span>
@@ -753,8 +753,8 @@ const AdminReviewManagement = () => {
                           </span>
                         )}
                         <span className={`text-xs px-2 py-1 rounded ${detailModal.data.product?.condition === 'new'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-yellow-100 text-yellow-800'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-yellow-100 text-yellow-800'
                           }`}>
                           {detailModal.data.product?.condition}
                         </span>

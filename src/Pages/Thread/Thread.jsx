@@ -182,6 +182,9 @@ export default function Thread() {
       label: "Description",
       width: "25%",
     },
+
+
+
     {
       key: "category",
       label: "Category/SubCategory",
@@ -192,6 +195,15 @@ export default function Thread() {
         return `${cat} / ${subCat}`;
       }
     },
+
+    {
+      key: "totalAssociatedProducts",
+      label: "Product",
+      width: "10%",
+    },
+
+
+
     {
       key: "status",
       label: "Status",
