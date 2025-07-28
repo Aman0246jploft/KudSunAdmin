@@ -80,7 +80,11 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
         { name: "Bank", href: "/bank", icon: AiOutlineSetting },
         { name: "Location Management", href: "/location", icon: AiOutlineSetting },
         { name: "Carrier Management", href: "/carrier", icon: AiOutlineSetting },
-
+        {
+          name: 'Report Types',
+          href: '/report-type-management',
+          icon: AiOutlineSetting
+        },
       ],
     },
 
@@ -90,7 +94,6 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
     { name: "Transactions", href: "/admin/transactions", icon: GrTransaction },
     { name: "Financial Analytics", href: "/admin/financial-dashboard", icon: AiOutlineDashboard },
     { name: "Review Management", href: "/admin/review-management", icon: MdRateReview },
-
 
 
 
@@ -384,7 +387,7 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
         </div>
 
         {/* Navigation Menu */}
-        <nav 
+        <nav
           className="flex-1 py-6 overflow-y-auto min-h-0 scrollbar-thin sidebar-scroll"
           style={{
             scrollbarWidth: 'thin',

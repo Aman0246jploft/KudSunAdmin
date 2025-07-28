@@ -435,7 +435,7 @@ export default function AuctionProduct() {
             }}
             editMode={true}
             productData={selectedProduct}
-            onProductUpdate={() => dispatch(productList(pagination))}
+            onProductUpdate={() => dispatch(productListAuction(pagination))}
           />
         ) : (
           <AddProductForm

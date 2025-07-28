@@ -15,23 +15,31 @@ import {
   MapPin,
   Clock,
   Gavel,
+  AlertCircle,
 } from "lucide-react";
 import { updateProduct } from "../../features/slices/productSlice";
 import { toast } from "react-toastify";
 
 const MAX_IMAGES = 5;
 const MAX_DESCRIPTION_LENGTH = 1200;
+const MAX_TITLE_LENGTH = 100;
 
 const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) => {
   const dispatch = useDispatch();
   const { categoryList } = useSelector((state) => state.category);
+  
+  // State management
+  const [loading, setLoading] = useState(false);
   const [tempSpecifics, setTempSpecifics] = useState({});
   const [selectedCategory, setSelectedCategory] = useState("");
   const [subCategories, setSubCategories] = useState([]);
   const [specifics, setSpecifics] = useState([]);
   const [selectedSpecifics, setSelectedSpecifics] = useState([]);
   const [imagePreview, setImagePreview] = useState([]);
+  const [existingImages, setExistingImages] = useState([]);
   const [showCustomDuration, setShowCustomDuration] = useState(false);
+  const [openSpecificModal, setOpenSpecificModal] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const [formData, setFormData] = useState({
     subCategoryId: "",
@@ -53,57 +61,49 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
     shippingCharge: "",
   });
 
-  const [openSpecificModal, setOpenSpecificModal] = useState(false);
-  const [errors, setErrors] = useState({});
-
   const durationOptions = [
     { value: "3", label: "3 Days" },
     { value: "5", label: "5 Days" },
     { value: "7", label: "7 Days" },
-    { value: "other", label: "Other" },
+    { value: "other", label: "Custom" },
   ];
 
-  useEffect(() => {
-    dispatch(mainCategory({ pageNo: 1, size: 10000000 }));
-  }, [dispatch]);
-
-  // Initialize form data when productData is available
+  // Initialize form with existing product data
   useEffect(() => {
     if (productData && editMode) {
-      setSelectedCategory(productData.categoryId?._id || "");
-      setFormData({
-        subCategoryId: productData.subCategoryId?._id || "",
+      const prefillData = {
+        subCategoryId: productData.subCategoryId?._id || productData.subCategoryId || "",
         images: [],
         title: productData.title || "",
         description: productData.description || "",
-        tags: productData.tags || [],
+        tags: Array.isArray(productData.tags) ? productData.tags : [],
         condition: productData.condition || "",
         saleType: "auction",
         auctionSettings: {
-          startingPrice: productData.auctionSettings?.startingPrice || "",
-          reservePrice: productData.auctionSettings?.reservePrice || "",
-          biddingIncrementPrice: productData.auctionSettings?.biddingIncrementPrice || "",
-          duration: productData.auctionSettings?.duration || "",
+          startingPrice: productData.auctionSettings?.startingPrice?.toString() || "",
+          reservePrice: productData.auctionSettings?.reservePrice?.toString() || "",
+          biddingIncrementPrice: productData.auctionSettings?.biddingIncrementPrice?.toString() || "",
+          duration: productData.auctionSettings?.duration?.toString() || "",
           endDate: productData.auctionSettings?.endDate || "",
           endTime: productData.auctionSettings?.endTime || "",
         },
         shippingOption: productData.deliveryType || "local pickup",
-        shippingCharge: productData.shippingCharge || "",
-      });
+        shippingCharge: productData.shippingCharge?.toString() || "",
+      };
 
-      // Set existing images
-      if (productData.images && productData.images.length > 0) {
-        setImagePreview(productData.images.map(img => img.url || img));
-      }
+      setFormData(prefillData);
+      setSelectedCategory(productData.categoryId?._id || productData.categoryId || "");
+      setExistingImages(Array.isArray(productData.productImages) ? productData.productImages : []);
 
-      // Set existing specifics
-      if (productData.specifics && productData.specifics.length > 0) {
-        setSelectedSpecifics(productData.specifics.map(spec => ({
-          parameterId: spec.parameterId,
+      // Set selected specifics with proper structure
+      if (productData.specifics && Array.isArray(productData.specifics)) {
+        const initialSpecifics = productData.specifics.map((spec) => ({
+          parameterId: spec.parameterId || spec.parameterID,
           parameterName: spec.parameterName,
-          valueId: spec.valueId,
+          valueId: spec.valueId || spec.valueID,
           valueName: spec.valueName,
-        })));
+        }));
+        setSelectedSpecifics(initialSpecifics);
       }
 
       // Check if custom duration is set
@@ -113,20 +113,51 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
     }
   }, [productData, editMode]);
 
+  // Fetch categories on mount
+  useEffect(() => {
+    dispatch(mainCategory({ pageNo: 1, size: 10000000 }));
+  }, [dispatch]);
+
+  // Fetch subcategories when category changes
   useEffect(() => {
     if (selectedCategory) {
       dispatch(
         subCategory({ categoryId: selectedCategory, pageNo: 1, size: 10000000 })
       ).then((res) => {
         if (subCategory.fulfilled.match(res)) {
-          setSubCategories(res.payload?.data?.data || []);
+          const fetchedSubCategories = res.payload?.data?.data || [];
+          setSubCategories(fetchedSubCategories);
         }
+      }).catch(() => {
+        setSubCategories([]);
+        toast.error("Failed to fetch subcategories");
       });
+    } else {
+      setSubCategories([]);
     }
-  }, [selectedCategory]);
+  }, [selectedCategory, dispatch]);
 
+  // Set subcategory after subcategories are loaded (only once)
   useEffect(() => {
-    if (!formData.subCategoryId) return;
+    if (productData && editMode && subCategories.length > 0 && !formData.subCategoryId) {
+      const expectedSubCategoryId = productData.subCategoryId?._id || productData.subCategoryId;
+      
+      // Check if the expected subcategory exists in the loaded list
+      const subCategoryExists = subCategories.find(sub => sub._id === expectedSubCategoryId);
+      
+      if (expectedSubCategoryId && subCategoryExists) {
+        setFormData(prev => ({ ...prev, subCategoryId: expectedSubCategoryId }));
+      }
+    }
+  }, [subCategories, productData, editMode]);
+
+  // Fetch specifics when subcategory changes
+  useEffect(() => {
+    if (!formData.subCategoryId) {
+      setSpecifics([]);
+      return;
+    }
+
     dispatch(
       subCategoryParameter({
         subCategoryId: formData.subCategoryId,
@@ -135,47 +166,136 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
       })
     ).then((res) => {
       if (subCategoryParameter.fulfilled.match(res)) {
-        setSpecifics(res.payload?.data?.parameters || []);
+        const fetchedSpecifics = res.payload?.data?.parameters || [];
+        setSpecifics(fetchedSpecifics);
+        
+        // If we have selectedSpecifics but they're not in the new list, clear them
+        if (selectedSpecifics.length > 0) {
+          const validSpecifics = selectedSpecifics.filter(spec => {
+            return fetchedSpecifics.some(param => 
+              param.key === spec.parameterName && 
+              param.values.some(val => val.value === spec.valueName)
+            );
+          });
+          
+          if (validSpecifics.length !== selectedSpecifics.length) {
+            setSelectedSpecifics(validSpecifics);
+          }
+        }
       } else {
         setSpecifics([]);
       }
+    }).catch(() => {
+      setSpecifics([]);
+      toast.error("Failed to fetch product specifications");
     });
-  }, [formData.subCategoryId]);
+  }, [formData.subCategoryId, dispatch, selectedSpecifics]);
 
+  // Ensure selectedSpecifics are preserved when specifics are loaded
+  useEffect(() => {
+    if (productData && editMode && specifics.length > 0 && selectedSpecifics.length === 0) {
+      // If we have product specifics but no selected specifics, try to restore them
+      if (productData.specifics && Array.isArray(productData.specifics)) {
+        const restoredSpecifics = productData.specifics
+          .map((spec) => ({
+            parameterId: spec.parameterId || spec.parameterID,
+            parameterName: spec.parameterName,
+            valueId: spec.valueId || spec.valueID,
+            valueName: spec.valueName,
+          }))
+          .filter(spec => {
+            // Only include specs that exist in the current specifics list
+            return specifics.some(param => 
+              param.key === spec.parameterName && 
+              param.values.some(val => val.value === spec.valueName)
+            );
+          });
+        
+        if (restoredSpecifics.length > 0) {
+          setSelectedSpecifics(restoredSpecifics);
+        }
+      }
+    }
+  }, [specifics, productData, editMode, selectedSpecifics.length]);
+
+  // Handle existing image removal
+  const removeExistingImage = (index) => {
+    setExistingImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Handle new image upload
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
-    if (files.length + formData.images.length > MAX_IMAGES) {
-      setErrors({
-        ...errors,
-        images: `You can upload a maximum of ${MAX_IMAGES} images.`,
-      });
+    const totalImages = existingImages.length + formData.images.length;
+
+    if (files.length + totalImages > MAX_IMAGES) {
+      setErrors(prev => ({
+        ...prev,
+        images: `Maximum ${MAX_IMAGES} images allowed. Current: ${totalImages}`,
+      }));
       return;
     }
 
-    const newPreviewUrls = files.map((file) => URL.createObjectURL(file));
-    setImagePreview([...imagePreview, ...newPreviewUrls]);
-    setFormData({ ...formData, images: [...formData.images, ...files] });
-    setErrors({ ...errors, images: "" });
+    // Validate file types and sizes
+    const validFiles = [];
+    const invalidFiles = [];
+
+    files.forEach(file => {
+      if (!file.type.startsWith('image/')) {
+        invalidFiles.push(`${file.name} - Not an image`);
+      } else if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        invalidFiles.push(`${file.name} - Too large (max 5MB)`);
+      } else {
+        validFiles.push(file);
+      }
+    });
+
+    if (invalidFiles.length > 0) {
+      setErrors(prev => ({
+        ...prev,
+        images: `Invalid files: ${invalidFiles.join(', ')}`,
+      }));
+    }
+
+    if (validFiles.length > 0) {
+      const newPreviewUrls = validFiles.map((file) => URL.createObjectURL(file));
+      setImagePreview(prev => [...prev, ...newPreviewUrls]);
+      setFormData(prev => ({ ...prev, images: [...prev.images, ...validFiles] }));
+      setErrors(prev => ({ ...prev, images: "" }));
+    }
   };
 
+  // Remove new image
   const removeImage = (index) => {
-    const newImages = formData.images.filter((_, i) => i !== index);
-    const newPreviews = imagePreview.filter((_, i) => i !== index);
-
     URL.revokeObjectURL(imagePreview[index]);
-
-    setFormData({ ...formData, images: newImages });
-    setImagePreview(newPreviews);
+    setFormData(prev => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index)
+    }));
+    setImagePreview(prev => prev.filter((_, i) => i !== index));
   };
 
+  // Handle tag input
   const handleTagInput = (e) => {
-    const tags = e.target.value
+    const value = e.target.value;
+    const tags = value
       .split(",")
       .map((tag) => tag.trim())
-      .filter(Boolean);
-    setFormData({ ...formData, tags });
+      .filter(Boolean)
+      .slice(0, 10); // Limit to 10 tags
+
+    setFormData(prev => ({ ...prev, tags }));
   };
 
+  // Remove individual tag
+  const removeTag = (indexToRemove) => {
+    setFormData(prev => ({
+      ...prev,
+      tags: prev.tags.filter((_, index) => index !== indexToRemove)
+    }));
+  };
+
+  // Handle auction setting changes
   const handleAuctionSettingChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
@@ -186,6 +306,7 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
     }));
   };
 
+  // Handle duration changes
   const handleDurationChange = (duration) => {
     if (duration === "other") {
       setShowCustomDuration(true);
@@ -198,177 +319,218 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
     }
   };
 
+  // Comprehensive form validation
   const validateForm = () => {
     const newErrors = {};
+    const totalImages = existingImages.length + formData.images.length;
 
-    if (!selectedCategory) newErrors.category = "Please select a category";
-    if (!formData.subCategoryId)
-      newErrors.subCategory = "Please select a subcategory";
-    if (!formData.title.trim()) newErrors.title = "Title is required";
-    if (!formData.description.trim())
-      newErrors.description = "Description is required";
-    if (imagePreview.length === 0)
-      newErrors.images = "At least one image is required";
-    if (!formData.condition) newErrors.condition = "Please select condition";
+    // Required field validations
+    if (!selectedCategory.trim()) {
+      newErrors.category = "Category is required";
+    }
 
+    if (!formData.subCategoryId.trim()) {
+      newErrors.subCategory = "Subcategory is required";
+    }
+
+    if (!formData.title.trim()) {
+      newErrors.title = "Product title is required";
+    } else if (formData.title.length > MAX_TITLE_LENGTH) {
+      newErrors.title = `Title must be ${MAX_TITLE_LENGTH} characters or less`;
+    }
+
+    if (!formData.description.trim()) {
+      newErrors.description = "Product description is required";
+    } else if (formData.description.length < 20) {
+      newErrors.description = "Description must be at least 20 characters";
+    }
+
+    if (totalImages === 0) {
+      newErrors.images = "At least one product image is required";
+    }
+
+    if (!formData.condition) {
+      newErrors.condition = "Product condition is required";
+    }
+
+    // Specifics validation
     if (specifics.length > 0 && selectedSpecifics.length === 0) {
       newErrors.specifics = "At least one product specification is required";
     }
 
+    // Auction settings validation
     const auction = formData.auctionSettings;
-    if (!auction.startingPrice)
+    
+    if (!auction.startingPrice.trim()) {
       newErrors.startingPrice = "Starting price is required";
-    if (!auction.reservePrice)
-      newErrors.reservePrice = "Reserve price is required";
-    if (!auction.biddingIncrementPrice)
-      newErrors.biddingIncrementPrice = "Bidding increment is required";
-
-    if (showCustomDuration) {
-      if (!auction.endDate) newErrors.endDate = "End date is required";
-      if (!auction.endTime) newErrors.endTime = "End time is required";
     } else {
-      if (!auction.duration && !showCustomDuration)
-        newErrors.duration = "Duration is required";
+      const startingPrice = parseFloat(auction.startingPrice);
+      if (isNaN(startingPrice) || startingPrice <= 0) {
+        newErrors.startingPrice = "Starting price must be a valid positive number";
+      }
     }
 
-    if (
-      formData.shippingOption === "charge shipping" &&
-      !formData.shippingCharge
-    ) {
+    if (!auction.reservePrice.trim()) {
+      newErrors.reservePrice = "Reserve price is required";
+    } else {
+      const reservePrice = parseFloat(auction.reservePrice);
+      const startingPrice = parseFloat(auction.startingPrice);
+      if (isNaN(reservePrice) || reservePrice <= 0) {
+        newErrors.reservePrice = "Reserve price must be a valid positive number";
+      } else if (!isNaN(startingPrice) && reservePrice < startingPrice) {
+        newErrors.reservePrice = "Reserve price should be greater than or equal to starting price";
+      }
+    }
+
+    if (!auction.biddingIncrementPrice.trim()) {
+      newErrors.biddingIncrementPrice = "Bidding increment is required";
+    } else {
+      const increment = parseFloat(auction.biddingIncrementPrice);
+      if (isNaN(increment) || increment <= 0) {
+        newErrors.biddingIncrementPrice = "Bidding increment must be a valid positive number";
+      }
+    }
+
+    // Duration validation
+    if (showCustomDuration) {
+      if (!auction.endDate) {
+        newErrors.endDate = "End date is required";
+    } else {
+        const endDate = new Date(auction.endDate);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (endDate < today) {
+          newErrors.endDate = "End date cannot be in the past";
+        }
+      }
+      if (!auction.endTime) {
+        newErrors.endTime = "End time is required";
+      }
+    } else {
+      if (!auction.duration) {
+        newErrors.duration = "Duration is required";
+    }
+    }
+
+    // Shipping validation
+    if (formData.shippingOption === "charge shipping") {
+      if (!formData.shippingCharge.trim()) {
       newErrors.shippingCharge = "Shipping charge is required";
+      } else {
+        const charge = parseFloat(formData.shippingCharge);
+        if (isNaN(charge) || charge < 0) {
+          newErrors.shippingCharge = "Shipping charge must be a valid number";
+        }
+      }
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
-    if (!validateForm()) return;
-
-    const payload = {
-      categoryId: selectedCategory,
-      subCategoryId: formData.subCategoryId,
-      title: formData.title,
-      description: formData.description,
-      condition: formData.condition,
-      saleType: "auction",
-      deliveryType: formData.shippingOption,
-      shippingCharge:
-        formData.shippingOption === "charge shipping"
-          ? formData.shippingCharge?.toString() || "0"
-          : "0",
-      isDraft: formData.isDraft ? "true" : "false",
-    };
-
-    const testPayload = {
-      ...payload,
-      tags: formData.tags || [],
-      specifics: selectedSpecifics || [],
-      auctionSettings: formData.auctionSettings || {},
-    };
-
-
-    // 🔍 Log payloads for testing
-    console.log("Raw Payload:", payload);
-    console.log("Test Payload (with tags, specifics, auctionSettings):", testPayload);
-
-
-
-
-
-    let newForm = new FormData();
-
-    // Append simple string fields
-    Object.entries(payload).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        newForm.append(key, value);
-      }
-    });
-
-    // Append tags (multiple entries)
-    if (Array.isArray(formData.tags)) {
-      formData.tags.forEach((tag) => {
-        if (tag) newForm.append("tags", tag);
-      });
+  // Handle form submission
+  const handleSubmit = async () => {
+    if (!validateForm()) {
+      toast.error("Please fix the validation errors");
+      return;
     }
 
-    // Format specifics as an object with parameterName: valueName
-    if (Array.isArray(selectedSpecifics) && selectedSpecifics.length > 0) {
+    setLoading(true);
+
+    try {
+      const formDataToSend = new FormData();
+
+      // Basic product data
+      formDataToSend.append("categoryId", selectedCategory);
+      formDataToSend.append("subCategoryId", formData.subCategoryId);
+      formDataToSend.append("title", formData.title.trim());
+      formDataToSend.append("description", formData.description.trim());
+      formDataToSend.append("condition", formData.condition);
+      formDataToSend.append("saleType", "auction");
+      formDataToSend.append("deliveryType", formData.shippingOption);
+      formDataToSend.append("shippingCharge", 
+        formData.shippingOption === "charge shipping" ? formData.shippingCharge || "0" : "0"
+      );
+      formDataToSend.append("isDraft", "false");
+
+      // Tags
+      formData.tags.forEach((tag) => {
+        formDataToSend.append("tags", tag);
+      });
+
+      // Specifics as JSON object
+      if (selectedSpecifics.length > 0) {
       const specificsObj = {};
       selectedSpecifics.forEach(({ parameterName, valueName }) => {
         specificsObj[parameterName] = valueName;
       });
-      newForm.append("specifics", JSON.stringify(specificsObj));
+        formDataToSend.append("specifics", JSON.stringify(specificsObj));
     }
 
-
-    // Append auctionSettings as JSON string (if valid object)
+      // Auction settings
     if (formData.auctionSettings && typeof formData.auctionSettings === "object") {
-      newForm.append("auctionSettings", JSON.stringify(formData.auctionSettings));
+        formDataToSend.append("auctionSettings", JSON.stringify(formData.auctionSettings));
     }
 
-    // Append files (limit 5)
-    if (Array.isArray(formData.images) && formData.images.length > 0) {
-      formData.images.slice(0, 5).forEach((file) => {
-        if (file) newForm.append("files", file);
+      // Image handling - send existing images to keep
+      if (existingImages.length > 0) {
+        formDataToSend.append("imageArray", JSON.stringify(existingImages));
+      }
+
+      // New images
+      formData.images.forEach((file) => {
+        formDataToSend.append("files", file);
       });
-    }
 
-    dispatch(updateProduct({ id: productData._id, formData: newForm }))
-      .then((result) => {
+      const result = await dispatch(updateProduct({ 
+        id: productData._id, 
+        formData: formDataToSend 
+      }));
+
         if (updateProduct.fulfilled.match(result)) {
-          toast.success("Product Updated Successfully");
+        toast.success("Auction product updated successfully!");
           onProductUpdate?.();
           closeForm();
         } else {
-          const { message, code } = result.payload || {};
-          console.error(`Update Product failed [${code}]: ${message}`);
-          toast.error(message || "Failed to update product");
+        const { message } = result.payload || {};
+        throw new Error(message || "Failed to update auction product");
         }
-      })
-      .catch((error) => {
-        console.error("Unexpected error:", error);
-        toast.error("Unexpected error occurred");
-      });
+    } catch (error) {
+      console.error("Update error:", error);
+      toast.error(error.message || "Failed to update auction product");
+    } finally {
+      setLoading(false);
+    }
   };
 
-
-
   const conditionOptions = [
-    {
-      value: "brand_new",
-      label: "Brand New",
-      color: "bg-green-100 text-green-800",
-    },
-    {
-      value: "like_new",
-      label: "Like New",
-      color: "bg-blue-100 text-blue-800",
-    },
-    { value: "good", label: "Good", color: "bg-yellow-100 text-yellow-800" },
-    { value: "fair", label: "Fair", color: "bg-orange-100 text-orange-800" },
-    { value: "works", label: "Works", color: "bg-gray-100 text-gray-800" },
+    { value: "brand_new", label: "Brand New", description: "Never used, in original packaging" },
+    { value: "like_new", label: "Like New", description: "Barely used, excellent condition" },
+    { value: "good", label: "Good", description: "Used with minor signs of wear" },
+    { value: "fair", label: "Fair", description: "Used with noticeable wear" },
+    { value: "works", label: "Works", description: "Functional but may have cosmetic issues" },
   ];
 
   return (
-    <div className="overflow-auto py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="rounded-xl shadow-lg overflow-auto">
-          <div className="p-8 space-y-8 h-[30rem]">
+    <div className="max-h-[80vh] overflow-y-auto bg-white">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 z-10">
+          <h2 className="text-2xl font-semibold text-gray-900">Edit Auction Product</h2>
+          <p className="text-gray-600 mt-1">Update your auction product information</p>
+        </div>
+
+        <div className="p-6 space-y-6">
             {/* Category Selection */}
-            <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                   Category *
                 </label>
                 <select
                   value={selectedCategory}
-                  onChange={(e) => {
-                    setSelectedCategory(e.target.value);
-                    setFormData({ ...formData, subCategoryId: "" });
-                  }}
-                  className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors ${errors.category ? "border-red-500" : "border-gray-300"
-                    }`}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.category ? "border-red-500" : "border-gray-300"}`}
                 >
                   <option value="">Select Category</option>
                   {categoryList?.data?.map((cat) => (
@@ -378,22 +540,24 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
                   ))}
                 </select>
                 {errors.category && (
-                  <p className="text-red-500 text-sm mt-1">{errors.category}</p>
+                <p className="text-red-500 text-sm mt-1 flex items-center">
+                  <AlertCircle size={16} className="mr-1" />
+                  {errors.category}
+                </p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                   Subcategory *
                 </label>
                 <select
-                  value={formData.subCategoryId}
+                value={formData.subCategoryId || ""}
                   onChange={(e) =>
-                    setFormData({ ...formData, subCategoryId: e.target.value })
+                  setFormData(prev => ({ ...prev, subCategoryId: e.target.value }))
                   }
                   disabled={!selectedCategory}
-                  className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors disabled:bg-gray-100 ${errors.subCategory ? "border-red-500" : "border-gray-300"
-                    }`}
+                className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors disabled:bg-gray-100 ${errors.subCategory ? "border-red-500" : "border-gray-300"}`}
                 >
                   <option value="">Select Subcategory</option>
                   {subCategories?.map((sub) => (
@@ -403,7 +567,8 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
                   ))}
                 </select>
                 {errors.subCategory && (
-                  <p className="text-red-500 text-sm mt-1">
+                <p className="text-red-500 text-sm mt-1 flex items-center">
+                  <AlertCircle size={16} className="mr-1" />
                     {errors.subCategory}
                   </p>
                 )}
@@ -412,80 +577,118 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
 
             {/* Title */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
                 Product Title *
               </label>
               <input
                 type="text"
-                placeholder="Enter product title"
+              placeholder="Enter a descriptive auction title"
                 value={formData.title}
+              maxLength={MAX_TITLE_LENGTH}
                 onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
+                setFormData(prev => ({ ...prev, title: e.target.value }))
                 }
-                className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors ${errors.title ? "border-red-500" : "border-gray-300"
-                  }`}
+              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.title ? "border-red-500" : "border-gray-300"}`}
               />
-              {errors.title && (
-                <p className="text-red-500 text-sm mt-1">{errors.title}</p>
+            <div className="flex justify-between items-center mt-1">
+              {errors.title ? (
+                <p className="text-red-500 text-sm flex items-center">
+                  <AlertCircle size={16} className="mr-1" />
+                  {errors.title}
+                </p>
+              ) : (
+                <div />
               )}
+              <p className="text-sm text-gray-500">
+                {formData.title.length}/{MAX_TITLE_LENGTH}
+              </p>
+            </div>
             </div>
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
                 Description *
               </label>
               <textarea
-                placeholder="Describe your product in detail..."
+              placeholder="Provide detailed information about your auction item..."
                 value={formData.description}
                 maxLength={MAX_DESCRIPTION_LENGTH}
                 onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
+                setFormData(prev => ({ ...prev, description: e.target.value }))
                 }
                 rows={6}
-                className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors resize-none ${errors.description ? "border-red-500" : "border-gray-300"
-                  }`}
+              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none ${errors.description ? "border-red-500" : "border-gray-300"}`}
               />
-              <div className="flex justify-between items-center mt-2">
-                {errors.description && (
-                  <p className="text-red-500 text-sm">{errors.description}</p>
+            <div className="flex justify-between items-center mt-1">
+              {errors.description ? (
+                <p className="text-red-500 text-sm flex items-center">
+                  <AlertCircle size={16} className="mr-1" />
+                  {errors.description}
+                </p>
+              ) : (
+                <div />
                 )}
-                <p className="text-sm text-gray-500 ml-auto">
-                  {formData.description.length} / {MAX_DESCRIPTION_LENGTH}
+              <p className="text-sm text-gray-500">
+                {formData.description.length}/{MAX_DESCRIPTION_LENGTH}
                 </p>
               </div>
             </div>
 
             {/* Images */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Product Images * (Max {MAX_IMAGES})
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Product Images * (Maximum {MAX_IMAGES})
               </label>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-4">
+              {/* Existing Images */}
+              {existingImages.map((url, index) => (
+                <div key={`existing-${index}`} className="relative group">
+                  <img
+                    src={url}
+                    alt={`Product ${index + 1}`}
+                    className="w-full h-24 object-cover rounded-lg border border-gray-200"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeExistingImage(index)}
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                  >
+                    <X size={14} />
+                  </button>
+                  <div className="absolute bottom-1 left-1 bg-black bg-opacity-50 text-white text-xs px-1 rounded">
+                    Existing
+                  </div>
+                </div>
+              ))}
+
+              {/* New Images */}
                 {imagePreview.map((url, index) => (
-                  <div key={index} className="relative group">
+                <div key={`new-${index}`} className="relative group">
                     <img
                       src={url}
-                      alt={`Preview ${index + 1}`}
-                      className="w-full h-24 object-cover rounded-lg border-2 border-gray-200"
+                    alt={`New ${index + 1}`}
+                    className="w-full h-24 object-cover rounded-lg border border-orange-200"
                     />
                     <button
                       type="button"
                       onClick={() => removeImage(index)}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
                     >
-                      <X size={16} />
+                    <X size={14} />
                     </button>
+                  <div className="absolute bottom-1 left-1 bg-orange-500 text-white text-xs px-1 rounded">
+                    New
+                  </div>
                   </div>
                 ))}
 
-                {imagePreview.length < MAX_IMAGES && (
-                  <label className="w-full h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-orange-500 hover:bg-orange-50 transition-colors">
+              {/* Upload Button */}
+              {existingImages.length + formData.images.length < MAX_IMAGES && (
+                                 <label className="w-full h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-gray-400 hover:bg-gray-50 transition-colors">
                     <Upload size={20} className="text-gray-400" />
-                    <span className="text-xs text-gray-500 mt-1">
-                      Add Image
-                    </span>
+                  <span className="text-xs text-gray-500 mt-1">Add Image</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -497,35 +700,47 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
                 )}
               </div>
 
+            <div className="flex justify-between items-center">
               <p className="text-sm text-gray-500">
-                {imagePreview.length} / {MAX_IMAGES} images selected
+                {existingImages.length + formData.images.length} / {MAX_IMAGES} images
               </p>
               {errors.images && (
-                <p className="text-red-500 text-sm mt-1">{errors.images}</p>
+                <p className="text-red-500 text-sm flex items-center">
+                  <AlertCircle size={16} className="mr-1" />
+                  {errors.images}
+                </p>
               )}
+            </div>
             </div>
 
             {/* Tags */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
                 <Tag className="inline w-4 h-4 mr-1" />
-                Tags (comma separated)
+              Tags (comma separated, max 10)
               </label>
               <input
                 type="text"
-                placeholder="e.g. electronics, smartphone, android"
-                value={formData.tags.join(", ")}
+              placeholder="e.g. auction, antique, collectible, rare"
                 onChange={handleTagInput}
-                className="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+              value={formData.tags.join(", ")}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               />
               {formData.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
                   {formData.tags.map((tag, index) => (
                     <span
                       key={index}
-                      className="px-3 py-1 bg-orange-100 text-orange-800 text-sm rounded-full"
+                    className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full flex items-center gap-2 border"
                     >
                       {tag}
+                    <button
+                      type="button"
+                      onClick={() => removeTag(index)}
+                      className="text-gray-500 hover:text-gray-700"
+                    >
+                      ×
+                    </button>
                     </span>
                   ))}
                 </div>
@@ -535,22 +750,22 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
             {/* Specifics */}
             {specifics.length > 0 && (
               <div>
-                <div className="flex justify-between items-center mb-4">
-                  <label className="block text-sm font-semibold text-gray-700">
-                    Product Specifics
+              <div className="flex justify-between items-center mb-3">
+                <label className="block text-sm font-medium text-gray-700">
+                  Product Specifications *
                   </label>
                   <button
                     type="button"
                     onClick={() => setOpenSpecificModal(true)}
-                    className="flex items-center gap-2 text-orange-600 hover:text-orange-700 font-medium"
+                  className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium text-sm"
                   >
                     <Plus size={16} />
-                    Add Specific
+                  Add Specification
                   </button>
                 </div>
 
-                {selectedSpecifics.length > 0 && (
-                  <div className="grid gap-3">
+              {selectedSpecifics.length > 0 ? (
+                <div className="space-y-2">
                     {selectedSpecifics.map((spec, i) => (
                       <div
                         key={i}
@@ -578,10 +793,15 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
                       </div>
                     ))}
                   </div>
+              ) : (
+                <div className="text-center py-4 text-gray-500 border border-dashed border-gray-300 rounded-lg">
+                  No specifications added yet
+                </div>
                 )}
 
                 {errors.specifics && (
-                  <p className="text-red-500 text-sm mt-1">
+                <p className="text-red-500 text-sm mt-2 flex items-center">
+                  <AlertCircle size={16} className="mr-1" />
                     {errors.specifics}
                   </p>
                 )}
@@ -590,17 +810,17 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
 
             {/* Condition */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Condition *
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              Product Condition *
               </label>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {conditionOptions.map((option) => (
                   <label
                     key={option.value}
-                    className={`cursor-pointer p-3 rounded-lg border-2 text-center transition-all ${formData.condition === option.value
-                      ? `${option.color} border-current`
-                      : "border-gray-200 hover:border-gray-300"
-                      }`}
+                                    className={`cursor-pointer p-4 rounded-lg border-2 transition-all ${formData.condition === option.value
+                    ? "border-blue-500 bg-blue-50"
+                    : "border-gray-200 hover:border-gray-300"
+                  }`}
                   >
                     <input
                       type="radio"
@@ -608,72 +828,77 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
                       value={option.value}
                       checked={formData.condition === option.value}
                       onChange={(e) =>
-                        setFormData({ ...formData, condition: e.target.value })
+                      setFormData(prev => ({ ...prev, condition: e.target.value }))
                       }
                       className="sr-only"
                     />
-                    <span className="text-sm font-medium">{option.label}</span>
+                  <div className="text-sm">
+                    <div className="font-medium text-gray-900">{option.label}</div>
+                    <div className="text-gray-600 text-xs mt-1">{option.description}</div>
+                  </div>
                   </label>
                 ))}
               </div>
               {errors.condition && (
-                <p className="text-red-500 text-sm mt-1">{errors.condition}</p>
+              <p className="text-red-500 text-sm mt-2 flex items-center">
+                <AlertCircle size={16} className="mr-1" />
+                {errors.condition}
+              </p>
               )}
             </div>
 
-            {/* Auction Settings */}
-            <div className="bg-gradient-to-br from-orange-50 to-red-50 p-6 rounded-xl border border-orange-200">
-              <div className="flex items-center gap-2 mb-6">
-                <Gavel className="text-orange-600" size={20} />
-                <h3 className="text-lg font-bold text-gray-900">
-                  Auction Settings
-                </h3>
-              </div>
+                      {/* Auction Settings */}
+          <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+            <div className="flex items-center gap-2 mb-6">
+              <Gavel className="text-gray-600" size={20} />
+              <h3 className="text-lg font-semibold text-gray-900">
+                Auction Settings
+              </h3>
+            </div>
 
               <div className="grid md:grid-cols-2 gap-6 mb-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                     <DollarSign className="inline w-4 h-4 mr-1" />
                     Starting Price *
                   </label>
                   <input
                     type="number"
                     placeholder="0.00"
+                  min="0"
+                  step="0.01"
                     value={formData.auctionSettings.startingPrice}
                     onChange={(e) =>
-                      handleAuctionSettingChange(
-                        "startingPrice",
-                        e.target.value
-                      )
+                    handleAuctionSettingChange("startingPrice", e.target.value)
                     }
-                    className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors ${errors.startingPrice
-                      ? "border-red-500"
-                      : "border-gray-300"
-                      }`}
+                  className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.startingPrice ? "border-red-500" : "border-gray-300"}`}
                   />
                   {errors.startingPrice && (
-                    <p className="text-red-500 text-sm mt-1">
+                  <p className="text-red-500 text-sm mt-1 flex items-center">
+                    <AlertCircle size={16} className="mr-1" />
                       {errors.startingPrice}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                     Reserve Price *
                   </label>
                   <input
                     type="number"
                     placeholder="0.00"
+                  min="0"
+                  step="0.01"
                     value={formData.auctionSettings.reservePrice}
                     onChange={(e) =>
                       handleAuctionSettingChange("reservePrice", e.target.value)
                     }
-                    className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors ${errors.reservePrice ? "border-red-500" : "border-gray-300"
-                      }`}
+                  className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.reservePrice ? "border-red-500" : "border-gray-300"}`}
                   />
                   {errors.reservePrice && (
-                    <p className="text-red-500 text-sm mt-1">
+                  <p className="text-red-500 text-sm mt-1 flex items-center">
+                    <AlertCircle size={16} className="mr-1" />
                       {errors.reservePrice}
                     </p>
                   )}
@@ -681,46 +906,43 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
               </div>
 
               <div className="mb-6">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                   Bidding Increment *
                 </label>
                 <input
                   type="number"
                   placeholder="0.00"
+                min="0"
+                step="0.01"
                   value={formData.auctionSettings.biddingIncrementPrice}
                   onChange={(e) =>
-                    handleAuctionSettingChange(
-                      "biddingIncrementPrice",
-                      e.target.value
-                    )
+                  handleAuctionSettingChange("biddingIncrementPrice", e.target.value)
                   }
-                  className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors ${errors.biddingIncrementPrice
-                    ? "border-red-500"
-                    : "border-gray-300"
-                    }`}
+                className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.biddingIncrementPrice ? "border-red-500" : "border-gray-300"}`}
                 />
                 {errors.biddingIncrementPrice && (
-                  <p className="text-red-500 text-sm mt-1">
+                <p className="text-red-500 text-sm mt-1 flex items-center">
+                  <AlertCircle size={16} className="mr-1" />
                     {errors.biddingIncrementPrice}
                   </p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-3">
                   <Clock className="inline w-4 h-4 mr-1" />
-                  Duration *
+                Auction Duration *
                 </label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
                   {durationOptions.map((option) => (
                     <label
                       key={option.value}
-                      className={`cursor-pointer p-3 rounded-lg border-2 text-center transition-all ${(option.value === "other" && showCustomDuration) ||
-                        (option.value !== "other" &&
-                          formData.auctionSettings.duration === option.value)
-                        ? "bg-orange-100 text-orange-800 border-orange-500"
-                        : "border-gray-200 hover:border-gray-300"
-                        }`}
+                                          className={`cursor-pointer p-3 rounded-lg border-2 text-center transition-all ${(option.value === "other" && showCustomDuration) ||
+                      (option.value !== "other" &&
+                        formData.auctionSettings.duration === option.value)
+                      ? "bg-blue-100 text-blue-800 border-blue-500"
+                      : "border-gray-200 hover:border-gray-300"
+                      }`}
                     >
                       <input
                         type="radio"
@@ -742,7 +964,10 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
                 </div>
 
                 {errors.duration && !showCustomDuration && (
-                  <p className="text-red-500 text-sm mt-1">{errors.duration}</p>
+                <p className="text-red-500 text-sm mt-1 flex items-center">
+                  <AlertCircle size={16} className="mr-1" />
+                  {errors.duration}
+                </p>
                 )}
 
                 {showCustomDuration && (
@@ -757,11 +982,11 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
                         onChange={(e) =>
                           handleAuctionSettingChange("endDate", e.target.value)
                         }
-                        className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors ${errors.endDate ? "border-red-500" : "border-gray-300"
-                          }`}
+                      className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.endDate ? "border-red-500" : "border-gray-300"}`}
                       />
                       {errors.endDate && (
-                        <p className="text-red-500 text-sm mt-1">
+                      <p className="text-red-500 text-sm mt-1 flex items-center">
+                        <AlertCircle size={16} className="mr-1" />
                           {errors.endDate}
                         </p>
                       )}
@@ -776,11 +1001,11 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
                         onChange={(e) =>
                           handleAuctionSettingChange("endTime", e.target.value)
                         }
-                        className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors ${errors.endTime ? "border-red-500" : "border-gray-300"
-                          }`}
+                      className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.endTime ? "border-red-500" : "border-gray-300"}`}
                       />
                       {errors.endTime && (
-                        <p className="text-red-500 text-sm mt-1">
+                      <p className="text-red-500 text-sm mt-1 flex items-center">
+                        <AlertCircle size={16} className="mr-1" />
                           {errors.endTime}
                         </p>
                       )}
@@ -792,26 +1017,26 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
 
             {/* Shipping Options */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-3">
                 <Truck className="inline w-4 h-4 mr-1" />
-                Shipping Options
+              Delivery Options
               </label>
 
               <div className="space-y-3">
-                <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-orange-50 transition-colors">
+              <label className="flex items-start p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
                   <input
                     type="radio"
                     name="shippingOption"
                     value="local pickup"
                     checked={formData.shippingOption === "local pickup"}
                     onChange={(e) =>
-                      setFormData({
-                        ...formData,
+                    setFormData(prev => ({
+                      ...prev,
                         shippingOption: e.target.value,
                         shippingCharge: "",
-                      })
+                    }))
                     }
-                    className="mr-3"
+                  className="mt-1 mr-3"
                   />
                   <div>
                     <div className="flex items-center gap-2 font-medium">
@@ -819,106 +1044,111 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
                       Local Pickup Only
                     </div>
                     <p className="text-sm text-gray-600">
-                      Buyer picks up the item
+                    Winner collects the item from your location
                     </p>
                   </div>
                 </label>
 
-                <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-green-50 transition-colors">
+              <label className="flex items-start p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
                   <input
                     type="radio"
                     name="shippingOption"
                     value="free shipping"
                     checked={formData.shippingOption === "free shipping"}
                     onChange={(e) =>
-                      setFormData({
-                        ...formData,
+                    setFormData(prev => ({
+                      ...prev,
                         shippingOption: e.target.value,
                         shippingCharge: "",
-                      })
+                    }))
                     }
-                    className="mr-3"
+                  className="mt-1 mr-3"
                   />
                   <div>
-                    <div className="font-medium text-green-700">
-                      Free Shipping
-                    </div>
+                  <div className="font-medium text-green-700">Free Shipping</div>
                     <p className="text-sm text-gray-600">
-                      You cover shipping costs
+                    You cover all shipping costs
                     </p>
                   </div>
                 </label>
 
-                <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-orange-50 transition-colors">
+              <label className="flex items-start p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
                   <input
                     type="radio"
                     name="shippingOption"
                     value="charge shipping"
                     checked={formData.shippingOption === "charge shipping"}
                     onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        shippingOption: e.target.value,
-                      })
+                    setFormData(prev => ({ ...prev, shippingOption: e.target.value }))
                     }
-                    className="mr-3"
+                  className="mt-1 mr-3"
                   />
                   <div className="flex-1">
-                    <div className="font-medium text-orange-700">
-                      Charged Shipping
-                    </div>
-                    <p className="text-sm text-gray-600">Buyer pays shipping</p>
+                  <div className="font-medium text-orange-700">Charged Shipping</div>
+                  <p className="text-sm text-gray-600 mb-2">Winner pays for shipping</p>
                     {formData.shippingOption === "charge shipping" && (
                       <input
                         type="number"
-                        placeholder="Shipping charge"
+                      placeholder="Enter shipping charge"
+                      min="0"
+                      step="0.01"
                         value={formData.shippingCharge}
                         onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            shippingCharge: e.target.value,
-                          })
+                        setFormData(prev => ({ ...prev, shippingCharge: e.target.value }))
                         }
-                        className={`mt-2 w-full p-2 border rounded focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${errors.shippingCharge
-                          ? "border-red-500"
-                          : "border-gray-300"
-                          }`}
+                      className={`w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.shippingCharge ? "border-red-500" : "border-gray-300"}`}
                       />
                     )}
                   </div>
                 </label>
               </div>
               {errors.shippingCharge && (
-                <p className="text-red-500 text-sm mt-1">
+              <p className="text-red-500 text-sm mt-2 flex items-center">
+                <AlertCircle size={16} className="mr-1" />
                   {errors.shippingCharge}
                 </p>
               )}
+          </div>
             </div>
 
-            {/* Submit Button */}
-            <div className="pt-6 border-t">
+        {/* Footer with action buttons */}
+        <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex gap-3">
+          <button
+            type="button"
+            onClick={closeForm}
+            disabled={loading}
+            className="flex-1 bg-gray-100 text-gray-700 font-medium py-3 px-6 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+          >
+            Cancel
+          </button>
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="w-full bg-gradient-to-r from-green-600 to-blue-600 text-white font-semibold py-4 px-6 rounded-lg hover:from-green-700 hover:to-blue-700 transform hover:scale-[1.02] transition-all duration-200 shadow-lg"
-              >
-                Update Product
+            disabled={loading}
+            className="flex-1 bg-blue-600 text-white font-medium py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center"
+          >
+            {loading ? (
+              <>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                Updating...
+              </>
+            ) : (
+              "Update Auction"
+            )}
               </button>
-            </div>
-          </div>
         </div>
       </div>
 
       {/* Specifics Modal */}
       {openSpecificModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-white w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl">
+          <div className="bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl">
             <div className="sticky top-0 bg-white border-b px-6 py-4">
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-bold">Product Specifics</h2>
+                <h2 className="text-xl font-semibold">Product Specifications</h2>
                 <button
                   onClick={() => setOpenSpecificModal(false)}
-                  className="text-gray-500 hover:text-gray-700 p-2"
+                  className="text-gray-400 hover:text-gray-600 p-2"
                 >
                   <X size={20} />
                 </button>
@@ -926,9 +1156,10 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
             </div>
 
             <div className="p-6">
+              {/* Selected Tags */}
               {Object.keys(tempSpecifics).length > 0 && (
                 <div className="mb-6">
-                  <h3 className="font-medium mb-3">Selected:</h3>
+                  <h3 className="font-medium mb-3">Selected Specifications:</h3>
                   <div className="flex flex-wrap gap-2">
                     {Object.entries(tempSpecifics).map(([pid, vid]) => {
                       const param = specifics.find((p) => p._id === pid);
@@ -957,10 +1188,11 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
                 </div>
               )}
 
+              {/* Parameters */}
               <div className="space-y-6">
                 {specifics.map((param) => (
                   <div key={param._id}>
-                    <h4 className="font-semibold text-gray-900 mb-3">
+                    <h4 className="font-medium text-gray-900 mb-3">
                       {param.key}
                     </h4>
                     <div className="flex flex-wrap gap-2">
@@ -975,9 +1207,9 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
                                 [param._id]: val._id,
                               }))
                             }
-                            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${isSelected
-                              ? "bg-blue-600 text-white"
-                              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${isSelected
+                              ? "bg-blue-600 text-white border-blue-600"
+                              : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
                               }`}
                           >
                             {val.value}
@@ -990,6 +1222,7 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
               </div>
             </div>
 
+            {/* Modal Footer */}
             <div className="sticky bottom-0 bg-white border-t px-6 py-4">
               <div className="flex gap-3">
                 <button
@@ -1020,7 +1253,7 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
                     setTempSpecifics({});
                   }}
                 >
-                  Save Changes
+                  Apply Changes
                 </button>
               </div>
             </div>

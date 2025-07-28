@@ -178,7 +178,7 @@ export const sendContactUsReply = createAsyncThunk(
 
 export const byUser = createAsyncThunk(
     'feesetting/byUser',
-    async ({userId,pageNo,size}, thunkAPI) => {
+    async ({ userId, pageNo, size }, thunkAPI) => {
         try {
             const res = await authAxiosClient.get(`/reportUser/byUser/${userId}?pageNo=${pageNo}&size=${size}`);
             return res.data;
@@ -242,8 +242,54 @@ export const createAppsetting = createAsyncThunk(
 );
 
 
+// Report Type endpoints
+export const getReportTypes = createAsyncThunk(
+    'settings/getReportTypes',
+    async ({ pageNo = 1, size = 10 }, { rejectWithValue }) => {
+        try {
+            const response = await authAxiosClient.get(`/reportType/getList?pageNo=${pageNo}&size=${size}`);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
 
+export const createReportType = createAsyncThunk(
+    'settings/createReportType',
+    async (data, { rejectWithValue }) => {
+        try {
+            const response = await authAxiosClient.post('/reportType/create', data);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
 
+export const updateReportType = createAsyncThunk(
+    'settings/updateReportType',
+    async (data, { rejectWithValue }) => {
+        try {
+            const response = await authAxiosClient.post('/reportType/update', data);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
+
+export const deleteReportType = createAsyncThunk(
+    'settings/deleteReportType',
+    async (id, { rejectWithValue }) => {
+        try {
+            const response = await authAxiosClient.post('/reportType/hardDelete', { id });
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
 
 
 
@@ -255,6 +301,19 @@ const settingSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
+            .addCase(getReportTypes.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getReportTypes.fulfilled, (state, action) => {
+                state.loading = false;
+                state.reportTypeinfo = action.payload.data;
+
+            })
+            .addCase(getReportTypes.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
             .addCase(termAndPolicy.pending, (state) => {
                 state.loading = true;
                 state.error = null;

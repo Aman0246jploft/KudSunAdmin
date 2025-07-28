@@ -119,16 +119,6 @@ export default function MessageInput({ socket, room }) {
       else if (fileType === 'audio') messageType = 'AUDIO';
 
 
-      console.log("77777700007777777",
-        {
-          roomId: room._id,
-        type: messageType,
-        content: event.target.result,
-        fileName: file.name,
-        systemMeta: null
-        }
-
-      )
 
 
       socket.emit('sendMessage', {

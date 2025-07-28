@@ -95,9 +95,7 @@ export default function SellProduct() {
 
   const handleToggleStatus = (product) => {
     const updatedStatus = !product.isDisable;
-    console.log(
-      `Toggling status for product ${product._id} to ${updatedStatus}`
-    );
+
 
     // Create FormData
     const formData = new FormData();
@@ -139,7 +137,13 @@ export default function SellProduct() {
             dispatch(deleteProduct({ id: product._id, formData }))
               .unwrap()
               .then((res) => {
-                dispatch(productList(pagination));
+                dispatch(productList({
+                  ...pagination,
+                  ...filters,
+                  deliveryFilter: shippingType,
+                  minPrice: filters.minPrice || undefined,
+                  maxPrice: filters.maxPrice || undefined,
+                }));
               })
               .catch((err) => {
                 console.error("Failed to update product status:", err);
@@ -453,7 +457,13 @@ export default function SellProduct() {
             }}
             editMode={true}
             productData={selectedProduct}
-            onProductUpdate={() => dispatch(productList(pagination))}
+            onProductUpdate={() => dispatch(productList({
+              ...pagination,
+              ...filters,
+              deliveryFilter: shippingType,
+              minPrice: filters.minPrice || undefined,
+              maxPrice: filters.maxPrice || undefined,
+            }))}
           />
         ) : (
           <AddProductForm

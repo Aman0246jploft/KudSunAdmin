@@ -7,7 +7,7 @@ import productReducer from '../slices/productSlice'
 import productCommentReducer from "../slices/commentSlice"
 import settingReducer from '../slices/settingSlice'
 import threadReducer from "../slices/threadSlice"
-
+import dashboardReducer from '../slices/dashboardSlice'
 
 export const store = configureStore({
   reducer: {
@@ -16,7 +16,8 @@ export const store = configureStore({
     product: productReducer,
     productComment: productCommentReducer,
     setting: settingReducer,
-    thread: threadReducer
+    thread: threadReducer,
+    dashboard:dashboardReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(logger),

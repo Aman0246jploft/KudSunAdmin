@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
 
-export default function Modal({ isOpen, onClose, children }) {
+export default function Modal({ isOpen, onClose, children, className = "" }) {
   const { theme } = useTheme();
   const modalRef = useRef();
 
@@ -12,11 +12,23 @@ export default function Modal({ isOpen, onClose, children }) {
       }
     };
 
+    const handleEscapeKey = (e) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+
     if (isOpen) {
       document.addEventListener("mousedown", handleOutsideClick);
+      document.addEventListener("keydown", handleEscapeKey);
+      // Prevent body scroll when modal is open
+      document.body.style.overflow = "hidden";
     }
+
     return () => {
       document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("keydown", handleEscapeKey);
+      document.body.style.overflow = "unset";
     };
   }, [isOpen, onClose]);
 
@@ -24,12 +36,12 @@ export default function Modal({ isOpen, onClose, children }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex justify-center items-center"
+      className="fixed inset-0 z-50 flex justify-center items-start"
       style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
     >
       <div
         ref={modalRef}
-        className="p-6 rounded-xl w-full max-w-2xl relative shadow-lg"
+        className={`mt-4 mb-4 rounded-xl w-full max-w-4xl max-h-[calc(100vh-2rem)] relative shadow-2xl ${className}`}
         style={{
           backgroundColor: theme.colors.background,
           color: theme.colors.textPrimary,

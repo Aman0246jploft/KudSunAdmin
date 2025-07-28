@@ -5,13 +5,13 @@ import {
   subCategory,
   subCategoryParameter,
 } from "../../features/slices/categorySlice";
-import { Upload, X, Plus, Tag, DollarSign, Truck, MapPin } from "lucide-react";
-
+import { Upload, X, Plus, Tag, DollarSign, Truck, MapPin, AlertCircle } from "lucide-react";
 import { toast } from "react-toastify";
 import { updateProduct } from "../../features/slices/productSlice";
 
 const MAX_IMAGES = 5;
 const MAX_DESCRIPTION_LENGTH = 1200;
+const MAX_TITLE_LENGTH = 100;
 
 const EditProductForm = ({
   productData,
@@ -21,6 +21,9 @@ const EditProductForm = ({
 }) => {
   const dispatch = useDispatch();
   const { categoryList } = useSelector((state) => state.category);
+
+  // State management
+  const [loading, setLoading] = useState(false);
   const [tempSpecifics, setTempSpecifics] = useState({});
   const [selectedCategory, setSelectedCategory] = useState("");
   const [subCategories, setSubCategories] = useState([]);
@@ -29,7 +32,8 @@ const EditProductForm = ({
   const [showOriginPrice, setShowOriginPrice] = useState(false);
   const [imagePreview, setImagePreview] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
-  const [removedImages, setRemovedImages] = useState([]);
+  const [openSpecificModal, setOpenSpecificModal] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const [formData, setFormData] = useState({
     subCategoryId: "",
@@ -44,70 +48,100 @@ const EditProductForm = ({
     shippingCharge: "",
   });
 
-  const [openSpecificModal, setOpenSpecificModal] = useState(false);
-  const [errors, setErrors] = useState({});
-  // Remove individual tag
-  const removeTag = (indexToRemove) => {
-    const updatedTags = formData.tags.filter(
-      (_, index) => index !== indexToRemove
-    );
-    setFormData({ ...formData, tags: updatedTags });
-  };
   // Initialize form with existing product data
   useEffect(() => {
     if (productData && editMode) {
-      setFormData({
-        subCategoryId: productData.subCategoryId || "",
+      const prefillData = {
+        subCategoryId: productData.subCategoryId?._id || productData.subCategoryId || "",
         images: [],
         title: productData.title || "",
         description: productData.description || "",
-        tags: productData.tags || [],
+        tags: Array.isArray(productData.tags) ? productData.tags : [],
         condition: productData.condition || "",
-        fixedPrice: productData.fixedPrice || "",
-        originPrice: productData.originPrice || "",
+        fixedPrice: productData.fixedPrice?.toString() || "",
+        originPrice: productData.originPrice?.toString() || "",
         shippingOption: productData.deliveryType || "local pickup",
-        shippingCharge: productData.shippingCharge || "",
-      });
+        shippingCharge: productData.shippingCharge?.toString() || "",
+      };
 
-      setSelectedCategory(
-        productData.categoryId?._id || productData.categoryId || ""
-      );
-      setExistingImages(productData.productImages || []);
+      setFormData(prefillData);
+      setSelectedCategory(productData.categoryId?._id || productData.categoryId || "");
+      setExistingImages(Array.isArray(productData.productImages) ? productData.productImages : []);
       setShowOriginPrice(!!productData.originPrice);
 
-      // Set selected specifics
-      if (productData.specifics) {
-        setSelectedSpecifics(
-          productData.specifics.map((spec) => ({
-            parameterId: spec.parameterId,
+      // Set selected specifics with proper structure
+      if (productData.specifics && Array.isArray(productData.specifics)) {
+        const initialSpecifics = productData.specifics.map((spec) => ({
+          parameterId: spec.parameterId || spec.parameterID,
             parameterName: spec.parameterName,
-            valueId: spec.valueId,
+          valueId: spec.valueId || spec.valueID,
             valueName: spec.valueName,
-          }))
-        );
+        }));
+        console.log("Initial product specifics:", productData.specifics);
+        console.log("Mapped specifics:", initialSpecifics);
+        setSelectedSpecifics(initialSpecifics);
       }
     }
   }, [productData, editMode]);
 
-  // Rest of the useEffect hooks remain the same as AddProductForm
+  // Set subcategory after subcategories are loaded (only once)
+  useEffect(() => {
+    if (productData && editMode && subCategories.length > 0 && !formData.subCategoryId) {
+      const expectedSubCategoryId = productData.subCategoryId?._id || productData.subCategoryId;
+
+      // Check if the expected subcategory exists in the loaded list
+      const subCategoryExists = subCategories.find(sub => sub._id === expectedSubCategoryId);
+
+      if (expectedSubCategoryId && subCategoryExists) {
+        setFormData(prev => ({ ...prev, subCategoryId: expectedSubCategoryId }));
+      }
+    }
+  }, [subCategories, productData, editMode]);
+
+  // Fetch categories on mount
   useEffect(() => {
     dispatch(mainCategory({ pageNo: 1, size: 10000000 }));
   }, [dispatch]);
 
+  // Fetch subcategories when category changes
   useEffect(() => {
     if (selectedCategory) {
       dispatch(
         subCategory({ categoryId: selectedCategory, pageNo: 1, size: 10000000 })
       ).then((res) => {
         if (subCategory.fulfilled.match(res)) {
-          setSubCategories(res.payload?.data?.data || []);
+          const fetchedSubCategories = res.payload?.data?.data || [];
+          setSubCategories(fetchedSubCategories);
         }
+      }).catch(() => {
+        setSubCategories([]);
+        toast.error("Failed to fetch subcategories");
       });
+    } else {
+      setSubCategories([]);
     }
-  }, [selectedCategory]);
+  }, [selectedCategory, dispatch]);
 
+  // Clear subcategory when category changes (but only if it's a different category)
   useEffect(() => {
-    if (!formData.subCategoryId) return;
+    if (selectedCategory && productData && editMode) {
+      const currentProductCategory = productData.categoryId?._id || productData.categoryId;
+      if (selectedCategory !== currentProductCategory) {
+        setFormData(prev => ({ ...prev, subCategoryId: "" }));
+        setSpecifics([]);
+        // Don't clear selectedSpecifics here - they will be validated when new specifics are loaded
+      }
+    }
+  }, [selectedCategory, productData, editMode]);
+
+  // Fetch specifics when subcategory changes
+  useEffect(() => {
+    if (!formData.subCategoryId) {
+      setSpecifics([]);
+      // Don't clear selectedSpecifics here - preserve them for prefilling
+      return;
+    }
+
     dispatch(
       subCategoryParameter({
         subCategoryId: formData.subCategoryId,
@@ -116,82 +150,207 @@ const EditProductForm = ({
       })
     ).then((res) => {
       if (subCategoryParameter.fulfilled.match(res)) {
-        setSpecifics(res.payload?.data?.parameters || []);
+        const fetchedSpecifics = res.payload?.data?.parameters || [];
+        console.log("Fetched specifics for subcategory:", formData.subCategoryId, fetchedSpecifics);
+        setSpecifics(fetchedSpecifics);
+        
+        // If we have selectedSpecifics but they're not in the new list, clear them
+        if (selectedSpecifics.length > 0) {
+          const validSpecifics = selectedSpecifics.filter(spec => {
+            return fetchedSpecifics.some(param => 
+              param.key === spec.parameterName && 
+              param.values.some(val => val.value === spec.valueName)
+            );
+          });
+          
+          if (validSpecifics.length !== selectedSpecifics.length) {
+            setSelectedSpecifics(validSpecifics);
+          }
+        }
       } else {
         setSpecifics([]);
       }
+    }).catch(() => {
+      setSpecifics([]);
+      toast.error("Failed to fetch product specifications");
     });
-  }, [formData.subCategoryId]);
+  }, [formData.subCategoryId, dispatch, selectedSpecifics]);
+
+  // Ensure selectedSpecifics are preserved when specifics are loaded
+  useEffect(() => {
+    if (productData && editMode && specifics.length > 0 && selectedSpecifics.length === 0) {
+      // If we have product specifics but no selected specifics, try to restore them
+      if (productData.specifics && Array.isArray(productData.specifics)) {
+        const restoredSpecifics = productData.specifics
+          .map((spec) => ({
+            parameterId: spec.parameterId || spec.parameterID,
+            parameterName: spec.parameterName,
+            valueId: spec.valueId || spec.valueID,
+            valueName: spec.valueName,
+          }))
+          .filter(spec => {
+            // Only include specs that exist in the current specifics list
+            return specifics.some(param => 
+              param.key === spec.parameterName && 
+              param.values.some(val => val.value === spec.valueName)
+            );
+          });
+        
+        if (restoredSpecifics.length > 0) {
+          console.log("Restoring selected specifics:", restoredSpecifics);
+          setSelectedSpecifics(restoredSpecifics);
+        }
+      }
+    }
+  }, [specifics, productData, editMode, selectedSpecifics.length]);
 
   // Handle existing image removal
   const removeExistingImage = (index) => {
-    const imageToRemove = existingImages[index];
-    setRemovedImages([...removedImages, imageToRemove]);
-    setExistingImages(existingImages.filter((_, i) => i !== index));
+    setExistingImages(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Handle new image upload (same as AddProductForm)
+  // Handle new image upload
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
     const totalImages = existingImages.length + formData.images.length;
 
     if (files.length + totalImages > MAX_IMAGES) {
-      setErrors({
-        ...errors,
-        images: `You can upload a maximum of ${MAX_IMAGES} images.`,
-      });
+      setErrors(prev => ({
+        ...prev,
+        images: `Maximum ${MAX_IMAGES} images allowed. Current: ${totalImages}`,
+      }));
       return;
     }
 
-    const newPreviewUrls = files.map((file) => URL.createObjectURL(file));
-    setImagePreview([...imagePreview, ...newPreviewUrls]);
-    setFormData({ ...formData, images: [...formData.images, ...files] });
-    setErrors({ ...errors, images: "" });
+    // Validate file types and sizes
+    const validFiles = [];
+    const invalidFiles = [];
+
+    files.forEach(file => {
+      if (!file.type.startsWith('image/')) {
+        invalidFiles.push(`${file.name} - Not an image`);
+      } else if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        invalidFiles.push(`${file.name} - Too large (max 5MB)`);
+      } else {
+        validFiles.push(file);
+      }
+    });
+
+    if (invalidFiles.length > 0) {
+      setErrors(prev => ({
+        ...prev,
+        images: `Invalid files: ${invalidFiles.join(', ')}`,
+      }));
+    }
+
+    if (validFiles.length > 0) {
+      const newPreviewUrls = validFiles.map((file) => URL.createObjectURL(file));
+      setImagePreview(prev => [...prev, ...newPreviewUrls]);
+      setFormData(prev => ({ ...prev, images: [...prev.images, ...validFiles] }));
+      setErrors(prev => ({ ...prev, images: "" }));
+    }
   };
 
-  // Remove new image (same as AddProductForm)
+  // Remove new image
   const removeImage = (index) => {
-    const newImages = formData.images.filter((_, i) => i !== index);
-    const newPreviews = imagePreview.filter((_, i) => i !== index);
-
     URL.revokeObjectURL(imagePreview[index]);
-
-    setFormData({ ...formData, images: newImages });
-    setImagePreview(newPreviews);
+    setFormData(prev => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index)
+    }));
+    setImagePreview(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Handle tag input (same as AddProductForm)
-
+  // Handle tag input
   const handleTagInput = (e) => {
-    const tags = e.target.value
+    const value = e.target.value;
+    const tags = value
       .split(",")
       .map((tag) => tag.trim())
-      .filter(Boolean);
-    setFormData({ ...formData, tags });
+      .filter(Boolean)
+      .slice(0, 10); // Limit to 10 tags
+
+    setFormData(prev => ({ ...prev, tags }));
   };
 
-  // Validate form (similar to AddProductForm but adjusted for edit)
+  // Remove individual tag
+  const removeTag = (indexToRemove) => {
+    setFormData(prev => ({
+      ...prev,
+      tags: prev.tags.filter((_, index) => index !== indexToRemove)
+    }));
+  };
+
+  // Comprehensive form validation
   const validateForm = () => {
     const newErrors = {};
     const totalImages = existingImages.length + formData.images.length;
 
-    if (!selectedCategory) newErrors.category = "Please select a category";
-    if (!formData.subCategoryId)
-      newErrors.subCategory = "Please select a subcategory";
-    if (!formData.title.trim()) newErrors.title = "Title is required";
-    if (!formData.description.trim())
-      newErrors.description = "Description is required";
-    if (totalImages === 0) newErrors.images = "At least one image is required";
-    if (!formData.condition) newErrors.condition = "Please select condition";
-    if (!formData.fixedPrice) newErrors.fixedPrice = "Fixed price is required";
+    // Required field validations
+    if (!selectedCategory.trim()) {
+      newErrors.category = "Category is required";
+    }
+
+    if (!formData.subCategoryId.trim()) {
+      newErrors.subCategory = "Subcategory is required";
+    }
+
+    if (!formData.title.trim()) {
+      newErrors.title = "Product title is required";
+    } else if (formData.title.length > MAX_TITLE_LENGTH) {
+      newErrors.title = `Title must be ${MAX_TITLE_LENGTH} characters or less`;
+    }
+
+    if (!formData.description.trim()) {
+      newErrors.description = "Product description is required";
+    } else if (formData.description.length < 20) {
+      newErrors.description = "Description must be at least 20 characters";
+    }
+
+    if (totalImages === 0) {
+      newErrors.images = "At least one product image is required";
+    }
+
+    if (!formData.condition) {
+      newErrors.condition = "Product condition is required";
+    }
+
+    if (!formData.fixedPrice.trim()) {
+      newErrors.fixedPrice = "Price is required";
+    } else {
+      const price = parseFloat(formData.fixedPrice);
+      if (isNaN(price) || price <= 0) {
+        newErrors.fixedPrice = "Price must be a valid positive number";
+      }
+    }
+
+    // Origin price validation
+    if (showOriginPrice && formData.originPrice.trim()) {
+      const originPrice = parseFloat(formData.originPrice);
+      const fixedPrice = parseFloat(formData.fixedPrice);
+
+      if (isNaN(originPrice) || originPrice <= 0) {
+        newErrors.originPrice = "Original price must be a valid positive number";
+      } else if (!isNaN(fixedPrice) && originPrice <= fixedPrice) {
+        newErrors.originPrice = "Original price should be higher than current price";
+      }
+    }
+
+    // Shipping validation
+    if (formData.shippingOption === "charge shipping") {
+      if (!formData.shippingCharge.trim()) {
+      newErrors.shippingCharge = "Shipping charge is required";
+      } else {
+        const charge = parseFloat(formData.shippingCharge);
+        if (isNaN(charge) || charge < 0) {
+          newErrors.shippingCharge = "Shipping charge must be a valid number";
+        }
+      }
+    }
+
+    // Specifics validation
     if (specifics.length > 0 && selectedSpecifics.length === 0) {
       newErrors.specifics = "At least one product specification is required";
-    }
-    if (
-      formData.shippingOption === "charge shipping" &&
-      !formData.shippingCharge
-    ) {
-      newErrors.shippingCharge = "Shipping charge is required";
     }
 
     setErrors(newErrors);
@@ -199,126 +358,111 @@ const EditProductForm = ({
   };
 
   // Handle form submission
-  const handleSubmit = () => {
-    if (!validateForm()) return;
-
-    const payload = {
-      categoryId: selectedCategory,
-      subCategoryId: formData.subCategoryId,
-      title: formData.title,
-      description: formData.description,
-      condition: formData.condition,
-      saleType: formData.saleType || "fixed",
-      fixedPrice: formData.fixedPrice,
-      originPriceView: formData.originPrice ? "true" : "false",
-      originPrice: formData.originPrice || "",
-      deliveryType: formData.shippingOption,
-      shippingCharge:
-        formData.shippingOption === "charge shipping"
-          ? formData.shippingCharge?.toString() || "0"
-          : "0",
-      isDraft: formData.isDraft ? "true" : "false",
-    };
-
-    let newForm = new FormData();
-
-    // Append scalar values
-    Object.entries(payload).forEach(([key, value]) => {
-      if (Array.isArray(value)) return;
-      if (typeof value === "object" && value !== null) return;
-      newForm.append(key, value);
-    });
-
-    // Append tags
-    if (Array.isArray(formData.tags)) {
-      formData.tags.forEach((tag) => {
-        newForm.append("tags", tag);
-      });
+  const handleSubmit = async () => {
+    if (!validateForm()) {
+      toast.error("Please fix the validation errors");
+      return;
     }
 
-    // Append specifics
-     // Format specifics as an object with parameterName: valueName
-    if (Array.isArray(selectedSpecifics) && selectedSpecifics.length > 0) {
+    setLoading(true);
+
+    try {
+      const formDataToSend = new FormData();
+
+      // Basic product data
+      formDataToSend.append("categoryId", selectedCategory);
+      formDataToSend.append("subCategoryId", formData.subCategoryId);
+      formDataToSend.append("title", formData.title.trim());
+      formDataToSend.append("description", formData.description.trim());
+      formDataToSend.append("condition", formData.condition);
+      formDataToSend.append("saleType", "fixed");
+      formDataToSend.append("fixedPrice", formData.fixedPrice);
+      formDataToSend.append("originPriceView", showOriginPrice && formData.originPrice ? "true" : "false");
+      formDataToSend.append("originPrice", formData.originPrice || "");
+      formDataToSend.append("deliveryType", formData.shippingOption);
+      formDataToSend.append("shippingCharge",
+        formData.shippingOption === "charge shipping" ? formData.shippingCharge || "0" : "0"
+      );
+      formDataToSend.append("isDraft", "false");
+
+      // Tags
+      formData.tags.forEach((tag) => {
+        formDataToSend.append("tags", tag);
+      });
+
+      // Specifics as JSON object
+      if (selectedSpecifics.length > 0) {
       const specificsObj = {};
       selectedSpecifics.forEach(({ parameterName, valueName }) => {
         specificsObj[parameterName] = valueName;
       });
-      newForm.append("specifics", JSON.stringify(specificsObj));
-    }
+        formDataToSend.append("specifics", JSON.stringify(specificsObj));
+      }
 
-    // Append removed images
-    if (removedImages.length > 0) {
-      removedImages.forEach((imageUrl) => {
-        newForm.append("removePhotos", imageUrl);
-      });
-    }
+      // Image handling - send existing images to keep
+      if (existingImages.length > 0) {
+        formDataToSend.append("imageArray", JSON.stringify(existingImages));
+      }
 
-    // Append new images
-    if (formData.images?.length > 0) {
+      // New images
       formData.images.forEach((file) => {
-        newForm.append("files", file);
+        formDataToSend.append("files", file);
       });
-    }
 
-    // Dispatch update action
-    dispatch(updateProduct({ id: productData._id, formData: newForm }))
-      .then((result) => {
+      const result = await dispatch(updateProduct({
+        id: productData._id,
+        formData: formDataToSend
+      }));
+
         if (updateProduct.fulfilled.match(result)) {
-          toast.success("Product Updated Successfully");
+        toast.success("Product updated successfully!");
           onProductUpdate();
           closeForm();
         } else {
-          const { message, code } = result.payload || {};
-          console.error(`Product update failed [${code}]: ${message}`);
-          toast.error("Failed to update product");
-        }
-      })
-      .catch((error) => {
-        console.error("Unexpected error:", error);
-        toast.error("Unexpected error occurred");
-      });
+        const { message } = result.payload || {};
+        throw new Error(message || "Failed to update product");
+      }
+    } catch (error) {
+      console.error("Update error:", error);
+      toast.error(error.message || "Failed to update product");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const conditionOptions = [
-    {
-      value: "brand_new",
-      label: "Brand New",
-      color: "bg-green-100 text-green-800",
-    },
-    {
-      value: "like_new",
-      label: "Like New",
-      color: "bg-blue-100 text-blue-800",
-    },
-    { value: "good", label: "Good", color: "bg-yellow-100 text-yellow-800" },
-    { value: "fair", label: "Fair", color: "bg-orange-100 text-orange-800" },
-    { value: "works", label: "Works", color: "bg-gray-100 text-gray-800" },
+    { value: "brand_new", label: "Brand New", description: "Never used, in original packaging" },
+    { value: "like_new", label: "Like New", description: "Barely used, excellent condition" },
+    { value: "good", label: "Good", description: "Used with minor signs of wear" },
+    { value: "fair", label: "Fair", description: "Used with noticeable wear" },
+    { value: "works", label: "Works", description: "Functional but may have cosmetic issues" },
   ];
 
   return (
-    <div className="overflow-auto py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="rounded-xl shadow-lg overflow-auto">
-          <div className="bg-gradient-to-r from-green-600 to-blue-600 px-8 py-6">
-            <h2 className="text-3xl font-bold text-white">Edit Product</h2>
-            <p className="text-green-100 mt-2">Update your product details</p>
+    <div className="max-h-[80vh] overflow-y-auto bg-white">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 z-10">
+          <h2 className="text-2xl font-semibold text-gray-900">Edit Product</h2>
+          <p className="text-gray-600 mt-1">Update your product information</p>
           </div>
 
-          <div className="p-8 space-y-8 h-[30rem]">
-            {/* Category Selection - Same as AddProductForm */}
-            <div className="grid md:grid-cols-2 gap-6">
+        <div className="p-6 space-y-6">
+    
+          
+          {/* Category Selection */}
+          <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                   Category *
                 </label>
                 <select
                   value={selectedCategory}
                   onChange={(e) => {
+                  console.log("Category changed to:", e.target.value);
                     setSelectedCategory(e.target.value);
-                    setFormData({ ...formData, subCategoryId: "" });
                   }}
-                  className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                    errors.category ? "border-red-500" : "border-gray-300"
+                className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.category ? "border-red-500" : "border-gray-300"
                   }`}
                 >
                   <option value="">Select Category</option>
@@ -329,22 +473,25 @@ const EditProductForm = ({
                   ))}
                 </select>
                 {errors.category && (
-                  <p className="text-red-500 text-sm mt-1">{errors.category}</p>
+                <p className="text-red-500 text-sm mt-1 flex items-center">
+                  <AlertCircle size={16} className="mr-1" />
+                  {errors.category}
+                </p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                   Subcategory *
                 </label>
                 <select
-                  value={formData.subCategoryId}
-                  onChange={(e) =>
-                    setFormData({ ...formData, subCategoryId: e.target.value })
-                  }
+                value={formData.subCategoryId || ""}
+                onChange={(e) => {
+                  console.log("Subcategory changed to:", e.target.value);
+                  setFormData(prev => ({ ...prev, subCategoryId: e.target.value }));
+                }}
                   disabled={!selectedCategory}
-                  className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors disabled:bg-gray-100 ${
-                    errors.subCategory ? "border-red-500" : "border-gray-300"
+                className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors disabled:bg-gray-100 ${errors.subCategory ? "border-red-500" : "border-gray-300"
                   }`}
                 >
                   <option value="">Select Subcategory</option>
@@ -355,83 +502,101 @@ const EditProductForm = ({
                   ))}
                 </select>
                 {errors.subCategory && (
-                  <p className="text-red-500 text-sm mt-1">
+                <p className="text-red-500 text-sm mt-1 flex items-center">
+                  <AlertCircle size={16} className="mr-1" />
                     {errors.subCategory}
                   </p>
                 )}
               </div>
             </div>
 
-            {/* Title - Same as AddProductForm */}
+          {/* Title */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
                 Product Title *
               </label>
               <input
                 type="text"
-                placeholder="Enter product title"
+              placeholder="Enter a descriptive product title"
                 value={formData.title}
+              maxLength={MAX_TITLE_LENGTH}
                 onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
+                setFormData(prev => ({ ...prev, title: e.target.value }))
                 }
-                className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                  errors.title ? "border-red-500" : "border-gray-300"
+              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.title ? "border-red-500" : "border-gray-300"
                 }`}
               />
-              {errors.title && (
-                <p className="text-red-500 text-sm mt-1">{errors.title}</p>
+            <div className="flex justify-between items-center mt-1">
+              {errors.title ? (
+                <p className="text-red-500 text-sm flex items-center">
+                  <AlertCircle size={16} className="mr-1" />
+                  {errors.title}
+                </p>
+              ) : (
+                <div />
               )}
+              <p className="text-sm text-gray-500">
+                {formData.title.length}/{MAX_TITLE_LENGTH}
+              </p>
+            </div>
             </div>
 
-            {/* Description - Same as AddProductForm */}
+          {/* Description */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
                 Description *
               </label>
               <textarea
-                placeholder="Describe your product in detail..."
+              placeholder="Provide detailed information about your product..."
                 value={formData.description}
                 maxLength={MAX_DESCRIPTION_LENGTH}
                 onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
+                setFormData(prev => ({ ...prev, description: e.target.value }))
                 }
                 rows={6}
-                className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none ${
-                  errors.description ? "border-red-500" : "border-gray-300"
+              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none ${errors.description ? "border-red-500" : "border-gray-300"
                 }`}
               />
-              <div className="flex justify-between items-center mt-2">
-                {errors.description && (
-                  <p className="text-red-500 text-sm">{errors.description}</p>
-                )}
-                <p className="text-sm text-gray-500 ml-auto">
-                  {formData.description.length} / {MAX_DESCRIPTION_LENGTH}
+            <div className="flex justify-between items-center mt-1">
+              {errors.description ? (
+                <p className="text-red-500 text-sm flex items-center">
+                  <AlertCircle size={16} className="mr-1" />
+                  {errors.description}
+                </p>
+              ) : (
+                <div />
+              )}
+              <p className="text-sm text-gray-500">
+                {formData.description.length}/{MAX_DESCRIPTION_LENGTH}
                 </p>
               </div>
             </div>
 
-            {/* Images - Modified for edit */}
+          {/* Images */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Product Images * (Max {MAX_IMAGES})
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Product Images * (Maximum {MAX_IMAGES})
               </label>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-4">
                 {/* Existing Images */}
                 {existingImages.map((url, index) => (
                   <div key={`existing-${index}`} className="relative group">
                     <img
                       src={url}
-                      alt={`Existing ${index + 1}`}
-                      className="w-full h-24 object-cover rounded-lg border-2 border-gray-200"
+                    alt={`Product ${index + 1}`}
+                    className="w-full h-24 object-cover rounded-lg border border-gray-200"
                     />
                     <button
                       type="button"
                       onClick={() => removeExistingImage(index)}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
                     >
-                      <X size={16} />
+                    <X size={14} />
                     </button>
+                  <div className="absolute bottom-1 left-1 bg-black bg-opacity-50 text-white text-xs px-1 rounded">
+                    Existing
+                  </div>
                   </div>
                 ))}
 
@@ -441,26 +606,26 @@ const EditProductForm = ({
                     <img
                       src={url}
                       alt={`New ${index + 1}`}
-                      className="w-full h-24 object-cover rounded-lg border-2 border-blue-200"
+                    className="w-full h-24 object-cover rounded-lg border border-blue-200"
                     />
                     <button
                       type="button"
                       onClick={() => removeImage(index)}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
                     >
-                      <X size={16} />
+                    <X size={14} />
                     </button>
+                  <div className="absolute bottom-1 left-1 bg-blue-500 text-white text-xs px-1 rounded">
+                    New
+                  </div>
                   </div>
                 ))}
 
                 {/* Upload Button */}
-                {existingImages.length + formData.images.length <
-                  MAX_IMAGES && (
-                  <label className="w-full h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors">
+              {existingImages.length + formData.images.length < MAX_IMAGES && (
+                <label className="w-full h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-gray-400 hover:bg-gray-50 transition-colors">
                     <Upload size={20} className="text-gray-400" />
-                    <span className="text-xs text-gray-500 mt-1">
-                      Add Image
-                    </span>
+                  <span className="text-xs text-gray-500 mt-1">Add Image</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -472,40 +637,44 @@ const EditProductForm = ({
                 )}
               </div>
 
+            <div className="flex justify-between items-center">
               <p className="text-sm text-gray-500">
-                {existingImages.length + formData.images.length} / {MAX_IMAGES}{" "}
-                images
+                {existingImages.length + formData.images.length} / {MAX_IMAGES} images
               </p>
               {errors.images && (
-                <p className="text-red-500 text-sm mt-1">{errors.images}</p>
+                <p className="text-red-500 text-sm flex items-center">
+                  <AlertCircle size={16} className="mr-1" />
+                  {errors.images}
+                </p>
               )}
+            </div>
             </div>
 
             {/* Tags */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
                 <Tag className="inline w-4 h-4 mr-1" />
-                Tags (comma separated)
+              Tags (comma separated, max 10)
               </label>
               <input
                 type="text"
-                placeholder="e.g. electronics, smartphone, android"
+              placeholder="e.g. electronics, smartphone, android, new"
                 onChange={handleTagInput}
-                value={formData.tags.join(", ")} // Add this to show current tags in input
-                className="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              value={formData.tags.join(", ")}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               />
               {formData.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
                   {formData.tags.map((tag, index) => (
                     <span
                       key={index}
-                      className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full flex items-center gap-2"
+                    className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full flex items-center gap-2 border"
                     >
                       {tag}
                       <button
                         type="button"
                         onClick={() => removeTag(index)}
-                        className="text-blue-600 hover:text-blue-800 font-bold"
+                      className="text-gray-500 hover:text-gray-700"
                       >
                         ×
                       </button>
@@ -518,22 +687,22 @@ const EditProductForm = ({
             {/* Specifics */}
             {specifics.length > 0 && (
               <div>
-                <div className="flex justify-between items-center mb-4">
-                  <label className="block text-sm font-semibold text-gray-700">
-                    Product Specifics
+              <div className="flex justify-between items-center mb-3">
+                <label className="block text-sm font-medium text-gray-700">
+                  Product Specifications *
                   </label>
                   <button
                     type="button"
                     onClick={() => setOpenSpecificModal(true)}
-                    className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
+                  className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium text-sm"
                   >
                     <Plus size={16} />
-                    Add Specific
+                  Add Specification
                   </button>
                 </div>
 
-                {selectedSpecifics.length > 0 && (
-                  <div className="grid gap-3">
+              {selectedSpecifics.length > 0 ? (
+                <div className="space-y-2">
                     {selectedSpecifics.map((spec, i) => (
                       <div
                         key={i}
@@ -560,29 +729,33 @@ const EditProductForm = ({
                         </button>
                       </div>
                     ))}
+                </div>
+              ) : (
+                <div className="text-center py-4 text-gray-500 border border-dashed border-gray-300 rounded-lg">
+                  No specifications added yet
+                </div>
+              )}
 
                     {errors.specifics && (
-                      <p className="text-red-500 text-sm mt-1">
+                <p className="text-red-500 text-sm mt-2 flex items-center">
+                  <AlertCircle size={16} className="mr-1" />
                         {errors.specifics}
                       </p>
-                    )}
-                  </div>
                 )}
               </div>
             )}
 
             {/* Condition */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Condition *
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              Product Condition *
               </label>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {conditionOptions.map((option) => (
                   <label
                     key={option.value}
-                    className={`cursor-pointer p-3 rounded-lg border-2 text-center transition-all ${
-                      formData.condition === option.value
-                        ? `${option.color} border-current`
+                  className={`cursor-pointer p-4 rounded-lg border-2 transition-all ${formData.condition === option.value
+                      ? "border-blue-500 bg-blue-50"
                         : "border-gray-200 hover:border-gray-300"
                     }`}
                   >
@@ -592,39 +765,47 @@ const EditProductForm = ({
                       value={option.value}
                       checked={formData.condition === option.value}
                       onChange={(e) =>
-                        setFormData({ ...formData, condition: e.target.value })
+                      setFormData(prev => ({ ...prev, condition: e.target.value }))
                       }
                       className="sr-only"
                     />
-                    <span className="text-sm font-medium">{option.label}</span>
+                  <div className="text-sm">
+                    <div className="font-medium text-gray-900">{option.label}</div>
+                    <div className="text-gray-600 text-xs mt-1">{option.description}</div>
+                  </div>
                   </label>
                 ))}
               </div>
               {errors.condition && (
-                <p className="text-red-500 text-sm mt-1">{errors.condition}</p>
+              <p className="text-red-500 text-sm mt-2 flex items-center">
+                <AlertCircle size={16} className="mr-1" />
+                {errors.condition}
+              </p>
               )}
             </div>
 
             {/* Pricing */}
-            <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                   <DollarSign className="inline w-4 h-4 mr-1" />
-                  Fixed Price *
+                Price *
                 </label>
                 <input
                   type="number"
                   placeholder="0.00"
+                min="0"
+                step="0.01"
                   value={formData.fixedPrice}
                   onChange={(e) =>
-                    setFormData({ ...formData, fixedPrice: e.target.value })
+                  setFormData(prev => ({ ...prev, fixedPrice: e.target.value }))
                   }
-                  className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                    errors.fixedPrice ? "border-red-500" : "border-gray-300"
+                className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.fixedPrice ? "border-red-500" : "border-gray-300"
                   }`}
                 />
                 {errors.fixedPrice && (
-                  <p className="text-red-500 text-sm mt-1">
+                <p className="text-red-500 text-sm mt-1 flex items-center">
+                  <AlertCircle size={16} className="mr-1" />
                     {errors.fixedPrice}
                   </p>
                 )}
@@ -632,53 +813,69 @@ const EditProductForm = ({
 
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <label className="block text-sm font-semibold text-gray-700">
+                <label className="block text-sm font-medium text-gray-700">
                     Original Price
                   </label>
                   <button
                     type="button"
-                    onClick={() => setShowOriginPrice(!showOriginPrice)}
+                  onClick={() => {
+                    setShowOriginPrice(!showOriginPrice);
+                    if (showOriginPrice) {
+                      setFormData(prev => ({ ...prev, originPrice: "" }));
+                    }
+                  }}
                     className="text-sm text-blue-600 hover:text-blue-700"
                   >
                     {showOriginPrice ? "Hide" : "Show"}
                   </button>
                 </div>
                 {showOriginPrice && (
+                <>
                   <input
                     type="number"
                     placeholder="0.00"
+                    min="0"
+                    step="0.01"
                     value={formData.originPrice}
                     onChange={(e) =>
-                      setFormData({ ...formData, originPrice: e.target.value })
+                      setFormData(prev => ({ ...prev, originPrice: e.target.value }))
                     }
-                    className="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.originPrice ? "border-red-500" : "border-gray-300"
+                      }`}
                   />
+                  {errors.originPrice && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                      <AlertCircle size={16} className="mr-1" />
+                      {errors.originPrice}
+                    </p>
+                  )}
+                </>
                 )}
               </div>
             </div>
 
             {/* Shipping Options */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-3">
                 <Truck className="inline w-4 h-4 mr-1" />
-                Shipping Options
+              Delivery Options
               </label>
 
               <div className="space-y-3">
-                <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-blue-50 transition-colors">
+              <label className="flex items-start p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
                   <input
                     type="radio"
                     name="shippingOption"
                     value="local pickup"
                     checked={formData.shippingOption === "local pickup"}
                     onChange={(e) =>
-                      setFormData({
-                        ...formData,
+                    setFormData(prev => ({
+                      ...prev,
                         shippingOption: e.target.value,
                         shippingCharge: "",
-                      })
+                    }))
                     }
-                    className="mr-3"
+                  className="mt-1 mr-3"
                   />
                   <div>
                     <div className="flex items-center gap-2 font-medium">
@@ -686,70 +883,59 @@ const EditProductForm = ({
                       Local Pickup Only
                     </div>
                     <p className="text-sm text-gray-600">
-                      Buyer picks up the item
+                    Buyer collects the item from your location
                     </p>
                   </div>
                 </label>
 
-                <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-green-50 transition-colors">
+              <label className="flex items-start p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
                   <input
                     type="radio"
                     name="shippingOption"
                     value="free shipping"
                     checked={formData.shippingOption === "free shipping"}
                     onChange={(e) =>
-                      setFormData({
-                        ...formData,
+                    setFormData(prev => ({
+                      ...prev,
                         shippingOption: e.target.value,
                         shippingCharge: "",
-                      })
+                    }))
                     }
-                    className="mr-3"
+                  className="mt-1 mr-3"
                   />
                   <div>
-                    <div className="font-medium text-green-700">
-                      Free Shipping
-                    </div>
+                  <div className="font-medium text-green-700">Free Shipping</div>
                     <p className="text-sm text-gray-600">
-                      You cover shipping costs
+                    You cover all shipping costs
                     </p>
                   </div>
                 </label>
 
-                <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-orange-50 transition-colors">
+              <label className="flex items-start p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
                   <input
                     type="radio"
                     name="shippingOption"
                     value="charge shipping"
                     checked={formData.shippingOption === "charge shipping"}
                     onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        shippingOption: e.target.value,
-                      })
+                    setFormData(prev => ({ ...prev, shippingOption: e.target.value }))
                     }
-                    className="mr-3"
+                  className="mt-1 mr-3"
                   />
                   <div className="flex-1">
-                    <div className="font-medium text-orange-700">
-                      Charged Shipping
-                    </div>
-                    <p className="text-sm text-gray-600">Buyer pays shipping</p>
+                  <div className="font-medium text-orange-700">Charged Shipping</div>
+                  <p className="text-sm text-gray-600 mb-2">Buyer pays for shipping</p>
                     {formData.shippingOption === "charge shipping" && (
                       <input
                         type="number"
-                        placeholder="Shipping charge"
+                      placeholder="Enter shipping charge"
+                      min="0"
+                      step="0.01"
                         value={formData.shippingCharge}
                         onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            shippingCharge: e.target.value,
-                          })
+                        setFormData(prev => ({ ...prev, shippingCharge: e.target.value }))
                         }
-                        className={`mt-2 w-full p-2 border rounded focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
-                          errors.shippingCharge
-                            ? "border-red-500"
-                            : "border-gray-300"
+                      className={`w-full p-2 border rounded focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${errors.shippingCharge ? "border-red-500" : "border-gray-300"
                         }`}
                       />
                     )}
@@ -757,45 +943,52 @@ const EditProductForm = ({
                 </label>
               </div>
               {errors.shippingCharge && (
-                <p className="text-red-500 text-sm mt-1">
+              <p className="text-red-500 text-sm mt-2 flex items-center">
+                <AlertCircle size={16} className="mr-1" />
                   {errors.shippingCharge}
                 </p>
               )}
+          </div>
             </div>
 
-            {/* Submit Button */}
-            <div className="pt-6 border-t">
-              <div className="flex gap-4">
+        {/* Footer with action buttons */}
+        <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex gap-3">
                 <button
                   type="button"
                   onClick={closeForm}
-                  className="flex-1 bg-gray-500 text-white font-semibold py-4 px-6 rounded-lg hover:bg-gray-600 transition-colors"
+            disabled={loading}
+            className="flex-1 bg-gray-100 text-gray-700 font-medium py-3 px-6 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handleSubmit}
-                  className="flex-1 bg-gradient-to-r from-green-600 to-blue-600 text-white font-semibold py-4 px-6 rounded-lg hover:from-green-700 hover:to-blue-700 transform hover:scale-[1.02] transition-all duration-200 shadow-lg"
-                >
-                  Update Product
+            disabled={loading}
+            className="flex-1 bg-blue-600 text-white font-medium py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center"
+          >
+            {loading ? (
+              <>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                Updating...
+              </>
+            ) : (
+              "Update Product"
+            )}
                 </button>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
-      {/* Specifics Modal - Same as AddProductForm */}
+      {/* Specifics Modal */}
       {openSpecificModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-white w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl">
+          <div className="bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl">
             <div className="sticky top-0 bg-white border-b px-6 py-4">
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-bold">Product Specifics</h2>
+                <h2 className="text-xl font-semibold">Product Specifications</h2>
                 <button
                   onClick={() => setOpenSpecificModal(false)}
-                  className="text-gray-500 hover:text-gray-700 p-2"
+                  className="text-gray-400 hover:text-gray-600 p-2"
                 >
                   <X size={20} />
                 </button>
@@ -806,7 +999,7 @@ const EditProductForm = ({
               {/* Selected Tags */}
               {Object.keys(tempSpecifics).length > 0 && (
                 <div className="mb-6">
-                  <h3 className="font-medium mb-3">Selected:</h3>
+                  <h3 className="font-medium mb-3">Selected Specifications:</h3>
                   <div className="flex flex-wrap gap-2">
                     {Object.entries(tempSpecifics).map(([pid, vid]) => {
                       const param = specifics.find((p) => p._id === pid);
@@ -839,7 +1032,7 @@ const EditProductForm = ({
               <div className="space-y-6">
                 {specifics.map((param) => (
                   <div key={param._id}>
-                    <h4 className="font-semibold text-gray-900 mb-3">
+                    <h4 className="font-medium text-gray-900 mb-3">
                       {param.key}
                     </h4>
                     <div className="flex flex-wrap gap-2">
@@ -854,10 +1047,9 @@ const EditProductForm = ({
                                 [param._id]: val._id,
                               }))
                             }
-                            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                              isSelected
-                                ? "bg-blue-600 text-white"
-                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${isSelected
+                                ? "bg-blue-600 text-white border-blue-600"
+                                : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
                             }`}
                           >
                             {val.value}
@@ -901,7 +1093,7 @@ const EditProductForm = ({
                     setTempSpecifics({});
                   }}
                 >
-                  Save Changes
+                  Apply Changes
                 </button>
               </div>
             </div>

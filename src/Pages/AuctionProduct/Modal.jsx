@@ -1,31 +1,39 @@
-import React from "react";
-import { useTheme } from "../../contexts/theme/hook/useTheme";
+import React, { useEffect } from "react";
 
-export default function Modal({ isOpen, onClose, children }) {
-  const { theme } = useTheme();
+export default function Modal({ isOpen, onClose, children, className = "" }) {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("keydown", handleEscape);
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex justify-center items-center"
-      style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
-    >
-      <div
-        className="p-6 rounded-xl w-full max-w-2xl relative shadow-lg"
-        style={{
-          backgroundColor: theme.colors.background,
-          color: theme.colors.textPrimary,
-        }}
-      >
-        {/* ❌ Close icon button */}
-        <button
-          onClick={onClose}
-          className="absolute top-3 right-3 text-xl font-bold hover:text-red-500"
-        >
-          &times;
-        </button>
-
+    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black bg-opacity-50 p-4">
+      <div className={`bg-white w-full max-w-4xl max-h-[calc(100vh-2rem)] overflow-hidden rounded-xl shadow-2xl mt-4 mb-4 ${className}`}>
         {children}
       </div>
     </div>

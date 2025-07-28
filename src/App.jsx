@@ -34,6 +34,7 @@ import SellerVerificationRequests from "./Pages/User/SellerVerificationRequests"
 import AdminFinancialDashboard from "./Pages/Admin/AdminFinancialDashboard";
 import AdminReviewManagement from "./Pages/Admin/AdminReviewManagement";
 import UserInfo from "./Pages/UserInfo/UserInfo";
+import ReportTypeManagement from "./Pages/Admin/ReportTypeManagement";
 
 
 
@@ -100,9 +101,11 @@ function App() {
               <Route path="/chat" element={<Chat />} />
 
               <Route path="/ProfilePage" element={<ProfilePage />} />
+              <Route path="/report-type-management" element={<ReportTypeManagement />} />
 
 
 
+              
 
               <Route
                 path="/subcategoryParameter/:id"
