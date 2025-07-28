@@ -160,7 +160,7 @@ console.log("formData",formData)
                   {parent.children.map((child) => (
                     <tr key={child.key} className="bg-gray-50">
                       <td className="px-6 py-1 text-gray-700">↳ {parent.value}</td>
-                      <td className="px-4 py-1">{child.value}</td>
+                      <td className="px-4 py-1 capitalize">{child.value}</td>
                       <td className="px-4 py-1 text-right space-x-2">
                         <button
                           className="text-green-600 hover:underline"
