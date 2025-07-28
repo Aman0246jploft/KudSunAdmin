@@ -205,8 +205,8 @@ export default function SellProduct() {
               color: row.isDisable ? "#4b5563" : "#166534",
             }}
           >
-            <option value="enabled">Enabled</option>
-            <option value="disabled">Disabled</option>
+            <option value="enabled">Active</option>
+            <option value="disabled">Inactive</option>
           </select>
         </div>
       ),

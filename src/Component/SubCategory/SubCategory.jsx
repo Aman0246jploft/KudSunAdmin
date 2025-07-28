@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { mainCategory, subCategory, addSubCategory } from "../../features/slices/categorySlice";
 import DataTable from "../Table/DataTable";
@@ -11,6 +11,8 @@ import { useTheme } from "../../contexts/theme/hook/useTheme";
 import { useNavigate, useParams } from "react-router";
 import { FaEye } from "react-icons/fa";
 import UpdateCategoryForm from "./UpdateCategoryForm";
+import { format } from "date-fns";
+
 import { confirmAlert } from "react-confirm-alert";
 import { toast } from "react-toastify";
 import "react-confirm-alert/src/react-confirm-alert.css";
@@ -54,6 +56,20 @@ export default function SubCategory() {
     }
   };
 
+
+
+  const formatDate = useCallback((dateString) => {
+    if (!dateString) return "N/A";
+    try {
+      return format(new Date(dateString), "dd-MM-yyyy");
+    } catch (error) {
+      console.error("Date formatting error:", error);
+      return "Invalid Date";
+    }
+  }, []);
+
+
+
   const handleDelete = (subCat) => {
     confirmAlert({
       title: "Confirm Delete",
@@ -74,7 +90,7 @@ export default function SubCategory() {
                   formData: formData
                 })
               );
-              
+
               if (addSubCategory.fulfilled.match(result)) {
                 toast.success("Subcategory deleted successfully");
                 // Refresh the list
@@ -91,7 +107,7 @@ export default function SubCategory() {
         },
         {
           label: "No",
-          onClick: () => {},
+          onClick: () => { },
         },
       ],
     });
@@ -130,7 +146,12 @@ export default function SubCategory() {
       label: "Parament Count",
       width: "25%",
     },
-
+    // {
+    //   key: "createdAt",
+    //   label: "Created At",
+    //   width: "20%",
+    //   render: formatDate,
+    // },
     {
       key: "actions",
       label: "Actions",
@@ -188,12 +209,16 @@ export default function SubCategory() {
           className="flex justify-between items-center px-2 py-2"
           style={{ borderBottom: `1px solid ${theme.colors.borderLight}` }}
         >
+
+
           <div
-            className="font-semibold text-xl"
+            className="font-semibold flex justify-center items-center text-xl gap-x-2"
             style={{ color: theme.colors.textPrimary }}
           >
-           <IoArrowBackSharp onClick={()=>navigate(-1)} /> SubCategory
+            <IoArrowBackSharp className="cursor-pointer" onClick={() => navigate(-1)} />
+            <span>SubCategory</span>
           </div>
+
 
           <Button
             onClick={() => setIsModalOpen(true)}

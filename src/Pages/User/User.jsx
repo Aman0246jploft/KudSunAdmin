@@ -399,15 +399,15 @@ export default function User() {
         <select
           value={row.isDisable ? "disabled" : "enabled"}
           onChange={(e) => handleToggleStatus(row)}
-          className="border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="border rounded px-2 py-1 text-sm focus:outline-none "
           style={{
             // backgroundColor: row.isDisable ? "#f3f4f6" : "#dcfce7",
             color: row.isDisable ? "#4b5563" : "#166534",
             // borderColor: row.isDisable ? "#d1d5db" : "#86efac"
           }}
         >
-          <option value="enabled">Enabled</option>
-          <option value="disabled">Disabled</option>
+          <option value="enabled">Active</option>
+          <option value="disabled">Inactive</option>
         </select>
       ),
     },
@@ -485,7 +485,7 @@ export default function User() {
                 >
                   <IoInformationCircle size={18} />
                 </button>
-           
+
                 {showReportedRequests && isReported && (
                   <button
                     onClick={() => {

@@ -14,9 +14,10 @@ import Modal from "./Modal";
 import Button from "../Atoms/Button/Button";
 import { FiEdit, FiTrash2 } from "react-icons/fi"; // From Feather Icons
 import { useTheme } from "../../contexts/theme/hook/useTheme";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import AddParameterForm from "./AddParameterForm";
 import { toast } from "react-toastify";
+import { IoArrowBackSharp } from "react-icons/io5";
 
 export default function SubCategoryParemeter() {
   const dispatch = useDispatch();
@@ -24,6 +25,7 @@ export default function SubCategoryParemeter() {
   const [pagination, setPagination] = useState({ pageNo: 1, size: 10 });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const param = useParams();
+  const navigate = useNavigate();
   const [editData, setEditData] = useState(null);
   const { subCategoryParameterList, loading, error } = useSelector(
     (state) => state.category || {}
@@ -114,23 +116,23 @@ export default function SubCategoryParemeter() {
   };
 
   const handleDelete = async (data) => {
-  
-   dispatch(deleteParameterFromSubCategory({ subCategoryId: param?.id, paramKey: data?.key }))
-        .then((result) => {
-          if (deleteParameterFromSubCategory.fulfilled.match(result)) {
-            toast.success("Parameter updated successfully");
-            dispatch(
-              subCategoryParameter({ subCategoryId: param?.id, pagination })
-            );
-            onClose();
-          } else {
-            const { message, code } = result.payload || {};
-            toast.error(`Update failed [${code}]: ${message}`);
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-        });
+
+    dispatch(deleteParameterFromSubCategory({ subCategoryId: param?.id, paramKey: data?.key }))
+      .then((result) => {
+        if (deleteParameterFromSubCategory.fulfilled.match(result)) {
+          toast.success("Parameter updated successfully");
+          dispatch(
+            subCategoryParameter({ subCategoryId: param?.id, pagination })
+          );
+          onClose();
+        } else {
+          const { message, code } = result.payload || {};
+          toast.error(`Update failed [${code}]: ${message}`);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
 
 
   }
@@ -241,12 +243,17 @@ export default function SubCategoryParemeter() {
           className="flex justify-between items-center px-2 py-2"
           style={{ borderBottom: `1px solid ${theme.colors.borderLight}` }}
         >
+
           <div
-            className="font-semibold text-xl"
+            className="font-semibold flex justify-center items-center text-xl gap-x-2"
             style={{ color: theme.colors.textPrimary }}
           >
-            SubCategory Parameters
+            <IoArrowBackSharp className="cursor-pointer" onClick={() => navigate(-1)} />
+            <span> SubCategory Parameters</span>
           </div>
+
+
+
 
           <Button
             onClick={() => setIsModalOpen(true)}

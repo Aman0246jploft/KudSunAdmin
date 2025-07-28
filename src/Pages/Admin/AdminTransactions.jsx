@@ -404,7 +404,7 @@ const AdminTransactions = () => {
   // Utility function to format PromptPay ID for display
   const formatPromptPayForDisplay = (promptPayId) => {
     if (!promptPayId) return 'N/A';
-    
+
     // Mobile Number: 0xx-xxx-xxxx
     if (/^0\d{9}$/.test(promptPayId)) {
       return `${promptPayId.slice(0, 3)}-${promptPayId.slice(3, 6)}-${promptPayId.slice(6)}`;
@@ -417,7 +417,7 @@ const AdminTransactions = () => {
     else if (promptPayId.length > 6) {
       return `****${promptPayId.slice(-4)}`;
     }
-    
+
     return promptPayId;
   };
 
@@ -522,7 +522,7 @@ const AdminTransactions = () => {
   // Confirm withdrawal action
   const confirmWithdrawalAction = (request, action) => {
     const actionText = action === 'Approved' ? 'approve' : 'reject';
-    
+
     confirmAlert({
       title: `Confirm ${action}`,
       message: `Are you sure you want to ${actionText} this withdrawal request for ฿${request.amount}?`,
@@ -858,7 +858,7 @@ const AdminTransactions = () => {
   // Calculate withdrawal fee based on type
   const calculateWithdrawalFee = (amount, feeValue, feeType) => {
     if (!amount || !feeValue) return 0;
-    
+
     if (feeType === 'PERCENTAGE') {
       return (amount * feeValue) / 100;
     } else {
@@ -899,11 +899,10 @@ const AdminTransactions = () => {
         <div className="flex border-b border-gray-200">
           <button
             onClick={() => setActiveTab('transactions')}
-            className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === 'transactions'
+            className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'transactions'
                 ? 'border-blue-500 text-blue-600 bg-blue-50'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-            }`}
+              }`}
           >
             <div className="flex items-center space-x-2">
               <MdPayment className="w-4 h-4" />
@@ -915,11 +914,10 @@ const AdminTransactions = () => {
           </button>
           <button
             onClick={() => setActiveTab('withdrawals')}
-            className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === 'withdrawals'
+            className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'withdrawals'
                 ? 'border-blue-500 text-blue-600 bg-blue-50'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-            }`}
+              }`}
           >
             <div className="flex items-center space-x-2">
               <FaWallet className="w-4 h-4" />
@@ -1283,12 +1281,12 @@ const AdminTransactions = () => {
                     <p className="text-sm text-gray-600">Seller</p>
                     <p className="font-medium">{calculationModal.data.seller?.name}</p>
                   </div>
-                  <div>
+                  {/* <div>
                     <p className="text-sm text-gray-600">Payout Completed</p>
                     <p className={`font-medium ${calculationModal.data.isPayoutCompleted ? 'text-green-600' : 'text-red-600'}`}>
                       {calculationModal.data.isPayoutCompleted ? 'Yes' : 'No'}
                     </p>
-                  </div>
+                  </div> */}
                 </div>
 
                 {/* Dispute Information (if any) */}
@@ -1764,13 +1762,13 @@ const AdminTransactions = () => {
                         <span>Withdrawal Amount:</span>
                         <span className="font-medium text-green-600">฿{withdrawalDetailModal.data.amount?.toFixed(2) || '0.00'}</span>
                       </div>
-                      
+
                       {(() => {
                         const amount = withdrawalDetailModal.data.amount || 0;
                         const feeValue = withdrawalDetailModal.data.withdrawfee || 0;
                         const feeType = withdrawalDetailModal.data.withdrawfeeType || 'FIXED';
                         const calculatedFee = calculateWithdrawalFee(amount, feeValue, feeType);
-                        
+
                         return (
                           <div className="flex justify-between items-center text-red-600">
                             <span className="flex flex-col">
@@ -1790,16 +1788,16 @@ const AdminTransactions = () => {
                           </div>
                         );
                       })()}
-                      
+
                       <hr className="border-gray-300" />
-                      
+
                       {(() => {
                         const amount = withdrawalDetailModal.data.amount || 0;
                         const feeValue = withdrawalDetailModal.data.withdrawfee || 0;
                         const feeType = withdrawalDetailModal.data.withdrawfeeType || 'FIXED';
                         const calculatedFee = calculateWithdrawalFee(amount, feeValue, feeType);
                         const netAmount = amount - calculatedFee;
-                        
+
                         return (
                           <div className="flex justify-between items-center font-bold text-lg text-blue-600">
                             <span>Net Amount to Transfer:</span>
@@ -1953,7 +1951,7 @@ const AdminTransactions = () => {
                       const feeValue = withdrawalActionModal.data.withdrawfee || 0;
                       const feeType = withdrawalActionModal.data.withdrawfeeType || 'FIXED';
                       const calculatedFee = calculateWithdrawalFee(amount, feeValue, feeType);
-                      
+
                       return (
                         <>
                           <div className="flex justify-between">
@@ -1980,14 +1978,12 @@ const AdminTransactions = () => {
                 </div>
 
                 {/* Action Warning */}
-                <div className={`p-3 rounded-lg ${
-                  withdrawalActionModal.action === 'Approved' 
-                    ? 'bg-green-50 border border-green-200' 
+                <div className={`p-3 rounded-lg ${withdrawalActionModal.action === 'Approved'
+                    ? 'bg-green-50 border border-green-200'
                     : 'bg-red-50 border border-red-200'
-                }`}>
-                  <div className={`flex items-center space-x-2 ${
-                    withdrawalActionModal.action === 'Approved' ? 'text-green-800' : 'text-red-800'
                   }`}>
+                  <div className={`flex items-center space-x-2 ${withdrawalActionModal.action === 'Approved' ? 'text-green-800' : 'text-red-800'
+                    }`}>
                     {withdrawalActionModal.action === 'Approved' ? (
                       <FaCheck className="w-4 h-4" />
                     ) : (
@@ -1997,11 +1993,10 @@ const AdminTransactions = () => {
                       {withdrawalActionModal.action === 'Approved' ? 'Approval Action' : 'Rejection Action'}
                     </span>
                   </div>
-                  <p className={`text-sm mt-1 ${
-                    withdrawalActionModal.action === 'Approved' ? 'text-green-700' : 'text-red-700'
-                  }`}>
-                    {withdrawalActionModal.action === 'Approved' 
-                      ? 'This action will process the withdrawal and transfer funds to the seller\'s account.' 
+                  <p className={`text-sm mt-1 ${withdrawalActionModal.action === 'Approved' ? 'text-green-700' : 'text-red-700'
+                    }`}>
+                    {withdrawalActionModal.action === 'Approved'
+                      ? 'This action will process the withdrawal and transfer funds to the seller\'s account.'
                       : 'This action will reject the withdrawal request and refund the amount to the seller\'s wallet.'
                     }
                   </p>
@@ -2030,8 +2025,8 @@ const AdminTransactions = () => {
                   <Button
                     variant={withdrawalActionModal.action === 'Approved' ? 'primary' : 'outline'}
                     onClick={() => handleWithdrawalAction(
-                      withdrawalActionModal.data._id, 
-                      withdrawalActionModal.action, 
+                      withdrawalActionModal.data._id,
+                      withdrawalActionModal.action,
                       withdrawalActionModal.notes
                     )}
                     disabled={withdrawalLoading}

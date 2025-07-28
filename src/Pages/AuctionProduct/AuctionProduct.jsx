@@ -170,6 +170,16 @@ export default function AuctionProduct() {
         return `${cat} / ${subCat}`;
       },
     },
+
+  {
+      key: "CurrentBid",
+      label: "Current Bid",
+      width: "10%",
+      render: (_, row) => {
+        return `${row?.highestBidAmount}`;
+      },
+    },
+    
     {
       key: "status",
       label: "Status",
@@ -184,8 +194,8 @@ export default function AuctionProduct() {
               color: row.isDisable ? "#4b5563" : "#166534",
             }}
           >
-            <option value="enabled">Enabled</option>
-            <option value="disabled">Disabled</option>
+            <option value="enabled">Active</option>
+            <option value="disabled">Inactive</option>
           </select>
         </div>
       ),
