@@ -35,6 +35,8 @@ import AdminFinancialDashboard from "./Pages/Admin/AdminFinancialDashboard";
 import AdminReviewManagement from "./Pages/Admin/AdminReviewManagement";
 import UserInfo from "./Pages/UserInfo/UserInfo";
 import ReportTypeManagement from "./Pages/Admin/ReportTypeManagement";
+import PasswordManagement from "./Pages/Admin/PasswordManagement";
+
 
 
 
@@ -81,6 +83,10 @@ function App() {
               <Route path="/auctionProduct" element={<AuctionProduct />} />
               <Route path="/thread" element={<Thread />} />
               <Route path="/thread/edit/:id" element={<EditThread />} />
+
+
+              <Route path="/passwordManagement" element={<PasswordManagement/>} />
+
 
               <Route path="/thread/:id" element={<ThreadDetail />} />
 

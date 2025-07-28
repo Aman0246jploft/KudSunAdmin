@@ -85,6 +85,11 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
           href: '/report-type-management',
           icon: AiOutlineSetting
         },
+        {
+          name: "Update Password",
+          href: "/passwordManagement",
+          icon: AiOutlineSetting
+        },
       ],
     },
 
