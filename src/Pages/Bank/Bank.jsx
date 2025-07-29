@@ -60,6 +60,8 @@ export default function Bank() {
     {
       key: "actions",
       label: "Actions",
+      width:"10%",
+      headerStyle:{textAlign:'right'},
       disableTooltip: true,
       render: (_, row) => (
         <div className="text-right space-x-2">

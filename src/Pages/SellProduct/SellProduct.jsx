@@ -152,7 +152,7 @@ export default function SellProduct() {
         },
         {
           label: "No",
-          onClick: () => {},
+          onClick: () => { },
         },
       ],
     });
@@ -197,7 +197,7 @@ export default function SellProduct() {
       width: "25%",
       render: (_, row) => (
         <div className="flex gap-2">
-            <select
+          <select
             value={row.isDisable ? "disabled" : "enabled"}
             onChange={() => handleToggleStatus(row)}
             className="border rounded px-2 py-1 text-sm focus:outline-none "
@@ -239,7 +239,7 @@ export default function SellProduct() {
             <FiTrash2 size={18} />
           </button>
 
-     
+
         </div>
       ),
     },
@@ -366,7 +366,7 @@ export default function SellProduct() {
             <input
               className="p-1 outline-none border"
               type="text"
-              placeholder="Search product title or keyword"
+              placeholder="Search product"
               value={filters.keyWord}
               onChange={(e) => {
                 setFilters({ ...filters, keyWord: e.target.value });

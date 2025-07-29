@@ -58,7 +58,8 @@ const DataTable = ({ columns, data = [], sortBy, sortOrder, onSort }) => {
 
   return (
     <>
-      <div className="overflow-x-auto w-full">
+      {/* Desktop/Tablet Table View */}
+      <div className="hidden sm:block overflow-x-auto w-full">
         <table
           className="min-w-full text-sm text-left table-fixed border"
           style={{ borderColor: theme.colors.border }}
@@ -68,9 +69,8 @@ const DataTable = ({ columns, data = [], sortBy, sortOrder, onSort }) => {
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className="p-2 font-medium border-b"
+                  className="p-2 md:p-3 font-medium border-b text-xs sm:text-sm"
                   style={{
-                
                     color: theme.colors.textPrimary,
                     borderColor: theme.colors.borderLight,
                     width: col.width || "auto",
@@ -78,15 +78,14 @@ const DataTable = ({ columns, data = [], sortBy, sortOrder, onSort }) => {
                   }}
                 >
                   <div
-                    className={`flex items-center gap-1 select-none ${
-                      col.headerStyle?.textAlign === "right" ? "justify-end" : ""
-                    }`}
+                    className={`flex items-center gap-1 select-none ${col.headerStyle?.textAlign === "right" ? "justify-end pr-2" : ""
+                      }`}
                     onClick={() => handleSort(col)}
                     style={{ cursor: col.sortable ? "pointer" : "default" }}
                   >
-                    {col.label}
+                    <span className="truncate">{col.label}</span>
                     {col.sortable && sortBy === (col.sortKey || col.key) && (
-                      <span>{sortOrder === "asc" ? "▲" : "▼"}</span>
+                      <span className="flex-shrink-0">{sortOrder === "asc" ? "▲" : "▼"}</span>
                     )}
                   </div>
                 </th>
@@ -120,7 +119,7 @@ const DataTable = ({ columns, data = [], sortBy, sortOrder, onSort }) => {
                     return (
                       <td
                         key={col.key}
-                        className="p-2 max-w-[200px] truncate align-top"
+                        className="p-2 md:p-3 max-w-[120px] sm:max-w-[150px] md:max-w-[200px] truncate align-top text-xs sm:text-sm"
                         style={{
                           ...col.cellStyle,
                         }}
@@ -140,11 +139,91 @@ const DataTable = ({ columns, data = [], sortBy, sortOrder, onSort }) => {
         </table>
       </div>
 
+      {/* Mobile Card View */}
+      <div className="block sm:hidden w-full">
+        {data?.length === 0 ? (
+          <div
+            className="p-4 text-center border rounded-lg"
+            style={{
+              color: theme.colors.textSecondary,
+              borderColor: theme.colors.border,
+              backgroundColor: theme.colors.background
+            }}
+          >
+            No data available
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {data?.map((row, rowIndex) => (
+              <div
+                key={rowIndex}
+                className="border rounded-lg overflow-hidden"
+                style={{
+                  borderColor: theme.colors.border,
+                  backgroundColor: theme.colors.background,
+                }}
+              >
+                {columns.map((col, colIndex) => {
+                  const content = getCellContent(col, row, rowIndex);
+                  const value = row[col.key];
+
+                  return (
+                    <div
+                      key={col.key}
+                      className={`p-3 flex justify-between items-start gap-2 ${colIndex !== columns.length - 1 ? 'border-b' : ''
+                        }`}
+                      style={{
+                        borderColor: theme.colors.borderLight,
+                      }}
+                    >
+                      <div className="flex-shrink-0 min-w-0 w-1/3">
+                        <div
+                          className="font-medium text-xs uppercase tracking-wide truncate"
+                          style={{ color: theme.colors.textSecondary }}
+                        >
+                          {col.label}
+                          {col.sortable && sortBy === (col.sortKey || col.key) && (
+                            <span
+                              className="ml-1 cursor-pointer"
+                              onClick={() => handleSort(col)}
+                            >
+                              {sortOrder === "asc" ? "▲" : "▼"}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div
+                        className="flex-1 min-w-0 text-right"
+                        onMouseEnter={(e) => {
+                          if (!col.disableTooltip) handleMouseEnter(e, value);
+                        }}
+                        onMouseLeave={handleMouseLeave}
+                      >
+                        <div
+                          className="text-sm  text-right  break-words"
+                          style={{
+                            color: theme.colors.textPrimary,
+                            ...col.cellStyle
+                          }}
+                        >
+                          {content}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Responsive Tooltip */}
       {tooltip.visible && (
         <div
           className="fixed z-[9999] pointer-events-auto custom-tooltip"
           style={{
-            left: `${tooltip.x}px`,
+            left: `${Math.min(tooltip.x, window.innerWidth - 320)}px`,
             top: `${tooltip.y}px`,
             transform: "translateY(-100%)",
           }}
@@ -162,21 +241,17 @@ const DataTable = ({ columns, data = [], sortBy, sortOrder, onSort }) => {
             }}
           />
           <div
-            className="text-sm p-3 break-words whitespace-normal shadow-xl max-w-xs rounded-lg"
+            className="text-xs sm:text-sm p-2 sm:p-3 break-words whitespace-normal shadow-xl rounded-lg"
             style={{
-              left: `${tooltip.x}px`,
-              top: `${tooltip.y}px`,
-              maxWidth: "300px",
+              maxWidth: "280px",
               backgroundColor: theme.colors.background,
-              // backgroundColor: theme.colors.backgroundSecondary,
               color: theme.colors.textPrimary,
               border: `1px solid ${theme.colors.borderLight}`,
-              padding: "8px",
               borderRadius: "4px",
               boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
               whiteSpace: "pre-wrap",
               overflowY: "auto",
-              maxHeight: "5.5em", // approx. 4 lines (1.375em per line)
+              maxHeight: "5.5em",
               lineHeight: "1.375em",
             }}
           >

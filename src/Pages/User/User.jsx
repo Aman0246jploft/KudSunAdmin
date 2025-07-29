@@ -380,7 +380,7 @@ export default function User() {
       label: "Preferred Seller",
       width: "7%",
       render: (value, row) => (
-        <div className="flex items-center justify-center">
+        <div className="flex items-center justify-end md:justify-start">
           <input
             type="checkbox"
             checked={row.is_Preferred_seller || false}
@@ -420,7 +420,7 @@ export default function User() {
           showSellerRequests && row.sellerVerificationStatus === "Pending";
         const isReported = row?.reportCount > 0;
         return (
-          <div className="flex gap-2">
+          <div className="flex gap-2 justify-end md:justify-start">
             {showSellerRequests ? (
               <>
                 <button

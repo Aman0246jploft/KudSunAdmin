@@ -343,7 +343,7 @@ export default function Thread() {
             <input
               className="p-1 outline-none border"
               type="text"
-              placeholder="Search thread title or keyword"
+              placeholder="Search thread"
               value={filters.keyWord}
               onChange={(e) => handleFilterChange("keyWord", e.target.value)}
             />

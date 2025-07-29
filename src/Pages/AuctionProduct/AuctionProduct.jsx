@@ -354,7 +354,7 @@ export default function AuctionProduct() {
             <input
               className="p-1 outline-none border"
               type="text"
-              placeholder="Search product title or keyword"
+              placeholder="Search product"
               value={filters.keyWord}
               onChange={(e) => {
                 setFilters({ ...filters, keyWord: e.target.value });

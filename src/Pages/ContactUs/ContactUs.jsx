@@ -147,7 +147,7 @@ export default function ContactUs() {
       width: "20%",
       render: (_, row) =>
         row.image && row.image.length > 0 ? (
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap  justify-end md:justify-start gap-1">
             {row.image.slice(0, 2).map((url, index) => {
               const isVideo = url.match(/\.(mp4|webm|ogg)$/i);
               return (
@@ -189,7 +189,7 @@ export default function ContactUs() {
       label: "Actions",
       width: "15%",
       render: (_, row) => (
-        <div className="flex gap-2">
+        <div className="flex justify-end md:justify-start gap-2">
           <button
             onClick={() => openDetailModal(row)}
             className="text-blue-600 hover:underline"
@@ -220,7 +220,7 @@ export default function ContactUs() {
       label: "Status",
       width: "25%",
       render: (_, row) => (
-        <div className="flex gap-2">
+        <div className="flex  justify-end gap-2">
           <select
             value={row.isRead ? "connected" : "notconnected"}
             onChange={() => handleToggleRead(row._id, row.isRead)}

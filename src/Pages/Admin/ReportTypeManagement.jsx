@@ -103,9 +103,9 @@ const ReportTypeManagement = () => {
     {
       key: 'Actions',
       label: 'Action',
-
+  
       render: (_, row) => (
-        <div className="flex gap-2">
+        <div className="flex gap-2 justify-end">
 
           <button
             variant="primary"
