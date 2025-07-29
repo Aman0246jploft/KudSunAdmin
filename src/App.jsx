@@ -37,6 +37,7 @@ import UserInfo from "./Pages/UserInfo/UserInfo";
 import ReportTypeManagement from "./Pages/Admin/ReportTypeManagement";
 import PasswordManagement from "./Pages/Admin/PasswordManagement";
 import DisputeTypeManagement from "./Pages/Admin/DisputeTypeManagement";
+import CancelTypeManagement from "./Pages/Admin/CancelTypeManagement ";
 
 
 
@@ -86,7 +87,7 @@ function App() {
               <Route path="/thread/edit/:id" element={<EditThread />} />
 
 
-              <Route path="/passwordManagement" element={<PasswordManagement/>} />
+              <Route path="/passwordManagement" element={<PasswordManagement />} />
 
 
               <Route path="/thread/:id" element={<ThreadDetail />} />
@@ -108,13 +109,16 @@ function App() {
               <Route path="/chat" element={<Chat />} />
 
               <Route path="/ProfilePage" element={<ProfilePage />} />
-              
+
               <Route path="/report-type-management" element={<ReportTypeManagement />} />
               <Route path="/dispute-type-management" element={<DisputeTypeManagement />} />
 
+              <Route path="/dispute-cancel-management" element={<CancelTypeManagement />} />
 
 
-              
+
+
+
 
               <Route
                 path="/subcategoryParameter/:id"
@@ -128,10 +132,10 @@ function App() {
 
               <Route path="/disputeManagement" element={<DisputeManagement />} />
               <Route path="/admin/transactions" element={<AdminTransactions />} />
-              <Route path="/admin/financial-dashboard" element={<AdminFinancialDashboard/>} />
-              <Route path="/admin/review-management" element={<AdminReviewManagement/>} />
-              <Route path="/seller-verification-requests" element={<SellerVerificationRequests/>} />
-              
+              <Route path="/admin/financial-dashboard" element={<AdminFinancialDashboard />} />
+              <Route path="/admin/review-management" element={<AdminReviewManagement />} />
+              <Route path="/seller-verification-requests" element={<SellerVerificationRequests />} />
+
             </Route>
           </Route>
         </Routes>

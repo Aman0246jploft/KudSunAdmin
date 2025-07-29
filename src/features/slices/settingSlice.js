@@ -345,6 +345,61 @@ export const deleteDisputeType = createAsyncThunk(
 
 
 
+
+
+
+
+// Cancel Type endpoints
+export const getCancelTypes = createAsyncThunk(
+    'settings/getCancelTypes',
+    async ({ pageNo = 1, size = 10 }, { rejectWithValue }) => {
+        try {
+            const response = await authAxiosClient.get(`/cancelType/getList?pageNo=${pageNo}&size=${size}`);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
+
+export const createCancelType = createAsyncThunk(
+    'settings/createCancelType',
+    async (data, { rejectWithValue }) => {
+        try {
+            const response = await authAxiosClient.post('/cancelType/create', data);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
+
+export const updateCancelType = createAsyncThunk(
+    'settings/updateCancelType',
+    async (data, { rejectWithValue }) => {
+        try {
+            const response = await authAxiosClient.post('/cancelType/update', data);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
+
+export const deleteCancelType = createAsyncThunk(
+    'settings/deleteCancelType',
+    async (id, { rejectWithValue }) => {
+        try {
+            const response = await authAxiosClient.post('/cancelType/hardDelete', { id });
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
+
+
+
 const settingSlice = createSlice({
     name: 'setting',
     initialState: {
@@ -366,6 +421,20 @@ const settingSlice = createSlice({
                 state.error = action.payload;
             })
 
+            
+       .addCase(getCancelTypes.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getCancelTypes.fulfilled, (state, action) => {
+                state.loading = false;
+                state.reportTypeinfo = action.payload.data;
+
+            })
+            .addCase(getCancelTypes.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
 
 
             .addCase(getDisputeTypes.pending, (state) => {

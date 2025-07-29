@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { getDashboardCount } from "../../features/slices/userSlice";
 import { useTheme } from "../../contexts/theme/hook/useTheme"; // import theme hook
 import MonthlyDashboardCharts from "./MonthlyDashboardCharts";
+import User from "../User/User";
+import User2 from "../User2/User2";
 
 export default function Dashboard() {
   const dispatch = useDispatch();
@@ -42,9 +44,8 @@ export default function Dashboard() {
             style={{
               backgroundColor: theme.colors.backgroundSecondary,
               color: theme.colors.textPrimary,
-              boxShadow: `0 2px 8px ${
-                theme.colors.shadow || "rgba(0,0,0,0.1)"
-              }`,
+              boxShadow: `0 2px 8px ${theme.colors.shadow || "rgba(0,0,0,0.1)"
+                }`,
             }}
           >
             <div
@@ -62,10 +63,8 @@ export default function Dashboard() {
           </div>
         ))}
       </div>
-
-
-
-      <MonthlyDashboardCharts/>
+      <MonthlyDashboardCharts />
+      <User2 />
     </div>
   );
 }

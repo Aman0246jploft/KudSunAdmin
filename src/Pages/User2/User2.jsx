@@ -27,14 +27,14 @@ import { byUser } from "../../features/slices/settingSlice";
 import { useNavigate } from 'react-router-dom';
 
 
-export default function User() {
+export default function User2() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { theme } = useTheme();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [pagination, setPagination] = useState({ pageNo: 1, size: 10 });
-  const [showSellerRequests, setShowSellerRequests] = useState(false);
+  const [showSellerRequests, setShowSellerRequests] = useState(true);
   const [showReportedRequests, setshowReportedRequests] = useState(false);
   const [showFlageduser, setshowFlageduser] = useState(false);
 
@@ -72,7 +72,7 @@ export default function User() {
     dispatch(
       fetchUserList({
         ...pagination,
-        showSellerRequests,
+        showSellerRequests: true,
         reported: showReportedRequests,
         isFlagedReported: showFlageduser,
         registrationDateStart,
@@ -542,152 +542,9 @@ export default function User() {
             className="font-semibold text-xl"
             style={{ color: theme.colors.textPrimary }}
           >
-            Users List
+            Seller Request  List
           </div>
-          <div className="flex flex-wrap  justify-end items-end gap-3">
-            {/* Keyword Search Input */}
 
-
-            {/* <label className="flex items-center space-x-2 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={showSellerRequests}
-                onChange={(e) => {
-                  setShowSellerRequests(e.target.checked);
-                  setPagination((prev) => ({ ...prev, pageNo: 1 }));
-                }}
-                className="w-4 h-4"
-              />
-              <span className="text-sm font-medium text-gray-700">
-                Seller Request
-              </span>
-            </label>
-
-            <label className="flex items-center space-x-2 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={showReportedRequests}
-                onChange={(e) => {
-                  setshowReportedRequests(e.target.checked);
-                  setPagination((prev) => ({ ...prev, pageNo: 1 }));
-                }}
-                className="w-4 h-4"
-              />
-              <span className="text-sm font-medium text-gray-700">
-                Reported User
-              </span>
-            </label> */}
-
-            <div className="flex items-start  flex-col space-x-2 select-none">
-              <label className="mb-1 px-3 text-sm font-medium text-gray-700 select-none">
-                Filter:
-              </label>
-              <select
-                value={
-                  showSellerRequests
-                    ? "seller"
-                    : showReportedRequests
-                      ? "reported"
-                      : showFlageduser
-                        ? "isFlagedReported"
-                        : "none"
-                }
-                onChange={(e) => {
-                  const value = e.target.value;
-
-                  setShowSellerRequests(value === "seller");
-                  setshowReportedRequests(value === "reported");
-                  setshowFlageduser(value === "isFlagedReported");
-                  setPagination((prev) => ({ ...prev, pageNo: 1 }));
-                }}
-                className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                style={{ minWidth: "140px" }}
-              >
-
-                <option value="none">All</option>
-                <option value="seller">Seller Requests</option>
-                <option value="reported">Reported Users</option>
-                <option value="isFlagedReported">Flaged Users</option>
-
-              </select>
-            </div>
-
-
-            <div className="flex flex-col">
-              <label className="mb-1 text-sm font-medium text-gray-700 select-none">
-                User Status:
-              </label>
-              <select
-                value={userStatusFilter}
-                onChange={(e) => {
-                  setUserStatusFilter(e.target.value);
-                  setPagination((prev) => ({ ...prev, pageNo: 1 })); // Reset to page 1
-                }}
-                className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                style={{ minWidth: "140px" }}
-              >
-                <option value="">All</option>
-                <option value="enabled">Enabled Users</option>
-                <option value="disabled">Disabled Users</option>
-              </select>
-            </div>
-
-            <div className="flex flex-col">
-              <label
-                htmlFor="reg-start"
-                className="mb-1 text-sm font-medium text-gray-700 select-none"
-              >
-                Registration Start:
-              </label>
-              <input
-                id="reg-start"
-                type="date"
-                value={registrationDateStart}
-                onChange={(e) => setRegistrationDateStart(e.target.value)}
-                className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                style={{ minWidth: "140px" }}
-              />
-            </div>
-
-            <div className="flex flex-col">
-              <label
-                htmlFor="reg-end"
-                className="mb-1 text-sm font-medium text-gray-700 select-none"
-              >
-                Registration End:
-              </label>
-              <input
-                id="reg-end"
-                type="date"
-                value={registrationDateEnd}
-                onChange={(e) => setRegistrationDateEnd(e.target.value)}
-                className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                style={{ minWidth: "140px" }}
-              />
-            </div>
-
-
-            <div className="flex flex-col">
-              <label
-                htmlFor="keyword-search"
-                className="mb-1 text-sm font-medium text-gray-700 select-none"
-              >
-                Search:
-              </label>
-              <input
-                id="keyword-search"
-                type="text"
-                value={keyWord}
-                onChange={(e) => {
-                  setKeyword(e.target.value);
-                  setPagination((prev) => ({ ...prev, pageNo: 1 })); // Reset to page 1 on search
-                }}
-                placeholder="Search users..."
-                className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                style={{ minWidth: "160px" }}
-              />
-            </div>
-          </div>
         </div>
 
         <div className="relative" style={{ minHeight: `${minTableHeight}px` }}>

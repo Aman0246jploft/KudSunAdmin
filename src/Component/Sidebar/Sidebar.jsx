@@ -91,6 +91,11 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
           icon: AiOutlineSetting
         },
         {
+          name: 'Cancel Types',
+          href: '/dispute-cancel-management',
+          icon: AiOutlineSetting
+        },
+        {
           name: "Update Password",
           href: "/passwordManagement",
           icon: AiOutlineSetting
