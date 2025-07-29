@@ -869,30 +869,32 @@ const AdminTransactions = () => {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 sm:gap-0">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Financial Management</h1>
-          <p className="text-gray-600 mt-1">Manage transactions, payouts, and withdrawal requests</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Financial Management</h1>
+          <p className="text-gray-600 mt-1 text-sm sm:text-base">Manage transactions, payouts, and withdrawal requests</p>
         </div>
-        <div className="flex space-x-3">
+        <div className="flex flex-wrap justify-start sm:justify-end gap-2">
           <Button
             variant="primary"
             onClick={() => window.location.href = '/admin/financial-dashboard'}
-            className="flex items-center space-x-2"
+            className="flex items-center gap-2"
           >
             <FaChartLine className="w-4 h-4" />
-            <span>Financial Analytics</span>
+            <span className="text-sm sm:text-base">Financial Analytics</span>
           </Button>
+          {/* Uncomment if needed */}
           {/* <Button
-            variant="outline"
-            onClick={() => activeTab === 'transactions' ? setShowFilters(!showFilters) : setShowWithdrawalFilters(!showWithdrawalFilters)}
-            className="flex items-center space-x-2"
-          >
-            <FaFilter className="w-4 h-4" />
-            <span>Filters</span>
-          </Button> */}
+      variant="outline"
+      onClick={() => activeTab === 'transactions' ? setShowFilters(!showFilters) : setShowWithdrawalFilters(!showWithdrawalFilters)}
+      className="flex items-center gap-2"
+    >
+      <FaFilter className="w-4 h-4" />
+      <span className="text-sm sm:text-base">Filters</span>
+    </Button> */}
         </div>
       </div>
+
 
       {/* Tab Navigation */}
       <div className="bg-white rounded-lg shadow-sm border">
@@ -900,8 +902,8 @@ const AdminTransactions = () => {
           <button
             onClick={() => setActiveTab('transactions')}
             className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'transactions'
-                ? 'border-blue-500 text-blue-600 bg-blue-50'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+              ? 'border-blue-500 text-blue-600 bg-blue-50'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
               }`}
           >
             <div className="flex items-center space-x-2">
@@ -915,8 +917,8 @@ const AdminTransactions = () => {
           <button
             onClick={() => setActiveTab('withdrawals')}
             className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'withdrawals'
-                ? 'border-blue-500 text-blue-600 bg-blue-50'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+              ? 'border-blue-500 text-blue-600 bg-blue-50'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
               }`}
           >
             <div className="flex items-center space-x-2">
@@ -1979,8 +1981,8 @@ const AdminTransactions = () => {
 
                 {/* Action Warning */}
                 <div className={`p-3 rounded-lg ${withdrawalActionModal.action === 'Approved'
-                    ? 'bg-green-50 border border-green-200'
-                    : 'bg-red-50 border border-red-200'
+                  ? 'bg-green-50 border border-green-200'
+                  : 'bg-red-50 border border-red-200'
                   }`}>
                   <div className={`flex items-center space-x-2 ${withdrawalActionModal.action === 'Approved' ? 'text-green-800' : 'text-red-800'
                     }`}>

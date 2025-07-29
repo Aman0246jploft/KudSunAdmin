@@ -136,7 +136,7 @@ export default function AuctionProduct() {
         },
         {
           label: "No",
-          onClick: () => {},
+          onClick: () => { },
         },
       ],
     });
@@ -171,7 +171,7 @@ export default function AuctionProduct() {
       },
     },
 
-  {
+    {
       key: "CurrentBid",
       label: "Current Bid",
       width: "10%",
@@ -179,14 +179,14 @@ export default function AuctionProduct() {
         return `${row?.highestBidAmount}`;
       },
     },
-    
+
     {
       key: "status",
       label: "Status",
       width: "25%",
       render: (_, row) => (
         <div className="flex md:justify-start justify-end gap-2">
-            <select
+          <select
             value={row.isDisable ? "disabled" : "enabled"}
             onChange={() => handleToggleStatus(row)}
             className="border rounded px-2 py-1 text-sm focus:outline-none "
@@ -241,34 +241,35 @@ export default function AuctionProduct() {
   const fixedRows = pagination.size;
   const minTableHeight = headerHeight + rowHeight * fixedRows;
 
- return (
-  <div style={{ backgroundColor: theme.colors.background }}>
-    <div
-      className="rounded-lg shadow-sm border overflow-hidden"
-      style={{
-        borderColor: theme.colors.border,
-        backgroundColor: theme.colors.backgroundSecondary,
-        color: theme.colors.textPrimary,
-      }}
-    >
+  return (
+    <div style={{ backgroundColor: theme.colors.background }}>
       <div
-        className="flex flex-col sm:flex-row sm:justify-between sm:items-center px-2 py-2 gap-3"
-        style={{ borderBottom: `1px solid ${theme.colors.borderLight}` }}
+        className="rounded-lg shadow-sm border overflow-hidden"
+        style={{
+          borderColor: theme.colors.border,
+          backgroundColor: theme.colors.backgroundSecondary,
+          color: theme.colors.textPrimary,
+        }}
       >
         <div
-          className="font-semibold text-xl"
-          style={{ color: theme.colors.textPrimary }}
+          className="flex flex-col lg:flex-row md:justify-between gap-4 px-3 py-3 border-b"
+          style={{ borderColor: theme.colors.borderLight }}
         >
-          Auction List
-        </div>
+          {/* Title */}
+          <div
+            className="font-semibold whitespace-nowrap text-xl lg:text-2xl"
+            style={{ color: theme.colors.textPrimary }}
+          >
+            Auction List
+          </div>
 
-        <div className="flex flex-col sm:flex-row justify-center items-stretch sm:items-center gap-3">
-          <div className="flex flex-col sm:flex-row gap-2">
+          {/* Filters */}
+          <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3">
             {/* Shipping Type Dropdown */}
             <select
               value={shippingType}
               onChange={(e) => setShippingType(e.target.value)}
-              className="border outline-none rounded px-2 py-1 text-sm w-full sm:w-auto"
+              className="border outline-none rounded px-3 py-2 text-sm w-full sm:w-auto min-w-[120px] focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               {shippingOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -291,7 +292,7 @@ export default function AuctionProduct() {
                 }));
                 setPagination((prev) => ({ ...prev, pageNo: 1 }));
               }}
-              className="px-3 py-2 border rounded-md w-full sm:w-auto"
+              className="px-3 py-2 border rounded-md w-full sm:w-auto min-w-[140px] focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">All Categories</option>
               {categoryList &&
@@ -315,7 +316,7 @@ export default function AuctionProduct() {
                 }));
                 setPagination((prev) => ({ ...prev, pageNo: 1 }));
               }}
-              className="px-3 py-2 border rounded-md w-full sm:w-auto"
+              className="px-3 py-2 border rounded-md w-full sm:w-auto min-w-[150px] focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
               disabled={!selectedCategory}
             >
               <option value="">All Subcategories</option>
@@ -325,105 +326,105 @@ export default function AuctionProduct() {
                 </option>
               ))}
             </select>
-          </div>
 
-          {/* Search Input */}
-          <input
-            className="p-1 outline-none border w-full sm:w-auto min-w-0 sm:min-w-[200px]"
-            type="text"
-            placeholder="Search product"
-            value={filters.keyWord}
-            onChange={(e) => {
-              setFilters({ ...filters, keyWord: e.target.value });
-              setPagination((prev) => ({ ...prev, pageNo: 1 }));
+            {/* Search Input */}
+            <input
+              className="px-3 py-2 outline-none border rounded-md w-full sm:w-auto min-w-[220px] lg:min-w-[250px] focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              type="text"
+              placeholder="Search product"
+              value={filters.keyWord}
+              onChange={(e) => {
+                setFilters({ ...filters, keyWord: e.target.value });
+                setPagination((prev) => ({ ...prev, pageNo: 1 }));
+              }}
+            />
+          </div>
+        </div>
+
+
+        <div className="relative overflow-x-auto" style={{ minHeight: `${minTableHeight}px` }}>
+          {loading ? (
+            <div
+              className="absolute inset-0 flex items-center justify-center"
+              style={{ backgroundColor: theme.colors.backgroundSecondary }}
+            >
+              <div className="text-center">
+                <div
+                  className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto"
+                  style={{ borderColor: theme.colors.primary }}
+                ></div>
+                <p
+                  className="mt-2"
+                  style={{ color: theme.colors.textSecondary }}
+                >
+                  Loading products...
+                </p>
+              </div>
+            </div>
+          ) : error ? (
+            <div
+              className="absolute inset-0 flex items-center justify-center"
+              style={{ backgroundColor: theme.colors.backgroundSecondary }}
+            >
+              <div
+                className="text-center font-semibold px-4"
+                style={{ color: theme.colors.error }}
+              >
+                Error: {error}
+              </div>
+            </div>
+          ) : (
+            <div className="px-1 pt-1">
+              <DataTable columns={columns} data={products} />
+            </div>
+          )}
+        </div>
+
+        <div
+          className="py-2 px-2 border-t overflow-x-auto"
+          style={{ borderColor: theme.colors.borderLight }}
+        >
+          <div className="flex justify-end min-w-max">
+            <Pagination
+              pageNo={pagination.pageNo}
+              size={pagination.size}
+              total={total}
+              onChange={handlePageChange}
+              theme={theme}
+            />
+          </div>
+        </div>
+      </div>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditMode(false);
+          setSelectedProduct(null);
+        }}
+      >
+        {editMode ? (
+          <EditProductForm
+            closeForm={() => {
+              setIsModalOpen(false);
+              setEditMode(false);
+              setSelectedProduct(null);
+            }}
+            editMode={true}
+            productData={selectedProduct}
+            onProductUpdate={() => dispatch(productListAuction(pagination))}
+          />
+        ) : (
+          <AddProductForm
+            closeForm={() => {
+              setIsModalOpen(false);
+              setEditMode(false);
+              setSelectedProduct(null);
             }}
           />
-        </div>
-      </div>
-
-      <div className="relative overflow-x-auto" style={{ minHeight: `${minTableHeight}px` }}>
-        {loading ? (
-          <div
-            className="absolute inset-0 flex items-center justify-center"
-            style={{ backgroundColor: theme.colors.backgroundSecondary }}
-          >
-            <div className="text-center">
-              <div
-                className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto"
-                style={{ borderColor: theme.colors.primary }}
-              ></div>
-              <p
-                className="mt-2"
-                style={{ color: theme.colors.textSecondary }}
-              >
-                Loading products...
-              </p>
-            </div>
-          </div>
-        ) : error ? (
-          <div
-            className="absolute inset-0 flex items-center justify-center"
-            style={{ backgroundColor: theme.colors.backgroundSecondary }}
-          >
-            <div
-              className="text-center font-semibold px-4"
-              style={{ color: theme.colors.error }}
-            >
-              Error: {error}
-            </div>
-          </div>
-        ) : (
-          <div className="px-1 pt-1">
-            <DataTable columns={columns} data={products} />
-          </div>
         )}
-      </div>
-
-      <div
-        className="py-2 px-2 border-t overflow-x-auto"
-        style={{ borderColor: theme.colors.borderLight }}
-      >
-        <div className="flex justify-end min-w-max">
-          <Pagination
-            pageNo={pagination.pageNo}
-            size={pagination.size}
-            total={total}
-            onChange={handlePageChange}
-            theme={theme}
-          />
-        </div>
-      </div>
+      </Modal>
     </div>
-
-    <Modal
-      isOpen={isModalOpen}
-      onClose={() => {
-        setIsModalOpen(false);
-        setEditMode(false);
-        setSelectedProduct(null);
-      }}
-    >
-      {editMode ? (
-        <EditProductForm
-          closeForm={() => {
-            setIsModalOpen(false);
-            setEditMode(false);
-            setSelectedProduct(null);
-          }}
-          editMode={true}
-          productData={selectedProduct}
-          onProductUpdate={() => dispatch(productListAuction(pagination))}
-        />
-      ) : (
-        <AddProductForm
-          closeForm={() => {
-            setIsModalOpen(false);
-            setEditMode(false);
-            setSelectedProduct(null);
-          }}
-        />
-      )}
-    </Modal>
-  </div>
-);
+  );
 }

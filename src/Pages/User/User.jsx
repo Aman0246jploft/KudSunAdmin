@@ -36,6 +36,8 @@ export default function User() {
   const [pagination, setPagination] = useState({ pageNo: 1, size: 10 });
   const [showSellerRequests, setShowSellerRequests] = useState(false);
   const [showReportedRequests, setshowReportedRequests] = useState(false);
+  const [showFlageduser, setshowFlageduser] = useState(false);
+
   const { userList, loading, error } = useSelector((state) => state.user || {});
   const [newPassword, setNewPassword] = useState("");
   const { users = [], total = 0 } = userList || {};
@@ -72,6 +74,7 @@ export default function User() {
         ...pagination,
         showSellerRequests,
         reported: showReportedRequests,
+        isFlagedReported: showFlageduser,
         registrationDateStart,
         registrationDateEnd,
         sortBy,
@@ -98,6 +101,7 @@ export default function User() {
     sortBy,
     showReportedRequests,
     sortOrder,
+    showFlageduser,
     keyWord, // Add keyword to dependency array
   ]);
 
@@ -537,7 +541,7 @@ export default function User() {
             {/* Keyword Search Input */}
 
 
-            <label className="flex items-center space-x-2 cursor-pointer select-none">
+            {/* <label className="flex items-center space-x-2 cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={showSellerRequests}
@@ -565,7 +569,38 @@ export default function User() {
               <span className="text-sm font-medium text-gray-700">
                 Reported User
               </span>
+            </label> */}
+
+            <label className="flex items-center space-x-2 select-none">
+              <select
+                value={
+                  showSellerRequests
+                    ? "seller"
+                    : showReportedRequests
+                      ? "reported"
+                      : showFlageduser
+                        ? "isFlagedReported"
+                        : "none"
+                }
+                onChange={(e) => {
+                  const value = e.target.value;
+
+                  setShowSellerRequests(value === "seller");
+                  setshowReportedRequests(value === "reported");
+                  setshowFlageduser(value === "isFlagedReported");
+                  setPagination((prev) => ({ ...prev, pageNo: 1 }));
+                }}
+                className="text-sm border rounded px-2 py-1"
+              >
+
+                <option value="none">Filter</option>
+                <option value="seller">Seller Requests</option>
+                <option value="reported">Reported Users</option>
+                <option value="isFlagedReported">Flaged Users</option>
+
+              </select>
             </label>
+
 
             <div className="flex flex-col">
               <label className="mb-1 text-sm font-medium text-gray-700 select-none">

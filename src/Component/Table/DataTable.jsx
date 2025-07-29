@@ -57,9 +57,9 @@ const DataTable = ({ columns, data = [], sortBy, sortOrder, onSort }) => {
   };
 
   return (
-    <>
+    <div>
       {/* Desktop/Tablet Table View */}
-      <div className="hidden sm:block overflow-x-auto w-full">
+      <div className="hidden sm:block overflow-x-auto ">
         <table
           className="min-w-full text-sm text-left table-fixed border"
           style={{ borderColor: theme.colors.border }}
@@ -259,7 +259,7 @@ const DataTable = ({ columns, data = [], sortBy, sortOrder, onSort }) => {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 
