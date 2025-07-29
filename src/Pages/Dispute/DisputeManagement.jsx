@@ -91,7 +91,7 @@ const DisputeManagement = () => {
       status: item?.status || '-',
       created: item?.createdAt ? new Date(item.createdAt).toLocaleDateString() : '-',
       // statusBadge: item?.status || '-',
-      all:item
+      all: item
     };
   });
 
@@ -141,24 +141,24 @@ const DisputeManagement = () => {
       label: 'Created',
       width: "15%",
     },
- {
-  key: 'Action',
-  label: 'Action',
-  width: "15%",
-  render: (value, row, rowIndex) => {
-    return (
-      <div className="flex gap-2">
-        <button
-          onClick={() => handleViewDispute(row?.all)}
-          className="p-1 rounded hover:bg-gray-200"
-          title="View Dispute"
-        >
-          <FaEye size={18} />
-        </button>
-      </div>
-    );
-  },
-},
+    {
+      key: 'Action',
+      label: 'Action',
+      width: "15%",
+      render: (value, row, rowIndex) => {
+        return (
+          <div className="flex md:justify-start justify-end gap-2">
+            <button
+              onClick={() => handleViewDispute(row?.all)}
+              className="p-1 rounded hover:bg-gray-200"
+              title="View Dispute"
+            >
+              <FaEye size={18} />
+            </button>
+          </div>
+        );
+      },
+    },
 
   ];
 
@@ -170,12 +170,12 @@ const DisputeManagement = () => {
         <h1 className="text-2xl font-bold mb-4">Dispute Management</h1>
 
         {/* Filters */}
-        <div className="flex gap-4 mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
           <select
             name="status"
             value={filters.status}
             onChange={handleFilterChange}
-            className="border rounded px-3 py-2"
+            className="border rounded px-3 py-2 w-full sm:w-auto"
           >
             <option value="">All Status</option>
             <option value="PENDING">Pending</option>
@@ -183,31 +183,21 @@ const DisputeManagement = () => {
             <option value="RESOLVED">Resolved</option>
           </select>
 
-          {/* <select
-            name="disputeType"
-            value={filters.disputeType}
-            onChange={handleFilterChange}
-            className="border rounded px-3 py-2"
-          >
-            <option value="">All Types</option>
-            <option value="ITEM_NOT_RECEIVED">Item Not Received</option>
-            <option value="PRODUCT_QUALITY">Product Quality</option>
-            <option value="SHIPPING">Shipping</option>
-            <option value="OTHER">Other</option>
-          </select> */}
-
-          <form onSubmit={handleSearch} className="flex gap-2">
+          <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <input
               type="text"
               name="q"
               value={filters.q}
               onChange={handleFilterChange}
               placeholder="Search disputes..."
-              className="border rounded px-3 py-2"
+              className="border rounded px-3 py-2 w-full sm:w-auto"
             />
-            <Button type="submit" variant="secondary">Search</Button>
+            <Button type="submit" variant="secondary" className="w-full sm:w-auto">
+              Search
+            </Button>
           </form>
         </div>
+
       </div>
 
       {loading ? (

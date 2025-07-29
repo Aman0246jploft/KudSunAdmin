@@ -36,6 +36,7 @@ import AdminReviewManagement from "./Pages/Admin/AdminReviewManagement";
 import UserInfo from "./Pages/UserInfo/UserInfo";
 import ReportTypeManagement from "./Pages/Admin/ReportTypeManagement";
 import PasswordManagement from "./Pages/Admin/PasswordManagement";
+import DisputeTypeManagement from "./Pages/Admin/DisputeTypeManagement";
 
 
 
@@ -107,7 +108,9 @@ function App() {
               <Route path="/chat" element={<Chat />} />
 
               <Route path="/ProfilePage" element={<ProfilePage />} />
+              
               <Route path="/report-type-management" element={<ReportTypeManagement />} />
+              <Route path="/dispute-type-management" element={<DisputeTypeManagement />} />
 
 
 

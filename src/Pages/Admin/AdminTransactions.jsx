@@ -607,7 +607,7 @@ const AdminTransactions = () => {
       label: 'Status',
       width: "12%",
       render: (_, row) => (
-        <div className="flex flex-col space-y-1">
+        <div className="flex flex-col md:justify-start justify-end space-y-1">
           <span className={`text-xs px-2 py-1 rounded-full ${row?.status === 'completed' ? 'bg-green-100 text-green-800' :
             row?.status === 'delivered' ? 'bg-blue-100 text-blue-800' :
               row?.status === 'shipped' ? 'bg-yellow-100 text-yellow-800' :
@@ -632,7 +632,7 @@ const AdminTransactions = () => {
       label: 'Actions',
       width: "18%",
       render: (_, transaction) => (
-        <div className="flex space-x-1 flex-wrap">
+        <div className="flex space-x-1 md:justify-start justify-end flex-wrap">
           <Button
             variant="outline"
             size="sm"
@@ -744,7 +744,7 @@ const AdminTransactions = () => {
 
         if (isPromptPay) {
           return (
-            <div className="flex flex-col">
+            <div className="flex flex-col md:justify-start justify-end">
               <span className="font-medium text-sm text-blue-600 flex items-center">
                 <span className="mr-1">{getPromptPayIdType(method.PromptPay).icon}</span>
                 {getPromptPayIdType(method.PromptPay).type}
@@ -756,7 +756,7 @@ const AdminTransactions = () => {
           );
         } else if (isBank) {
           return (
-            <div className="flex flex-col">
+            <div className="flex flex-col md:justify-start justify-end">
               <span className="font-medium text-sm text-green-600 flex items-center">
                 <span className="mr-1">🏦</span>
                 {method.bankName || 'Bank Transfer'}
@@ -800,7 +800,7 @@ const AdminTransactions = () => {
       label: 'Actions',
       width: "18%",
       render: (_, request) => (
-        <div className="flex space-x-1 flex-wrap">
+        <div className="flex space-x-1 md:justify-start justify-end flex-wrap">
           <Button
             variant="outline"
             size="sm"

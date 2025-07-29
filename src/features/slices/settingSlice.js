@@ -293,6 +293,57 @@ export const deleteReportType = createAsyncThunk(
 
 
 
+// Dispute Type endpoints
+export const getDisputeTypes = createAsyncThunk(
+    'settings/getDisputeTypes',
+    async ({ pageNo = 1, size = 10 }, { rejectWithValue }) => {
+        try {
+            const response = await authAxiosClient.get(`/disputeType/getList?pageNo=${pageNo}&size=${size}`);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
+
+export const createDisputeType = createAsyncThunk(
+    'settings/createDisputeType',
+    async (data, { rejectWithValue }) => {
+        try {
+            const response = await authAxiosClient.post('/disputeType/create', data);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
+
+export const updateDisputeType = createAsyncThunk(
+    'settings/updateDisputeType',
+    async (data, { rejectWithValue }) => {
+        try {
+            const response = await authAxiosClient.post('/disputeType/update', data);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
+
+export const deleteDisputeType = createAsyncThunk(
+    'settings/deleteDisputeType',
+    async (id, { rejectWithValue }) => {
+        try {
+            const response = await authAxiosClient.post('/disputeType/hardDelete', { id });
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
+
+
+
 
 const settingSlice = createSlice({
     name: 'setting',
@@ -314,6 +365,24 @@ const settingSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
+
+
+
+            .addCase(getDisputeTypes.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getDisputeTypes.fulfilled, (state, action) => {
+                state.loading = false;
+                state.reportTypeinfo = action.payload.data;
+
+            })
+            .addCase(getDisputeTypes.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
+
             .addCase(termAndPolicy.pending, (state) => {
                 state.loading = true;
                 state.error = null;

@@ -209,7 +209,7 @@ export default function Thread() {
       label: "Status",
       width: "25%",
       render: (_, row) => (
-        <div className="flex gap-2">
+        <div className="flex md:justify-start justify-end gap-2">
           <select
             value={row?.isDisable ? "disabled" : "enabled"}
             onChange={() => handleToggleStatus(row._id)}
@@ -229,7 +229,7 @@ export default function Thread() {
       label: "Actions",
       width: "10%",
       render: (_, row) => (
-        <div className="flex gap-2">
+        <div className="flex gap-2 md:justify-start justify-end">
           <button
             onClick={() => navigate(`/thread/${row._id}`)}
             className="p-1 rounded hover:bg-gray-200"
@@ -272,76 +272,80 @@ export default function Thread() {
         }}
       >
         <div
-          className="flex justify-between items-center px-2 py-2"
+          className="flex flex-col lg:flex-row lg:justify-between lg:items-center px-2 py-2 gap-4 lg:gap-0"
           style={{ borderBottom: `1px solid ${theme.colors.borderLight}` }}
         >
           <div
-            className="font-semibold text-xl"
+            className="font-semibold text-xl text-center lg:text-left"
             style={{ color: theme.colors.textPrimary }}
           >
             Thread List
           </div>
 
-          <div className="flex justify-center items-center gap-3">
-            <div className="flex gap-2">
-              <input
-                type="number"
-                min="0"
-                placeholder="Min Budget"
-                value={filters.minBudget}
-                onChange={(e) => handleFilterChange("minBudget", e.target.value)}
-                className="px-2 py-1 border rounded w-24"
-              />
-              <span className="mx-1">-</span>
-              <input
-                type="number"
-                min="0"
-                placeholder="Max Budget"
-                value={filters.maxBudget}
-                onChange={(e) => handleFilterChange("maxBudget", e.target.value)}
-                className="px-2 py-1 border rounded w-24"
-              />
+          <div className="flex flex-col lg:flex-row lg:justify-center lg:items-center gap-3">
+            <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
+              <div className="flex gap-2 items-center">
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="Min Budget"
+                  value={filters.minBudget}
+                  onChange={(e) => handleFilterChange("minBudget", e.target.value)}
+                  className="px-2 py-1 border rounded w-20 sm:w-24 text-sm"
+                />
+                <span className="mx-1">-</span>
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="Max Budget"
+                  value={filters.maxBudget}
+                  onChange={(e) => handleFilterChange("maxBudget", e.target.value)}
+                  className="px-2 py-1 border rounded w-20 sm:w-24 text-sm"
+                />
+              </div>
 
-              <select
-                value={selectedCategory}
-                onChange={(e) => {
-                  const categoryId = e.target.value;
-                  setSelectedCategory(categoryId);
-                  setSelectedSubCategory("");
-                  handleFilterChange("categoryId", categoryId);
-                  handleFilterChange("subCategoryId", "");
-                }}
-                className="px-3 py-2 border rounded-md"
-              >
-                <option value="">All Categories</option>
-                {categoryList?.data?.map((cat) => (
-                  <option key={cat._id} value={cat._id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => {
+                    const categoryId = e.target.value;
+                    setSelectedCategory(categoryId);
+                    setSelectedSubCategory("");
+                    handleFilterChange("categoryId", categoryId);
+                    handleFilterChange("subCategoryId", "");
+                  }}
+                  className="px-3 py-2 border rounded-md text-sm w-full sm:w-auto min-w-0"
+                >
+                  <option value="">All Categories</option>
+                  {categoryList?.data?.map((cat) => (
+                    <option key={cat._id} value={cat._id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
 
-              <select
-                value={selectedSubCategory}
-                onChange={(e) => {
-                  const subCategoryId = e.target.value;
-                  setSelectedSubCategory(subCategoryId);
-                  handleFilterChange("subCategoryId", subCategoryId);
-                }}
-                className="px-3 py-2 border rounded-md"
-                disabled={!selectedCategory}
-              >
-                <option value="">All Subcategories</option>
-                {subCategories?.map((sub) => (
-                  <option key={sub._id} value={sub._id}>
-                    {sub.name}
-                  </option>
-                ))}
-              </select>
+                <select
+                  value={selectedSubCategory}
+                  onChange={(e) => {
+                    const subCategoryId = e.target.value;
+                    setSelectedSubCategory(subCategoryId);
+                    handleFilterChange("subCategoryId", subCategoryId);
+                  }}
+                  className="px-3 py-2 border rounded-md text-sm w-full sm:w-auto min-w-0"
+                  disabled={!selectedCategory}
+                >
+                  <option value="">All Subcategories</option>
+                  {subCategories?.map((sub) => (
+                    <option key={sub._id} value={sub._id}>
+                      {sub.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             <input
-              className="p-1 outline-none border"
+              className="p-2 outline-none border rounded text-sm w-full sm:w-auto min-w-0"
               type="text"
               placeholder="Search thread"
               value={filters.keyWord}

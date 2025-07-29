@@ -196,7 +196,7 @@ export default function SellProduct() {
       label: "Status",
       width: "25%",
       render: (_, row) => (
-        <div className="flex gap-2">
+        <div className="flex gap-2 md:justify-start justify-end">
           <select
             value={row.isDisable ? "disabled" : "enabled"}
             onChange={() => handleToggleStatus(row)}
@@ -216,7 +216,7 @@ export default function SellProduct() {
       label: "Actions",
       width: "10%",
       render: (_, row) => (
-        <div className="flex gap-2">
+        <div className="flex gap-2 md:justify-start justify-end">
           <button
             onClick={() => navigate(`/productInfo/${row?._id}`)}
             className="p-1 rounded hover:bg-gray-200"
@@ -264,19 +264,22 @@ export default function SellProduct() {
           color: theme.colors.textPrimary,
         }}
       >
+<div
+        className="flex flex-col lg:flex-row lg:justify-between lg:items-center px-2 py-2 gap-4"
+        style={{ borderBottom: `1px solid ${theme.colors.borderLight}` }}
+      >
         <div
-          className="flex justify-between items-center px-2 py-2"
-          style={{ borderBottom: `1px solid ${theme.colors.borderLight}` }}
+          className="font-semibold text-xl text-center lg:text-left"
+          style={{ color: theme.colors.textPrimary }}
         >
-          <div
-            className="font-semibold text-xl"
-            style={{ color: theme.colors.textPrimary }}
-          >
-            Product List
-          </div>
-          <div className=" flex justify-center items-center gap-3">
-            <div className=" flex gap-2">
-              {/* Price Range Inputs */}
+          Product List
+        </div>
+        
+        <div className="flex flex-col sm:flex-row justify-center items-stretch sm:items-center gap-3">
+          {/* Price Range and Shipping Row */}
+          <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
+            {/* Price Range Inputs */}
+            <div className="flex gap-2 items-center">
               <input
                 type="number"
                 min="0"
@@ -286,9 +289,9 @@ export default function SellProduct() {
                   setFilters((prev) => ({ ...prev, minPrice: e.target.value }));
                   setPagination((prev) => ({ ...prev, pageNo: 1 }));
                 }}
-                className="px-2 py-1 border rounded w-24"
+                className="px-2 py-1 border rounded w-20 sm:w-24 text-sm"
               />
-              <span className="mx-1">-</span>
+              <span className="mx-1 text-sm">-</span>
               <input
                 type="number"
                 min="0"
@@ -298,93 +301,101 @@ export default function SellProduct() {
                   setFilters((prev) => ({ ...prev, maxPrice: e.target.value }));
                   setPagination((prev) => ({ ...prev, pageNo: 1 }));
                 }}
-                className="px-2 py-1 border rounded w-24"
+                className="px-2 py-1 border rounded w-20 sm:w-24 text-sm"
               />
-
-              <select
-                value={shippingType}
-                onChange={(e) => setShippingType(e.target.value)}
-                className="border outline-none rounded px-2 py-1 text-sm"
-              >
-                {shippingOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-
-              {/* Category Dropdown */}
-              <select
-                value={selectedCategory}
-                onChange={(e) => {
-                  const categoryId = e.target.value;
-                  setSelectedCategory(categoryId);
-                  setSelectedSubCategory("");
-                  setFilters((prev) => ({
-                    ...prev,
-                    categoryId,
-                    subCategoryId: "",
-                  }));
-                  setPagination((prev) => ({ ...prev, pageNo: 1 }));
-                }}
-                className="px-3 py-2 border rounded-md"
-              >
-                <option value="">All Categories</option>
-                {categoryList &&
-                  Array.isArray(categoryList?.data) &&
-                  categoryList?.data?.map((cat) => (
-                    <option key={cat._id} value={cat._id}>
-                      {cat.name}
-                    </option>
-                  ))}
-              </select>
-
-              {/* Subcategory Dropdown */}
-              <select
-                value={selectedSubCategory}
-                onChange={(e) => {
-                  const subCategoryId = e.target.value;
-                  setSelectedSubCategory(subCategoryId);
-                  setFilters((prev) => ({
-                    ...prev,
-                    subCategoryId,
-                  }));
-                  setPagination((prev) => ({ ...prev, pageNo: 1 }));
-                }}
-                className="px-3 py-2 border rounded-md"
-                disabled={!selectedCategory}
-              >
-                <option value="">All Subcategories</option>
-                {subCategories?.map((sub) => (
-                  <option key={sub._id} value={sub._id}>
-                    {sub.name}
-                  </option>
-                ))}
-              </select>
             </div>
 
-            <input
-              className="p-1 outline-none border"
-              type="text"
-              placeholder="Search product"
-              value={filters.keyWord}
-              onChange={(e) => {
-                setFilters({ ...filters, keyWord: e.target.value });
-                setPagination((prev) => ({ ...prev, pageNo: 1 }));
-              }}
-            />
+            {/* Shipping Type */}
+            <select
+              value={shippingType}
+              onChange={(e) => setShippingType(e.target.value)}
+              className="border outline-none rounded px-2 py-1 text-sm min-w-0 flex-shrink"
+            >
+              {shippingOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </div>
 
-          {/* <Button
-            onClick={() => setIsModalOpen(true)}
-            style={{
-              backgroundColor: theme.colors.buttonPrimary,
-              color: theme.colors.buttonText,
+          {/* Categories Row */}
+          <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
+            {/* Category Dropdown */}
+            <select
+              value={selectedCategory}
+              onChange={(e) => {
+                const categoryId = e.target.value;
+                setSelectedCategory(categoryId);
+                setSelectedSubCategory("");
+                setFilters((prev) => ({
+                  ...prev,
+                  categoryId,
+                  subCategoryId: "",
+                }));
+                setPagination((prev) => ({ ...prev, pageNo: 1 }));
+              }}
+              className="px-2 sm:px-3 py-2 border rounded-md text-sm min-w-0 flex-shrink"
+            >
+              <option value="">All Categories</option>
+              {categoryList &&
+                Array.isArray(categoryList?.data) &&
+                categoryList?.data?.map((cat) => (
+                  <option key={cat._id} value={cat._id}>
+                    {cat.name}
+                  </option>
+                ))}
+            </select>
+
+            {/* Subcategory Dropdown */}
+            <select
+              value={selectedSubCategory}
+              onChange={(e) => {
+                const subCategoryId = e.target.value;
+                setSelectedSubCategory(subCategoryId);
+                setFilters((prev) => ({
+                  ...prev,
+                  subCategoryId,
+                }));
+                setPagination((prev) => ({ ...prev, pageNo: 1 }));
+              }}
+              className="px-2 sm:px-3 py-2 border rounded-md text-sm min-w-0 flex-shrink"
+              disabled={!selectedCategory}
+            >
+              <option value="">All Subcategories</option>
+              {subCategories?.map((sub) => (
+                <option key={sub._id} value={sub._id}>
+                  {sub.name}
+                </option>
+                ))}
+            </select>
+          </div>
+
+          {/* Search Input */}
+          <input
+            className="p-2 outline-none border rounded text-sm w-full sm:w-auto min-w-0"
+            type="text"
+            placeholder="Search product"
+            value={filters.keyWord}
+            onChange={(e) => {
+              setFilters({ ...filters, keyWord: e.target.value });
+              setPagination((prev) => ({ ...prev, pageNo: 1 }));
             }}
-          >
-            Add Product
-          </Button> */}
+          />
         </div>
+
+        {/* Uncomment and make responsive if needed
+        <Button
+          onClick={() => setIsModalOpen(true)}
+          className="w-full sm:w-auto mt-2 lg:mt-0"
+          style={{
+            backgroundColor: theme.colors.buttonPrimary,
+            color: theme.colors.buttonText,
+          }}
+        >
+          Add Product
+        </Button> */}
+      </div>
 
         <div className="relative" style={{ minHeight: `${minTableHeight}px` }}>
           {loading ? (

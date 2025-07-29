@@ -185,7 +185,7 @@ export default function AuctionProduct() {
       label: "Status",
       width: "25%",
       render: (_, row) => (
-        <div className="flex gap-2">
+        <div className="flex md:justify-start justify-end gap-2">
             <select
             value={row.isDisable ? "disabled" : "enabled"}
             onChange={() => handleToggleStatus(row)}
@@ -205,7 +205,7 @@ export default function AuctionProduct() {
       label: "Actions",
       width: "10%",
       render: (_, row) => (
-        <div className="flex gap-2">
+        <div className="flex gap-2 md:justify-start justify-end">
           <button
             onClick={() => navigate(`/productInfo/${row?._id}`)}
             className="p-1 rounded hover:bg-gray-200"
@@ -241,222 +241,189 @@ export default function AuctionProduct() {
   const fixedRows = pagination.size;
   const minTableHeight = headerHeight + rowHeight * fixedRows;
 
-  return (
-    <div style={{ backgroundColor: theme.colors.background }}>
+ return (
+  <div style={{ backgroundColor: theme.colors.background }}>
+    <div
+      className="rounded-lg shadow-sm border overflow-hidden"
+      style={{
+        borderColor: theme.colors.border,
+        backgroundColor: theme.colors.backgroundSecondary,
+        color: theme.colors.textPrimary,
+      }}
+    >
       <div
-        className="rounded-lg shadow-sm border overflow-hidden"
-        style={{
-          borderColor: theme.colors.border,
-          backgroundColor: theme.colors.backgroundSecondary,
-          color: theme.colors.textPrimary,
-        }}
+        className="flex flex-col sm:flex-row sm:justify-between sm:items-center px-2 py-2 gap-3"
+        style={{ borderBottom: `1px solid ${theme.colors.borderLight}` }}
       >
         <div
-          className="flex justify-between items-center px-2 py-2"
-          style={{ borderBottom: `1px solid ${theme.colors.borderLight}` }}
+          className="font-semibold text-xl"
+          style={{ color: theme.colors.textPrimary }}
         >
-          <div
-            className="font-semibold text-xl"
-            style={{ color: theme.colors.textPrimary }}
-          >
-            Auction List
-          </div>
+          Auction List
+        </div>
 
-          <div className=" flex justify-center items-center gap-3">
-            <div className=" flex gap-2">
-              {/* Price Range Inputs */}
-              {/* <input
-                type="number"
-                min="0"
-                placeholder="Min Price"
-                value={filters.minPrice}
-                onChange={(e) => {
-                  setFilters((prev) => ({ ...prev, minPrice: e.target.value }));
-                  setPagination((prev) => ({ ...prev, pageNo: 1 }));
-                }}
-                className="px-2 py-1 border rounded w-24"
-              />
-              <span className="mx-1">-</span>
-              <input
-                type="number"
-                min="0"
-                placeholder="Max Price"
-                value={filters.maxPrice}
-                onChange={(e) => {
-                  setFilters((prev) => ({ ...prev, maxPrice: e.target.value }));
-                  setPagination((prev) => ({ ...prev, pageNo: 1 }));
-                }}
-                className="px-2 py-1 border rounded w-24"
-              /> */}
+        <div className="flex flex-col sm:flex-row justify-center items-stretch sm:items-center gap-3">
+          <div className="flex flex-col sm:flex-row gap-2">
+            {/* Shipping Type Dropdown */}
+            <select
+              value={shippingType}
+              onChange={(e) => setShippingType(e.target.value)}
+              className="border outline-none rounded px-2 py-1 text-sm w-full sm:w-auto"
+            >
+              {shippingOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
 
-              <select
-                value={shippingType}
-                onChange={(e) => setShippingType(e.target.value)}
-                className="border outline-none rounded px-2 py-1 text-sm"
-              >
-                {shippingOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-
-              {/* Category Dropdown */}
-              <select
-                value={selectedCategory}
-                onChange={(e) => {
-                  const categoryId = e.target.value;
-                  setSelectedCategory(categoryId);
-                  setSelectedSubCategory("");
-                  setFilters((prev) => ({
-                    ...prev,
-                    categoryId,
-                    subCategoryId: "",
-                  }));
-                  setPagination((prev) => ({ ...prev, pageNo: 1 }));
-                }}
-                className="px-3 py-2 border rounded-md"
-              >
-                <option value="">All Categories</option>
-                {categoryList &&
-                  Array.isArray(categoryList?.data) &&
-                  categoryList?.data?.map((cat) => (
-                    <option key={cat._id} value={cat._id}>
-                      {cat.name}
-                    </option>
-                  ))}
-              </select>
-
-              {/* Subcategory Dropdown */}
-              <select
-                value={selectedSubCategory}
-                onChange={(e) => {
-                  const subCategoryId = e.target.value;
-                  setSelectedSubCategory(subCategoryId);
-                  setFilters((prev) => ({
-                    ...prev,
-                    subCategoryId,
-                  }));
-                  setPagination((prev) => ({ ...prev, pageNo: 1 }));
-                }}
-                className="px-3 py-2 border rounded-md"
-                disabled={!selectedCategory}
-              >
-                <option value="">All Subcategories</option>
-                {subCategories?.map((sub) => (
-                  <option key={sub._id} value={sub._id}>
-                    {sub.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <input
-              className="p-1 outline-none border"
-              type="text"
-              placeholder="Search product"
-              value={filters.keyWord}
+            {/* Category Dropdown */}
+            <select
+              value={selectedCategory}
               onChange={(e) => {
-                setFilters({ ...filters, keyWord: e.target.value });
+                const categoryId = e.target.value;
+                setSelectedCategory(categoryId);
+                setSelectedSubCategory("");
+                setFilters((prev) => ({
+                  ...prev,
+                  categoryId,
+                  subCategoryId: "",
+                }));
                 setPagination((prev) => ({ ...prev, pageNo: 1 }));
               }}
-            />
+              className="px-3 py-2 border rounded-md w-full sm:w-auto"
+            >
+              <option value="">All Categories</option>
+              {categoryList &&
+                Array.isArray(categoryList?.data) &&
+                categoryList?.data?.map((cat) => (
+                  <option key={cat._id} value={cat._id}>
+                    {cat.name}
+                  </option>
+                ))}
+            </select>
+
+            {/* Subcategory Dropdown */}
+            <select
+              value={selectedSubCategory}
+              onChange={(e) => {
+                const subCategoryId = e.target.value;
+                setSelectedSubCategory(subCategoryId);
+                setFilters((prev) => ({
+                  ...prev,
+                  subCategoryId,
+                }));
+                setPagination((prev) => ({ ...prev, pageNo: 1 }));
+              }}
+              className="px-3 py-2 border rounded-md w-full sm:w-auto"
+              disabled={!selectedCategory}
+            >
+              <option value="">All Subcategories</option>
+              {subCategories?.map((sub) => (
+                <option key={sub._id} value={sub._id}>
+                  {sub.name}
+                </option>
+              ))}
+            </select>
           </div>
 
-          {/* <Button
-            onClick={() => setIsModalOpen(true)}
-            style={{
-              backgroundColor: theme.colors.buttonPrimary,
-              color: theme.colors.buttonText,
+          {/* Search Input */}
+          <input
+            className="p-1 outline-none border w-full sm:w-auto min-w-0 sm:min-w-[200px]"
+            type="text"
+            placeholder="Search product"
+            value={filters.keyWord}
+            onChange={(e) => {
+              setFilters({ ...filters, keyWord: e.target.value });
+              setPagination((prev) => ({ ...prev, pageNo: 1 }));
             }}
-          >
-            Add Product
-          </Button> */}
-        </div>
-
-        <div className="relative" style={{ minHeight: `${minTableHeight}px` }}>
-          {loading ? (
-            <div
-              className="absolute inset-0 flex items-center justify-center"
-              style={{ backgroundColor: theme.colors.backgroundSecondary }}
-            >
-              <div className="text-center">
-                <div
-                  className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto"
-                  style={{ borderColor: theme.colors.primary }}
-                ></div>
-                <p
-                  className="mt-2"
-                  style={{ color: theme.colors.textSecondary }}
-                >
-                  Loading products...
-                </p>
-              </div>
-            </div>
-          ) : error ? (
-            <div
-              className="absolute inset-0 flex items-center justify-center"
-              style={{ backgroundColor: theme.colors.backgroundSecondary }}
-            >
-              <div
-                className="text-center font-semibold"
-                style={{ color: theme.colors.error }}
-              >
-                Error: {error}
-              </div>
-            </div>
-          ) : (
-            <div className="px-1 pt-1">
-              <DataTable columns={columns} data={products} />
-            </div>
-          )}
-        </div>
-
-        <div
-          className="py-2 px-2 border-t"
-          style={{ borderColor: theme.colors.borderLight }}
-        >
-          <div className="flex justify-end">
-            <Pagination
-              pageNo={pagination.pageNo}
-              size={pagination.size}
-              total={total}
-              onChange={handlePageChange}
-              theme={theme}
-            />
-          </div>
+          />
         </div>
       </div>
 
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setEditMode(false);
-          setSelectedProduct(null);
-        }}
-      >
-        {editMode ? (
-          <EditProductForm
-            closeForm={() => {
-              setIsModalOpen(false);
-              setEditMode(false);
-              setSelectedProduct(null);
-            }}
-            editMode={true}
-            productData={selectedProduct}
-            onProductUpdate={() => dispatch(productListAuction(pagination))}
-          />
+      <div className="relative overflow-x-auto" style={{ minHeight: `${minTableHeight}px` }}>
+        {loading ? (
+          <div
+            className="absolute inset-0 flex items-center justify-center"
+            style={{ backgroundColor: theme.colors.backgroundSecondary }}
+          >
+            <div className="text-center">
+              <div
+                className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto"
+                style={{ borderColor: theme.colors.primary }}
+              ></div>
+              <p
+                className="mt-2"
+                style={{ color: theme.colors.textSecondary }}
+              >
+                Loading products...
+              </p>
+            </div>
+          </div>
+        ) : error ? (
+          <div
+            className="absolute inset-0 flex items-center justify-center"
+            style={{ backgroundColor: theme.colors.backgroundSecondary }}
+          >
+            <div
+              className="text-center font-semibold px-4"
+              style={{ color: theme.colors.error }}
+            >
+              Error: {error}
+            </div>
+          </div>
         ) : (
-          <AddProductForm
-            closeForm={() => {
-              setIsModalOpen(false);
-              setEditMode(false);
-              setSelectedProduct(null);
-            }}
-          />
+          <div className="px-1 pt-1">
+            <DataTable columns={columns} data={products} />
+          </div>
         )}
-      </Modal>
+      </div>
+
+      <div
+        className="py-2 px-2 border-t overflow-x-auto"
+        style={{ borderColor: theme.colors.borderLight }}
+      >
+        <div className="flex justify-end min-w-max">
+          <Pagination
+            pageNo={pagination.pageNo}
+            size={pagination.size}
+            total={total}
+            onChange={handlePageChange}
+            theme={theme}
+          />
+        </div>
+      </div>
     </div>
-  );
+
+    <Modal
+      isOpen={isModalOpen}
+      onClose={() => {
+        setIsModalOpen(false);
+        setEditMode(false);
+        setSelectedProduct(null);
+      }}
+    >
+      {editMode ? (
+        <EditProductForm
+          closeForm={() => {
+            setIsModalOpen(false);
+            setEditMode(false);
+            setSelectedProduct(null);
+          }}
+          editMode={true}
+          productData={selectedProduct}
+          onProductUpdate={() => dispatch(productListAuction(pagination))}
+        />
+      ) : (
+        <AddProductForm
+          closeForm={() => {
+            setIsModalOpen(false);
+            setEditMode(false);
+            setSelectedProduct(null);
+          }}
+        />
+      )}
+    </Modal>
+  </div>
+);
 }
