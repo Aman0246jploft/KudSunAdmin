@@ -86,6 +86,11 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
           icon: AiOutlineSetting
         },
         {
+          name: 'Dispute Types',
+          href: '/dispute-type-management',
+          icon: AiOutlineSetting
+        },
+        {
           name: "Update Password",
           href: "/passwordManagement",
           icon: AiOutlineSetting
