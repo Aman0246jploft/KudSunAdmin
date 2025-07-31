@@ -51,10 +51,10 @@ export default function Bank() {
   sortable: true,
   render: (name) =>
     name
-      ?.toLowerCase()
-      .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" "),
+      // ?.toLowerCase()
+      // .split(" ")
+      // .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      // .join(" "),
 },
 
     {
@@ -109,33 +109,19 @@ export default function Bank() {
     }
   };
 
-  const handleDelete = async (id) => {
-    try {
-      confirmAlert({
-        title: "Confirm to submit",
-        message: "Are you sure to delete this.",
-        buttons: [
-          {
-            label: "Yes",
-            onClick: async () => {
-              await authAxiosClient.post("/bank/softDelete", { id });
-              toast.success("Bank deleted");
-              fetchAllBanks();
-            },
-          },
-          {
-            label: "No",
-            onClick: () => { },
-          },
-        ],
-      });
+const handleDelete = async (id) => {
+  try {
+    const confirmed = window.confirm("Are you sure you want to delete this?");
+    if (!confirmed) return;
 
-
-    } catch (err) {
-      console.error(err);
-      toast.error("Delete failed");
-    }
-  };
+    await authAxiosClient.post("/bank/hardDelete", { id });
+    toast.success("Bank deleted");
+    fetchAllBanks();
+  } catch (err) {
+    console.error(err);
+    toast.error("Delete failed");
+  }
+};
 
   // ─── UI ─────────────────────────────────────────────────
   return (

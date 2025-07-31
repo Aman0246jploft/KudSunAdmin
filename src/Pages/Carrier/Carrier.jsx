@@ -87,10 +87,10 @@ export default function Carrier() {
       sortable: true,
       render: (name) =>
         name
-          ?.toLowerCase()
-          .split(" ")
-          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(" "),
+          // ?.toLowerCase()
+          // .split(" ")
+          // .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          // .join(" "),
     },
 
     // {
@@ -183,32 +183,20 @@ export default function Carrier() {
     }
   };
 
-  const handleDelete = async (id) => {
-    try {
-      confirmAlert({
-        title: "Confirm Deletion",
-        message: "Are you sure you want to delete this carrier?",
-        buttons: [
-          {
-            label: "Yes, Delete",
-            onClick: async () => {
-              await authAxiosClient.post("/carrier/softDelete", { id });
-              toast.success("Carrier deleted successfully");
-              setPagination((prev) => ({ ...prev, pageNo: 1 })); // Reset to first page
-              fetchAllCarriers();
-            },
-          },
-          {
-            label: "Cancel",
-            onClick: () => {},
-          },
-        ],
-      });
-    } catch (err) {
-      console.error(err);
-      toast.error("Delete failed");
-    }
-  };
+const handleDelete = async (id) => {
+  try {
+    const confirmed = window.confirm("Are you sure you want to delete this carrier?");
+    if (!confirmed) return;
+
+    await authAxiosClient.post("/carrier/softDelete", { id });
+    toast.success("Carrier deleted successfully");
+    setPagination((prev) => ({ ...prev, pageNo: 1 })); // Reset to first page
+    fetchAllCarriers();
+  } catch (err) {
+    console.error(err);
+    toast.error("Delete failed");
+  }
+};
 
   // ─── UI ─────────────────────────────────────────────────
   return (

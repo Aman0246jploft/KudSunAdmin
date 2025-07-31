@@ -93,10 +93,10 @@ const ReportTypeManagement = () => {
       width: "99%",
       render: (_, record) => {
         return record?.name
-          ?.toLowerCase()
-          .split(" ")
-          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(" ");
+          // ?.toLowerCase()
+          // .split(" ")
+          // .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          // .join(" ");
       }
     },
 

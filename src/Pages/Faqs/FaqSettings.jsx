@@ -46,20 +46,24 @@ export default function FaqSettings() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = (row) => {
-    dispatch(deleteSetting(row._id))
-      .then((result) => {
-        if (deleteSetting.fulfilled.match(result)) {
-          dispatch(getFAQs());
-        } else {
-          const { message, code } = result.payload || {};
-          console.error(`deleteSetting failed [${code}]: ${message}`);
-        }
-      })
-      .catch((error) => {
-        console.error("Unexpected error:", error);
-      });
-  };
+const handleDelete = (row) => {
+  const confirmed = window.confirm("Are you sure you want to delete this setting?");
+  if (!confirmed) return;
+
+  dispatch(deleteSetting(row._id))
+    .then((result) => {
+      if (deleteSetting.fulfilled.match(result)) {
+        dispatch(getFAQs());
+      } else {
+        const { message, code } = result.payload || {};
+        console.error(`deleteSetting failed [${code}]: ${message}`);
+      }
+    })
+    .catch((error) => {
+      console.error("Unexpected error:", error);
+    });
+};
+
 
   const handlePageChange = (newPage) => {
     setPagination((prev) => ({ ...prev, pageNo: newPage }));
