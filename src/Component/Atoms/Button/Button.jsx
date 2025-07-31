@@ -50,7 +50,7 @@ const Button = ({
   const current = variantStyles[variant] || variantStyles.primary;
 
   const baseStyles =
-    "rounded-xl transition-colors duration-200 ease-in-out font-semibold focus:outline-none transition duration-200 active:scale-95 inline-flex items-center justify-center focus:ring-2 focus:ring-primary/50 " +
+    "rounded-xl transition-colors duration-200 ease-in-out font-semibold focus:outline-none transition duration-200 active:scale-95 inline-flex items-center justify-center  focus:ring-primary/50 " +
     (current.shadow || "");
 
   const finalClass = classNames(baseStyles, SIZES[size], className, {

@@ -462,7 +462,7 @@ const EditProductForm = ({
                   console.log("Category changed to:", e.target.value);
                   setSelectedCategory(e.target.value);
                 }}
-                className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.category ? "border-red-500" : "border-gray-300"
+                className={`w-full p-3 border rounded-lg   focus:border-blue-500 transition-colors ${errors.category ? "border-red-500" : "border-gray-300"
                   }`}
               >
                 <option value="">Select Category</option>
@@ -491,7 +491,7 @@ const EditProductForm = ({
                   setFormData(prev => ({ ...prev, subCategoryId: e.target.value }));
                 }}
                 disabled={!selectedCategory}
-                className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors disabled:bg-gray-100 ${errors.subCategory ? "border-red-500" : "border-gray-300"
+                className={`w-full p-3 border rounded-lg   focus:border-blue-500 transition-colors disabled:bg-gray-100 ${errors.subCategory ? "border-red-500" : "border-gray-300"
                   }`}
               >
                 <option value="">Select Subcategory</option>
@@ -523,7 +523,7 @@ const EditProductForm = ({
               onChange={(e) =>
                 setFormData(prev => ({ ...prev, title: e.target.value }))
               }
-              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.title ? "border-red-500" : "border-gray-300"
+              className={`w-full p-3 border rounded-lg   focus:border-blue-500 transition-colors ${errors.title ? "border-red-500" : "border-gray-300"
                 }`}
             />
             <div className="flex justify-between items-center mt-1">
@@ -554,7 +554,7 @@ const EditProductForm = ({
                 setFormData(prev => ({ ...prev, description: e.target.value }))
               }
               rows={6}
-              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none ${errors.description ? "border-red-500" : "border-gray-300"
+              className={`w-full p-3 border rounded-lg   focus:border-blue-500 transition-colors resize-none ${errors.description ? "border-red-500" : "border-gray-300"
                 }`}
             />
             <div className="flex justify-between items-center mt-1">
@@ -661,7 +661,7 @@ const EditProductForm = ({
               placeholder="e.g. electronics, smartphone, android, new"
               onChange={handleTagInput}
               value={formData.tags.join(", ")}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full p-3 border border-gray-300 rounded-lg   focus:border-blue-500 transition-colors"
             />
             {formData.tags.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
@@ -800,7 +800,7 @@ const EditProductForm = ({
                 onChange={(e) =>
                   setFormData(prev => ({ ...prev, fixedPrice: e.target.value }))
                 }
-                className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.fixedPrice ? "border-red-500" : "border-gray-300"
+                className={`w-full p-3 border rounded-lg   focus:border-blue-500 transition-colors ${errors.fixedPrice ? "border-red-500" : "border-gray-300"
                   }`}
               />
               {errors.fixedPrice && (
@@ -840,7 +840,7 @@ const EditProductForm = ({
                     onChange={(e) =>
                       setFormData(prev => ({ ...prev, originPrice: e.target.value }))
                     }
-                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.originPrice ? "border-red-500" : "border-gray-300"
+                    className={`w-full p-3 border rounded-lg   focus:border-blue-500 transition-colors ${errors.originPrice ? "border-red-500" : "border-gray-300"
                       }`}
                   />
                   {errors.originPrice && (
@@ -935,7 +935,7 @@ const EditProductForm = ({
                       onChange={(e) =>
                         setFormData(prev => ({ ...prev, shippingCharge: e.target.value }))
                       }
-                      className={`w-full p-2 border rounded focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${errors.shippingCharge ? "border-red-500" : "border-gray-300"
+                      className={`w-full p-2 border rounded  focus:ring-orange-500 focus:border-orange-500 ${errors.shippingCharge ? "border-red-500" : "border-gray-300"
                         }`}
                     />
                   )}

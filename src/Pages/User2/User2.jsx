@@ -389,7 +389,7 @@ export default function User2() {
             type="checkbox"
             checked={row.is_Preferred_seller || false}
             onChange={() => handleTogglePreferredSeller(row)}
-            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
+            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded   cursor-pointer"
             title={row.is_Preferred_seller ? "Remove from preferred sellers" : "Mark as preferred seller"}
           />
         </div>
@@ -637,7 +637,7 @@ export default function User2() {
                       placeholder="Enter new password"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className="w-full px-3 py-2.5 pr-10 border border-gray-300  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 text-gray-900  transition-colors"
+                      className="w-full px-3 py-2.5 pr-10 border border-gray-300  rounded-lg   focus:border-blue-500 placeholder-gray-400 text-gray-900  transition-colors"
                     />
                     <button
                       type="button"
@@ -656,7 +656,7 @@ export default function User2() {
               <div className="sticky bottom-0 z-10 bg-white  rounded-b-lg px-4 sm:px-6 py-3 border-t border-gray-200  flex flex-col sm:flex-row gap-2">
                 <button
                   onClick={() => handleChangePassword()}
-                  className="flex-1 bg-blue-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 bg-blue-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-blue-700   focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={!newPassword.trim()}
                 >
                   Change Password
@@ -759,14 +759,14 @@ export default function User2() {
               {/* Sticky Footer (Actions) */}
               <div className="sticky bottom-0 z-10 bg-white  rounded-b-lg px-4 sm:px-6 py-3 border-t border-gray-200  flex flex-col sm:flex-row gap-2">
                 <button
-                  className="flex-1 bg-green-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
+                  className="flex-1 bg-green-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-green-700  focus:ring-green-500 focus:ring-offset-2 transition-colors"
                   onClick={() => handleSellerRequestAction('Approved')}
                   disabled={sellerRequestLoading || !sellerRequestDetails}
                 >
                   Accept
                 </button>
                 <button
-                  className="flex-1 bg-red-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
+                  className="flex-1 bg-red-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-red-700  focus:ring-red-500 focus:ring-offset-2 transition-colors"
                   onClick={() => handleSellerRequestAction('Rejected')}
                   disabled={sellerRequestLoading || !sellerRequestDetails}
                 >

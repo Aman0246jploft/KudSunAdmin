@@ -128,7 +128,7 @@ export default function VerifyResetOtp() {
                 onChange={(e) => handleChange(idx, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(idx, e)}
                 disabled={loading}
-                className={`w-12 h-12 md:w-14 md:h-14 text-xl text-center border rounded-lg focus:outline-none focus:ring-2 transition-all ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`w-12 h-12 md:w-14 md:h-14 text-xl text-center border rounded-lg focus:outline-none  transition-all ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 style={{
                   backgroundColor: theme.colors.input,
                   color: theme.colors.textPrimary,

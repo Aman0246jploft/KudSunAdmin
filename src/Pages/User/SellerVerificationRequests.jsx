@@ -199,14 +199,14 @@ export default function SellerVerificationRequests() {
               value={filters.keyWord}
               onChange={handleFilterChange}
               placeholder="Search by name, email, etc."
-              className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none  "
               style={{ minWidth: "180px" }}
             /> */}
             <select
               name="status"
               value={filters.status}
               onChange={handleFilterChange}
-              className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none  "
               style={{ minWidth: "140px" }}
             >
               <option value="">All Status</option>
@@ -219,7 +219,7 @@ export default function SellerVerificationRequests() {
               name="fromDate"
               value={filters.fromDate}
               onChange={handleFilterChange}
-              className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none  "
               style={{ minWidth: "140px" }}
             />
             <input
@@ -227,7 +227,7 @@ export default function SellerVerificationRequests() {
               name="toDate"
               value={filters.toDate}
               onChange={handleFilterChange}
-              className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none  "
               style={{ minWidth: "140px" }}
             />
           </div>

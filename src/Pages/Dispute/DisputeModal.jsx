@@ -213,7 +213,7 @@ const DisputeModal = ({ dispute, onClose, onUpdate }) => {
                 <select
                   value={adminDecision.decision}
                   onChange={(e) => setAdminDecision((p) => ({ ...p, decision: e.target.value }))}
-                  className="w-full border rounded-md px-3 py-2 bg-white   focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full border rounded-md px-3 py-2 bg-white   focus:outline-none  focus:ring-primary-500"
                   required
                 >
                   <option value="">Select Decision</option>
@@ -237,7 +237,7 @@ const DisputeModal = ({ dispute, onClose, onUpdate }) => {
                       ...p, 
                       disputeAmountPercent: Math.min(100, Math.max(0, parseInt(e.target.value) || 0))
                     }))}
-                    className="w-full border rounded-md px-3 py-2 bg-white   focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full border rounded-md px-3 py-2 bg-white   focus:outline-none  focus:ring-primary-500"
                     placeholder="Enter percentage (0-100)"
                   />
                   
@@ -273,7 +273,7 @@ const DisputeModal = ({ dispute, onClose, onUpdate }) => {
                 <textarea
                   value={adminDecision.decisionNote}
                   onChange={(e) => setAdminDecision((p) => ({ ...p, decisionNote: e.target.value }))}
-                  className="w-full border rounded-md px-3 py-2 h-24 bg-white   focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full border rounded-md px-3 py-2 h-24 bg-white   focus:outline-none  focus:ring-primary-500"
                   placeholder="Provide reasoning for your decision..."
                   required
                 />

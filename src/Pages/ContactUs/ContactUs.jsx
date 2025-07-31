@@ -5,7 +5,7 @@ import { contactUsList, markAsreadContactUs, sendContactUsReply } from "../../fe
 import Pagination from "../../Component/Atoms/Pagination/Pagination";
 import DataTable from "../../Component/Table/DataTable";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
-import { FiTrash2, FiCheckCircle, FiSlash } from "react-icons/fi";
+import { FiTrash2, FiCheckCircle, FiSlash, FiSearch, FiFilter, FiX } from "react-icons/fi";
 import Modal from "./Modal";
 import Button from '../../Component/Atoms/Button/Button'
 import AdvancedRichTextEditor from "../../Component/RichTextEditor/AdvancedRichTextEditor";
@@ -26,12 +26,53 @@ export default function ContactUs() {
     to: ""
   });
 
+  // Search and Filter State
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [statusFilter, setStatusFilter] = useState(""); // "" = all, "true" = resolved, "false" = unresolved
+  const [dateRange, setDateRange] = useState({
+    fromDate: "",
+    toDate: ""
+  });
+  const [showFilters, setShowFilters] = useState(false);
+
   const selector = useSelector((state) => state?.setting);
   const { error, loading, contactUs } = selector || {};
   const { data, total } = contactUs ? contactUs : {};
 
-  useEffect(() => {
-    dispatch(contactUsList(pagination))
+  // Build query parameters for API call
+  const buildQueryParams = () => {
+    const params = {
+      pageNo: pagination.pageNo,
+      size: pagination.size,
+      sortBy: 'createdAt',
+      sortOrder: 'desc'
+    };
+
+    // Add search functionality
+    if (searchKeyword.trim()) {
+      params.keyWord = searchKeyword.trim();
+      params.searchFields = 'name,contact,type'; // Search in name, contact (email/phone), and type fields
+    }
+
+    // Add status filter
+    if (statusFilter !== "") {
+      params.query = `isRead:${statusFilter}`;
+    }
+
+    // Add date range filter
+    if (dateRange.fromDate) {
+      params.fromDate = dateRange.fromDate;
+    }
+    if (dateRange.toDate) {
+      params.toDate = dateRange.toDate;
+    }
+
+    return params;
+  };
+
+  const fetchContactUs = () => {
+    const queryParams = buildQueryParams();
+    dispatch(contactUsList(queryParams))
       .unwrap()
       .then((faqResult) => {
         setFaqs(faqResult.data || []);
@@ -40,11 +81,40 @@ export default function ContactUs() {
         console.error("Unexpected error in fetchData:", error);
         toast.error("Unexpected error occurred");
       });
-  }, [dispatch, pagination]);
+  };
+
+  useEffect(() => {
+    fetchContactUs();
+  }, [dispatch, pagination, searchKeyword, statusFilter, dateRange]);
 
   const handlePageChange = (newPage) => {
     setPagination((prev) => ({ ...prev, pageNo: newPage }));
   };
+
+  // Reset pagination when filters change
+  const handleSearchChange = (value) => {
+    setSearchKeyword(value);
+    setPagination(prev => ({ ...prev, pageNo: 1 }));
+  };
+
+  const handleStatusFilterChange = (value) => {
+    setStatusFilter(value);
+    setPagination(prev => ({ ...prev, pageNo: 1 }));
+  };
+
+  const handleDateRangeChange = (field, value) => {
+    setDateRange(prev => ({ ...prev, [field]: value }));
+    setPagination(prev => ({ ...prev, pageNo: 1 }));
+  };
+
+  const clearFilters = () => {
+    setSearchKeyword("");
+    setStatusFilter("");
+    setDateRange({ fromDate: "", toDate: "" });
+    setPagination(prev => ({ ...prev, pageNo: 1 }));
+  };
+
+  const hasActiveFilters = searchKeyword || statusFilter !== "" || dateRange.fromDate || dateRange.toDate;
 
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -85,11 +155,7 @@ export default function ContactUs() {
       setIsReplyModalOpen(false);
 
       // Refresh the contact us list to update the status
-      dispatch(contactUsList(pagination))
-        .unwrap()
-        .then((faqResult) => {
-          setFaqs(faqResult.data || []);
-        });
+      fetchContactUs();
     } catch (error) {
       console.error("Failed to send reply:", error);
       toast.error("Failed to send reply. Please try again.");
@@ -101,11 +167,7 @@ export default function ContactUs() {
   const handleToggleRead = async (id, currentStatus) => {
     try {
       dispatch(markAsreadContactUs({ id, isRead: !currentStatus })).unwrap()
-      dispatch(contactUsList(pagination))
-        .unwrap()
-        .then((faqResult) => {
-          setFaqs(faqResult.data || []);
-        });
+      fetchContactUs();
     } catch (err) {
       console.error("Failed to toggle read status", err);
     }
@@ -123,22 +185,41 @@ export default function ContactUs() {
       key: "name",
       label: "Name",
       width: "15%",
+      render: (_, row) => (
+        <div className="justify-end md:justify-start" title={row.name}>
+          {row.name}
+        </div>
+      ),
     },
     {
       key: "contact",
       label: "Contact",
       width: "15%",
+      render: (_, row) => (
+        <div className="justify-end md:justify-start" title={row.contact}>
+          {row.contact}
+        </div>
+      ),
     },
     {
       key: "type",
       label: "Type",
       width: "10%",
+      render: (_, row) => (
+        <div className="justify-end md:justify-start" title={row.type}>
+          {row.type}
+        </div>
+      ),
     },
     {
       key: "desc",
       label: "Description",
       width: "25%",
-      render: (_, row) => row.desc || "N/A",
+      render: (_, row) => (
+        <div className="">
+          {row.desc || "N/A"}
+        </div>
+      ),
     },
     {
       key: "media",
@@ -147,7 +228,7 @@ export default function ContactUs() {
       width: "20%",
       render: (_, row) =>
         row.image && row.image.length > 0 ? (
-          <div className="flex flex-wrap  justify-end md:justify-start gap-1">
+          <div className="justify-end md:justify-start">
             {row.image.slice(0, 2).map((url, index) => {
               const isVideo = url.match(/\.(mp4|webm|ogg)$/i);
               return (
@@ -156,12 +237,12 @@ export default function ContactUs() {
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 block"
+                  className="justify-end md:justify-start"
                 >
                   {isVideo ? (
                     <video
                       src={url}
-                      className="w-10 h-10 object-cover rounded border"
+                      className="w-8 h-8 sm:w-10 sm:h-10 object-cover rounded border"
                       muted
                       playsInline
                     />
@@ -169,62 +250,65 @@ export default function ContactUs() {
                     <img
                       src={url}
                       alt="media"
-                      className="w-10 h-10 object-cover rounded border"
+                      className="w-8 h-8 sm:w-10 sm:h-10 object-cover rounded border"
                     />
                   )}
                 </a>
               );
             })}
             {row.image.length > 2 && (
-              <span className="text-xs text-gray-500">+{row.image.length - 2} more</span>
+              <span className="justify-end md:justify-start">+{row.image.length - 2} more</span>
             )}
           </div>
         ) : (
-          "No Media"
+          <span className="text-xs sm:text-sm">No Media</span>
         ),
-    }
-    ,
+    },
     {
       key: "view",
       label: "Actions",
       width: "15%",
       render: (_, row) => (
-        <div className="flex justify-end md:justify-start gap-2">
+        <div className="justify-end md:justify-start">
           <button
             onClick={() => openDetailModal(row)}
-            className="text-blue-600 hover:underline"
+            className="text-blue-600 hover:underline text-xs sm:text-sm px-1"
           >
             View
           </button>
-          {isValidEmail(row.contact) && <button
-            onClick={() => openReplyModal(row)}
-            className="text-green-600 hover:underline"
-            disabled={!isValidEmail(row.contact)}
-            title={!isValidEmail(row.contact) ? "Invalid email address" : ""}
-          >
-            Reply
-          </button>}
+          {isValidEmail(row.contact) && (
+            <button
+              onClick={() => openReplyModal(row)}
+              className="text-green-600 hover:underline text-xs sm:text-sm px-1"
+              disabled={!isValidEmail(row.contact)}
+              title={!isValidEmail(row.contact) ? "Invalid email address" : ""}
+            >
+              Reply
+            </button>
+          )}
         </div>
       ),
     },
-
     {
       key: "createdAt",
       label: "Date",
       width: "10%",
-      render: (_, row) =>
-        new Date(row.createdAt).toLocaleDateString("en-IN"),
+      render: (_, row) => (
+        <div className="text-xs sm:text-sm">
+          {new Date(row.createdAt).toLocaleDateString("en-IN")}
+        </div>
+      ),
     },
     {
       key: "status",
       label: "Status",
       width: "25%",
       render: (_, row) => (
-        <div className="flex  justify-end gap-2">
+        <div className="justify-end md:justify-start">
           <select
             value={row.isRead ? "connected" : "notconnected"}
             onChange={() => handleToggleRead(row._id, row.isRead)}
-            className="border rounded px-2 py-1 text-sm focus:outline-none"
+            className="border rounded px-1 sm:px-2 py-1 text-xs sm:text-sm focus:outline-none w-full max-w-[100px] sm:max-w-none"
             style={{
               color: row.isRead ? "#166534" : "#4b5563",
             }}
@@ -235,7 +319,6 @@ export default function ContactUs() {
         </div>
       ),
     }
-
   ];
 
   const rowHeight = 40;
@@ -253,11 +336,90 @@ export default function ContactUs() {
         }}
       >
         <div
-          className="flex justify-between items-center px-2 py-2"
+          className="flex justify-between items-end px-2 py-2"
           style={{ borderBottom: `1px solid ${theme.colors.borderLight}` }}
         >
-          <div className="font-semibold text-xl" style={{ color: theme.colors.textPrimary }}>
+          <div
+            className="font-semibold whitespace-nowrap text-xl"
+            style={{ color: theme.colors.textPrimary }}
+          >
             Contact Us
+          </div>
+          <div className="flex flex-wrap justify-end items-end gap-3">
+            {/* Search Input */}
+            <div className="flex flex-col">
+              <label
+                htmlFor="keyword-search"
+                className="mb-1 text-sm font-medium text-gray-700 select-none"
+              >
+                Search:
+              </label>
+              <div className="relative">
+                <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  id="keyword-search"
+                  type="text"
+                  placeholder="Search by name, email, contact..."
+                  value={searchKeyword}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  className="border border-gray-300 rounded pl-10 pr-3 py-1.5 text-sm focus:outline-none  "
+                  style={{ minWidth: "200px" }}
+                />
+              </div>
+            </div>
+
+            {/* Status Filter */}
+            <div className="flex flex-col">
+              <label className="mb-1 text-sm font-medium text-gray-700 select-none">
+                Inquiry Status:
+              </label>
+              <select
+                value={statusFilter}
+                onChange={(e) => handleStatusFilterChange(e.target.value)}
+                className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none  "
+                style={{ minWidth: "140px" }}
+              >
+                <option value="">All Status</option>
+                <option value="true">Resolved</option>
+                <option value="false">Unresolved</option>
+              </select>
+            </div>
+
+            {/* From Date */}
+            <div className="flex flex-col">
+              <label
+                htmlFor="from-date"
+                className="mb-1 text-sm font-medium text-gray-700 select-none"
+              >
+                From Date:
+              </label>
+              <input
+                id="from-date"
+                type="date"
+                value={dateRange.fromDate}
+                onChange={(e) => handleDateRangeChange('fromDate', e.target.value)}
+                className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none  "
+                style={{ minWidth: "140px" }}
+              />
+            </div>
+
+            {/* To Date */}
+            <div className="flex flex-col">
+              <label
+                htmlFor="to-date"
+                className="mb-1 text-sm font-medium text-gray-700 select-none"
+              >
+                To Date:
+              </label>
+              <input
+                id="to-date"
+                type="date"
+                value={dateRange.toDate}
+                onChange={(e) => handleDateRangeChange('toDate', e.target.value)}
+                className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none  "
+                style={{ minWidth: "140px" }}
+              />
+            </div>
           </div>
         </div>
 
@@ -272,7 +434,10 @@ export default function ContactUs() {
                   className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto"
                   style={{ borderColor: theme.colors.primary }}
                 ></div>
-                <p className="mt-2" style={{ color: theme.colors.textSecondary }}>
+                <p
+                  className="mt-2"
+                  style={{ color: theme.colors.textSecondary }}
+                >
                   Loading entries...
                 </p>
               </div>
@@ -282,7 +447,10 @@ export default function ContactUs() {
               className="absolute inset-0 flex items-center justify-center"
               style={{ backgroundColor: theme.colors.backgroundSecondary }}
             >
-              <div className="text-center font-semibold" style={{ color: theme.colors.error }}>
+              <div
+                className="text-center font-semibold"
+                style={{ color: theme.colors.error }}
+              >
                 Error: {error}
               </div>
             </div>
@@ -308,60 +476,63 @@ export default function ContactUs() {
           </div>
         </div>
       </div>
+
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         {selectedFaq && (
-          <div className="space-y-4 p-3">
-            <h2 className="text-lg font-semibold">Contact Detail</h2>
-            <div><strong>Name:</strong> {selectedFaq.name}</div>
-            <div><strong>Contact:</strong> {selectedFaq.contact}</div>
-            <div><strong>Type:</strong> {selectedFaq.type}</div>
-            <div
-              style={{
-                wordBreak: "break-word",
-                whiteSpace: "normal",
-                maxWidth: "100%",
-                maxHeight: "150px",
-                overflowY: "auto",
-              }}
-            >
-              <strong>Description:</strong> {selectedFaq.desc}
-            </div>
-            <div><strong>Date:</strong> {new Date(selectedFaq.createdAt).toLocaleString()}</div>
-            <div>
-              <strong>Media:</strong>
-              {selectedFaq.image && selectedFaq.image.length > 0 ? (
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {selectedFaq.image.map((url, index) => {
-                    const isVideo = url.match(/\.(mp4|webm|ogg)$/i);
-                    return (
-                      <a
-                        key={index}
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-16 h-16 block"
-                      >
-                        {isVideo ? (
-                          <video
-                            src={url}
-                            className="w-16 h-16 object-cover rounded border"
-                            muted
-                            playsInline
-                          />
-                        ) : (
-                          <img
-                            src={url}
-                            alt="media"
-                            className="w-16 h-16 object-cover rounded border"
-                          />
-                        )}
-                      </a>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div>No media</div>
-              )}
+          <div className="p-6 bg-white rounded-lg shadow-sm border border-gray-200 max-w-4xl mx-auto max-h-[80vh] overflow-y-auto">
+            <h2 className="text-xl font-semibold mb-4">Contact Detail</h2>
+            <div className="space-y-3">
+              <div><strong>Name:</strong> {selectedFaq.name}</div>
+              <div><strong>Contact:</strong> {selectedFaq.contact}</div>
+              <div><strong>Type:</strong> {selectedFaq.type}</div>
+              <div
+                style={{
+                  wordBreak: "break-word",
+                  whiteSpace: "normal",
+                  maxWidth: "100%",
+                  maxHeight: "150px",
+                  overflowY: "auto",
+                }}
+              >
+                <strong>Description:</strong> {selectedFaq.desc}
+              </div>
+              <div><strong>Date:</strong> {new Date(selectedFaq.createdAt).toLocaleString()}</div>
+              <div>
+                <strong>Media:</strong>
+                {selectedFaq.image && selectedFaq.image.length > 0 ? (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {selectedFaq.image.map((url, index) => {
+                      const isVideo = url.match(/\.(mp4|webm|ogg)$/i);
+                      return (
+                        <a
+                          key={index}
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-16 h-16 block"
+                        >
+                          {isVideo ? (
+                            <video
+                              src={url}
+                              className="w-16 h-16 object-cover rounded border"
+                              muted
+                              playsInline
+                            />
+                          ) : (
+                            <img
+                              src={url}
+                              alt="media"
+                              className="w-16 h-16 object-cover rounded border"
+                            />
+                          )}
+                        </a>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div>No media</div>
+                )}
+              </div>
             </div>
           </div>
         )}
@@ -369,10 +540,14 @@ export default function ContactUs() {
 
       <Modal isOpen={isReplyModalOpen} onClose={() => setIsReplyModalOpen(false)}>
         {isReplyModalOpen && (
-          <div className="space-y-4 p-4" style={{ minWidth: '600px' }}>
-            <h2 className="text-xl font-semibold mb-6">Reply to Contact</h2>
+          <div className="p-0 bg-white rounded-lg shadow-sm border border-gray-200 w-full max-w-md sm:max-w-lg mx-auto flex flex-col max-h-[80vh]">
+            {/* Header */}
+            <div className="sticky top-0 z-10 bg-white rounded-t-lg px-4 sm:px-6 pt-4 pb-2 border-b border-gray-200">
+              <h2 className="text-2xl font-bold text-gray-900">Reply to Contact</h2>
+            </div>
 
-            <div className="space-y-4">
+            {/* Scrollable Body */}
+            <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-1">To:</label>
                 <input
@@ -382,7 +557,6 @@ export default function ContactUs() {
                   className="w-full px-3 py-2 border rounded-md bg-gray-50"
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium mb-1">Subject:</label>
                 <input
@@ -392,7 +566,6 @@ export default function ContactUs() {
                   className="w-full px-3 py-2 border rounded-md"
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium mb-1">Message:</label>
                 <div className="border rounded-md">
@@ -402,23 +575,24 @@ export default function ContactUs() {
                   />
                 </div>
               </div>
+            </div>
 
-              <div className="flex justify-end gap-3 mt-6">
-                <button
-                  onClick={() => setIsReplyModalOpen(false)}
-                  className="px-4 py-2 border rounded-md hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <Button
-                  loading={isSending}
-                  onClick={handleReplySubmit}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                  disabled={!replyData.subject || !replyData.body}
-                >
-                  Send Reply
-                </Button>
-              </div>
+            {/* Sticky Footer (Actions) */}
+            <div className="sticky bottom-0 z-10 bg-white rounded-b-lg px-4 sm:px-6 py-3 border-t border-gray-200 flex flex-col sm:flex-row gap-2">
+              <button
+                onClick={() => setIsReplyModalOpen(false)}
+                className="px-4 py-2 border rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <Button
+                loading={isSending}
+                onClick={handleReplySubmit}
+                className="flex-1 bg-blue-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-blue-700   focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!replyData.subject || !replyData.body}
+              >
+                Send Reply
+              </Button>
             </div>
           </div>
         )}

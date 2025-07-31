@@ -1236,7 +1236,7 @@ export default function UserInfo() {
                                                     name="status"
                                                     value={transactionFilters.status}
                                                     onChange={handleFilterChange}
-                                                    className="border rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    className="border rounded-lg px-4 py-2 w-full focus:outline-none  "
                                                     style={{
                                                         borderColor: theme.colors.borderLight,
                                                         backgroundColor: theme.colors.background,
@@ -1259,7 +1259,7 @@ export default function UserInfo() {
                                                     name="paymentStatus"
                                                     value={transactionFilters.paymentStatus}
                                                     onChange={handleFilterChange}
-                                                    className="border rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    className="border rounded-lg px-4 py-2 w-full focus:outline-none  "
                                                     style={{
                                                         borderColor: theme.colors.borderLight,
                                                         backgroundColor: theme.colors.background,

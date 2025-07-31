@@ -176,7 +176,7 @@ export default function AddParameterForm({ onClose, pagination, editData }) {
                       type="text"
                       value={val}
                       onChange={(e) => handleValueChange(index, e.target.value)}
-                      className="w-full p-2.5 sm:p-3 rounded-md border text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                      className="w-full p-2.5 sm:p-3 rounded-md border text-sm   focus:border-blue-500 transition-all duration-200"
                       style={{
                         backgroundColor: theme.colors.background,
                         border: `1px solid ${theme.colors.border}`,

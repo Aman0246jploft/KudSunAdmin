@@ -1000,7 +1000,7 @@ const AdminTransactions = () => {
                 name="status"
                 value={filters.status}
                 onChange={handleFilterChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none  "
               >
                 <option value="">All Statuses</option>
                 <option value="pending">Pending</option>
@@ -1019,7 +1019,7 @@ const AdminTransactions = () => {
                 name="paymentStatus"
                 value={filters.paymentStatus}
                 onChange={handleFilterChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none  "
               >
                 <option value="">All Payment Status</option>
                 <option value="pending">Pending</option>
@@ -1036,7 +1036,7 @@ const AdminTransactions = () => {
                 name="paidToSeller"
                 value={filters.paidToSeller}
                 onChange={handleFilterChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none  "
               >
                 <option value="">All</option>
                 <option value="true">Paid</option>
@@ -1051,7 +1051,7 @@ const AdminTransactions = () => {
                 name="hasDispute"
                 value={filters.hasDispute}
                 onChange={handleFilterChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none  "
               >
                 <option value="">All</option>
                 <option value="true">Has Dispute</option>
@@ -1140,7 +1140,7 @@ const AdminTransactions = () => {
                 name="status"
                 value={withdrawalFilters.status}
                 onChange={handleWithdrawalFilterChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none  "
               >
                 <option value="">All Statuses</option>
                 <option value="pending">Pending</option>
@@ -1625,7 +1625,7 @@ const AdminTransactions = () => {
                     Payment Notes (Optional)
                   </label>
                   <textarea
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none  "
                     rows="3"
                     maxLength="500"
                     placeholder="Add any notes about this payment..."
@@ -2060,7 +2060,7 @@ const AdminTransactions = () => {
                       Admin Notes (Optional)
                     </label>
                     <textarea
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none   resize-none"
                       rows="3"
                       maxLength="500"
                       placeholder={`Add notes for ${withdrawalActionModal.action.toLowerCase()} this request...`}

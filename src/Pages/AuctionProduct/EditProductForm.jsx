@@ -530,7 +530,7 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
                 <select
                   value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.category ? "border-red-500" : "border-gray-300"}`}
+                className={`w-full p-3 border rounded-lg   focus:border-blue-500 transition-colors ${errors.category ? "border-red-500" : "border-gray-300"}`}
                 >
                   <option value="">Select Category</option>
                   {categoryList?.data?.map((cat) => (
@@ -557,7 +557,7 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
                   setFormData(prev => ({ ...prev, subCategoryId: e.target.value }))
                   }
                   disabled={!selectedCategory}
-                className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors disabled:bg-gray-100 ${errors.subCategory ? "border-red-500" : "border-gray-300"}`}
+                className={`w-full p-3 border rounded-lg   focus:border-blue-500 transition-colors disabled:bg-gray-100 ${errors.subCategory ? "border-red-500" : "border-gray-300"}`}
                 >
                   <option value="">Select Subcategory</option>
                   {subCategories?.map((sub) => (
@@ -588,7 +588,7 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
                 onChange={(e) =>
                 setFormData(prev => ({ ...prev, title: e.target.value }))
                 }
-              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.title ? "border-red-500" : "border-gray-300"}`}
+              className={`w-full p-3 border rounded-lg   focus:border-blue-500 transition-colors ${errors.title ? "border-red-500" : "border-gray-300"}`}
               />
             <div className="flex justify-between items-center mt-1">
               {errors.title ? (
@@ -618,7 +618,7 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
                 setFormData(prev => ({ ...prev, description: e.target.value }))
                 }
                 rows={6}
-              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none ${errors.description ? "border-red-500" : "border-gray-300"}`}
+              className={`w-full p-3 border rounded-lg   focus:border-blue-500 transition-colors resize-none ${errors.description ? "border-red-500" : "border-gray-300"}`}
               />
             <div className="flex justify-between items-center mt-1">
               {errors.description ? (
@@ -724,7 +724,7 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
               placeholder="e.g. auction, antique, collectible, rare"
                 onChange={handleTagInput}
               value={formData.tags.join(", ")}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full p-3 border border-gray-300 rounded-lg   focus:border-blue-500 transition-colors"
               />
               {formData.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
@@ -871,7 +871,7 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
                     onChange={(e) =>
                     handleAuctionSettingChange("startingPrice", e.target.value)
                     }
-                  className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.startingPrice ? "border-red-500" : "border-gray-300"}`}
+                  className={`w-full p-3 border rounded-lg   focus:border-blue-500 transition-colors ${errors.startingPrice ? "border-red-500" : "border-gray-300"}`}
                   />
                   {errors.startingPrice && (
                   <p className="text-red-500 text-sm mt-1 flex items-center">
@@ -894,7 +894,7 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
                     onChange={(e) =>
                       handleAuctionSettingChange("reservePrice", e.target.value)
                     }
-                  className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.reservePrice ? "border-red-500" : "border-gray-300"}`}
+                  className={`w-full p-3 border rounded-lg   focus:border-blue-500 transition-colors ${errors.reservePrice ? "border-red-500" : "border-gray-300"}`}
                   />
                   {errors.reservePrice && (
                   <p className="text-red-500 text-sm mt-1 flex items-center">
@@ -918,7 +918,7 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
                   onChange={(e) =>
                   handleAuctionSettingChange("biddingIncrementPrice", e.target.value)
                   }
-                className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.biddingIncrementPrice ? "border-red-500" : "border-gray-300"}`}
+                className={`w-full p-3 border rounded-lg   focus:border-blue-500 transition-colors ${errors.biddingIncrementPrice ? "border-red-500" : "border-gray-300"}`}
                 />
                 {errors.biddingIncrementPrice && (
                 <p className="text-red-500 text-sm mt-1 flex items-center">
@@ -982,7 +982,7 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
                         onChange={(e) =>
                           handleAuctionSettingChange("endDate", e.target.value)
                         }
-                      className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.endDate ? "border-red-500" : "border-gray-300"}`}
+                      className={`w-full p-3 border rounded-lg   focus:border-blue-500 transition-colors ${errors.endDate ? "border-red-500" : "border-gray-300"}`}
                       />
                       {errors.endDate && (
                       <p className="text-red-500 text-sm mt-1 flex items-center">
@@ -1001,7 +1001,7 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
                         onChange={(e) =>
                           handleAuctionSettingChange("endTime", e.target.value)
                         }
-                      className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.endTime ? "border-red-500" : "border-gray-300"}`}
+                      className={`w-full p-3 border rounded-lg   focus:border-blue-500 transition-colors ${errors.endTime ? "border-red-500" : "border-gray-300"}`}
                       />
                       {errors.endTime && (
                       <p className="text-red-500 text-sm mt-1 flex items-center">
@@ -1096,7 +1096,7 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
                         onChange={(e) =>
                         setFormData(prev => ({ ...prev, shippingCharge: e.target.value }))
                         }
-                      className={`w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.shippingCharge ? "border-red-500" : "border-gray-300"}`}
+                      className={`w-full p-2 border rounded   focus:border-blue-500 ${errors.shippingCharge ? "border-red-500" : "border-gray-300"}`}
                       />
                     )}
                   </div>

@@ -249,7 +249,7 @@ const AddProductForm = () => {
                     setSelectedCategory(e.target.value);
                     setFormData({ ...formData, subCategoryId: "" });
                   }}
-                  className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                  className={`w-full p-3 border-2 rounded-lg   focus:border-blue-500 transition-colors ${
                     errors.category ? "border-red-500" : "border-gray-300"
                   }`}
                 >
@@ -275,7 +275,7 @@ const AddProductForm = () => {
                     setFormData({ ...formData, subCategoryId: e.target.value })
                   }
                   disabled={!selectedCategory}
-                  className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors disabled:bg-gray-100 ${
+                  className={`w-full p-3 border-2 rounded-lg   focus:border-blue-500 transition-colors disabled:bg-gray-100 ${
                     errors.subCategory ? "border-red-500" : "border-gray-300"
                   }`}
                 >
@@ -306,7 +306,7 @@ const AddProductForm = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, title: e.target.value })
                 }
-                className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                className={`w-full p-3 border-2 rounded-lg   focus:border-blue-500 transition-colors ${
                   errors.title ? "border-red-500" : "border-gray-300"
                 }`}
               />
@@ -328,7 +328,7 @@ const AddProductForm = () => {
                   setFormData({ ...formData, description: e.target.value })
                 }
                 rows={6}
-                className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none ${
+                className={`w-full p-3 border-2 rounded-lg   focus:border-blue-500 transition-colors resize-none ${
                   errors.description ? "border-red-500" : "border-gray-300"
                 }`}
               />
@@ -401,7 +401,7 @@ const AddProductForm = () => {
                 type="text"
                 placeholder="e.g. electronics, smartphone, android"
                 onChange={handleTagInput}
-                className="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full p-3 border-2 border-gray-300 rounded-lg   focus:border-blue-500 transition-colors"
               />
               {formData.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
@@ -521,7 +521,7 @@ const AddProductForm = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, fixedPrice: e.target.value })
                   }
-                  className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                  className={`w-full p-3 border-2 rounded-lg   focus:border-blue-500 transition-colors ${
                     errors.fixedPrice ? "border-red-500" : "border-gray-300"
                   }`}
                 />
@@ -553,7 +553,7 @@ const AddProductForm = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, originPrice: e.target.value })
                     }
-                    className="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className="w-full p-3 border-2 border-gray-300 rounded-lg   focus:border-blue-500 transition-colors"
                   />
                 )}
               </div>
@@ -648,7 +648,7 @@ const AddProductForm = () => {
                             shippingCharge: e.target.value,
                           })
                         }
-                        className={`mt-2 w-full p-2 border rounded focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
+                        className={`mt-2 w-full p-2 border rounded  focus:ring-orange-500 focus:border-orange-500 ${
                           errors.shippingCharge
                             ? "border-red-500"
                             : "border-gray-300"

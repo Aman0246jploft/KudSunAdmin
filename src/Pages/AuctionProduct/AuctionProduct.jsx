@@ -260,7 +260,7 @@ const handleDelete = (product) => {
             <select
               value={shippingType}
               onChange={(e) => setShippingType(e.target.value)}
-              className="border outline-none rounded px-3 py-2 text-sm w-full sm:w-auto min-w-[120px] focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="border outline-none rounded px-3 py-2 text-sm w-full sm:w-auto min-w-[120px]   focus:border-transparent"
             >
               {shippingOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -283,7 +283,7 @@ const handleDelete = (product) => {
                 }));
                 setPagination((prev) => ({ ...prev, pageNo: 1 }));
               }}
-              className="px-3 py-2 border rounded-md w-full sm:w-auto min-w-[140px] focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-3 py-2 border rounded-md w-full sm:w-auto min-w-[140px]   focus:border-transparent"
             >
               <option value="">All Categories</option>
               {categoryList &&
@@ -307,7 +307,7 @@ const handleDelete = (product) => {
                 }));
                 setPagination((prev) => ({ ...prev, pageNo: 1 }));
               }}
-              className="px-3 py-2 border rounded-md w-full sm:w-auto min-w-[150px] focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+              className="px-3 py-2 border rounded-md w-full sm:w-auto min-w-[150px]   focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
               disabled={!selectedCategory}
             >
               <option value="">All Subcategories</option>
@@ -320,7 +320,7 @@ const handleDelete = (product) => {
 
             {/* Search Input */}
             <input
-              className="px-3 py-2 outline-none border rounded-md w-full sm:w-auto min-w-[220px] lg:min-w-[250px] focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-3 py-2 outline-none border rounded-md w-full sm:w-auto min-w-[220px] lg:min-w-[250px]   focus:border-transparent"
               type="text"
               placeholder="Search product"
               value={filters.keyWord}
