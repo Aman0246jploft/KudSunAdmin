@@ -13,7 +13,7 @@ const MainLayout = ({ children }) => {
     const checkMobile = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
-      
+
       // Set initial sidebar state based on screen size
       if (mobile) {
         setIsSidebarOpen(false); // Always closed on mobile initially
@@ -24,7 +24,7 @@ const MainLayout = ({ children }) => {
 
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    
+
     return () => window.removeEventListener('resize', checkMobile);
   }, []); // Remove isSidebarOpen from dependency array to prevent loops
 
@@ -37,24 +37,21 @@ const MainLayout = ({ children }) => {
       className="flex h-screen overflow-hidden"
       style={{ backgroundColor: theme.colors.background }}
     >
-      {/* Sidebar */} 
-      <Sidebar 
-        isOpen={isSidebarOpen} 
-        toggleSidebar={toggleSidebar} 
+      {/* Sidebar */}
+      <Sidebar
+        isOpen={isSidebarOpen}
+        toggleSidebar={toggleSidebar}
         isMobile={isMobile}
       />
 
       {/* Main Content Area */}
       <div
-        className={`flex-1 flex flex-col transition-all duration-300 ${
-          // On mobile: no margin (sidebar overlays)
-          // On desktop: apply margin based on sidebar state
-          isMobile 
-            ? "ml-0" 
-            : isSidebarOpen 
-              ? "ml-64" 
+        className={`flex-1 flex flex-col transition-all duration-300 w-1/2 ${isMobile
+            ? "ml-0"
+            : isSidebarOpen
+              ? "ml-64"
               : "ml-16"
-        }`}
+          }`}
       >
         {/* Header */}
         <Header toggleSidebar={toggleSidebar} isMobile={isMobile} />

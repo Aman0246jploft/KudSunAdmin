@@ -455,7 +455,7 @@ export default function UserInfo() {
             key: 'totalAssociatedProducts',
             label: 'Associated Products',
             render: (value) => (
-                <div className="text-center">
+                <div className="text-start">
                     <span className="font-medium" style={{ color: theme.colors.textPrimary }}>
                         {value || 0}
                     </span>
@@ -543,11 +543,11 @@ export default function UserInfo() {
             label: 'Status',
             render: (value) => getStatusBadge(value)
         },
-        {
-            key: 'paymentStatus',
-            label: 'Payment',
-            render: (value) => getStatusBadge(value)
-        },
+        // {
+        //     key: 'paymentStatus',
+        //     label: 'Payment',
+        //     render: (value) => getStatusBadge(value)
+        // },
         {
             key: 'createdAt',
             label: 'Date',
