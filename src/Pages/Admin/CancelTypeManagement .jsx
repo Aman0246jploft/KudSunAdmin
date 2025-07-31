@@ -20,7 +20,7 @@ const CancelTypeManagement  = () => {
   const [pageSize, setPageSize] = useState(10);
 
   const {
-    reports: reportTypes = [],
+    data: reportTypes = [],
     size = 0,
     loading: reportTypesLoading = false,
     totalReportTypes = 0,
@@ -135,7 +135,7 @@ const CancelTypeManagement  = () => {
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Report Type Management</h1>
+        <h1 className="text-2xl font-bold">Cancel Type Management</h1>
         <Button variant="primary" onClick={() => handleOpenModal()}>
           Add New Cancel Type
         </Button>

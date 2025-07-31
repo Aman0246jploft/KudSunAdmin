@@ -190,36 +190,56 @@ export default function User() {
     setIsModalOpen(true); // Open the modal
   };
 
-  const handleDelete = (product) => {
-    // Create FormData
-    const formData = new FormData();
-    confirmAlert({
-      title: "Confirm to submit",
-      message: "Are you sure to delete this.",
-      buttons: [
-        {
-          label: "Yes",
-          onClick: () => {
-            dispatch(softDelete({ id: product._id }))
-              .unwrap()
-              .then((res) => {
-                dispatch(fetchUserList({
-                  ...pagination,
-                  keyWord, // Add keyword parameter
-                }));
-              })
-              .catch((err) => {
-                console.error("Failed to update product status:", err);
-              });
-          },
-        },
-        {
-          label: "No",
-          onClick: () => { },
-        },
-      ],
-    });
+  // const handleDelete = (product) => {
+  //   // Create FormData
+  //   const formData = new FormData();
+  //   confirmAlert({
+  //     title: "Confirm to submit",
+  //     message: "Are you sure to delete this.",
+  //     buttons: [
+  //       {
+  //         label: "Yes",
+  //         onClick: () => {
+  //           dispatch(softDelete({ id: product._id }))
+  //             .unwrap()
+  //             .then((res) => {
+  //               dispatch(fetchUserList({
+  //                 ...pagination,
+  //                 keyWord, // Add keyword parameter
+  //               }));
+  //             })
+  //             .catch((err) => {
+  //               console.error("Failed to update product status:", err);
+  //             });
+  //         },
+  //       },
+  //       {
+  //         label: "No",
+  //         onClick: () => { },
+  //       },
+  //     ],
+  //   });
+  // };
+
+
+
+  const handleDelete = async (product) => {
+    const confirmed = window.confirm(`Are you sure you want to delete ${product?.userName || product.phoneNumber} ?`);
+    if (!confirmed) return;
+
+    try {
+      await dispatch(softDelete({ id: product._id })).unwrap();
+      dispatch(fetchUserList({
+        ...pagination,
+        keyWord,
+      }));
+    } catch (error) {
+      console.error("Failed to delete product:", error);
+    }
   };
+
+
+
 
   const fetchUserReports = async (userId, pageNo = 1, size = 5) => {
     console.log("userIduserId", userId);
@@ -367,7 +387,11 @@ export default function User() {
       key: "Location",
       label: "Location",
       render: (_, value) => {
-        return `${value?.userAddress?.province?.name} / ${value?.userAddress?.district?.name}` || "-";
+        const province = value?.userAddress?.province?.name || "";
+        const district = value?.userAddress?.district?.name || "";
+
+        const location = `${province} ${district}`.trim();
+        return location || "Not Found";
       }
     },
 
@@ -542,7 +566,7 @@ export default function User() {
             className="font-semibold text-xl"
             style={{ color: theme.colors.textPrimary }}
           >
-            Users List
+            Account List
           </div>
           <div className="flex flex-wrap  justify-end items-end gap-3">
             {/* Keyword Search Input */}
@@ -615,7 +639,7 @@ export default function User() {
 
             <div className="flex flex-col">
               <label className="mb-1 text-sm font-medium text-gray-700 select-none">
-                User Status:
+                Account Status:
               </label>
               <select
                 value={userStatusFilter}
@@ -758,7 +782,7 @@ export default function User() {
           }}
         >
           {selectedUser && isModalOpen === true && (
-            <div className="p-0 bg-white  rounded-lg shadow-sm border border-gray-200  w-full max-w-md sm:max-w-lg mx-auto flex flex-col max-h-[80vh]">
+            <div className="p-0 rounded-lg shadow-sm border border-gray-200  w-full max-w-md sm:max-w-lg mx-auto flex flex-col max-h-[80vh]">
               {/* Header */}
               <div className="sticky top-0 z-10 bg-white  rounded-t-lg px-4 sm:px-6 pt-4 pb-2 border-b border-gray-200 ">
                 <h2 className="text-2xl font-bold text-gray-900 -1">Change Password</h2>
@@ -802,7 +826,7 @@ export default function User() {
                   className="flex-1 bg-blue-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={!newPassword.trim()}
                 >
-                  Change Password
+                  Update Password
                 </button>
               </div>
             </div>

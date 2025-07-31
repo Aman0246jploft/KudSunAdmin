@@ -73,9 +73,9 @@ const EditProductForm = ({
       if (productData.specifics && Array.isArray(productData.specifics)) {
         const initialSpecifics = productData.specifics.map((spec) => ({
           parameterId: spec.parameterId || spec.parameterID,
-            parameterName: spec.parameterName,
+          parameterName: spec.parameterName,
           valueId: spec.valueId || spec.valueID,
-            valueName: spec.valueName,
+          valueName: spec.valueName,
         }));
         console.log("Initial product specifics:", productData.specifics);
         console.log("Mapped specifics:", initialSpecifics);
@@ -153,16 +153,16 @@ const EditProductForm = ({
         const fetchedSpecifics = res.payload?.data?.parameters || [];
         console.log("Fetched specifics for subcategory:", formData.subCategoryId, fetchedSpecifics);
         setSpecifics(fetchedSpecifics);
-        
+
         // If we have selectedSpecifics but they're not in the new list, clear them
         if (selectedSpecifics.length > 0) {
           const validSpecifics = selectedSpecifics.filter(spec => {
-            return fetchedSpecifics.some(param => 
-              param.key === spec.parameterName && 
+            return fetchedSpecifics.some(param =>
+              param.key === spec.parameterName &&
               param.values.some(val => val.value === spec.valueName)
             );
           });
-          
+
           if (validSpecifics.length !== selectedSpecifics.length) {
             setSelectedSpecifics(validSpecifics);
           }
@@ -190,12 +190,12 @@ const EditProductForm = ({
           }))
           .filter(spec => {
             // Only include specs that exist in the current specifics list
-            return specifics.some(param => 
-              param.key === spec.parameterName && 
+            return specifics.some(param =>
+              param.key === spec.parameterName &&
               param.values.some(val => val.value === spec.valueName)
             );
           });
-        
+
         if (restoredSpecifics.length > 0) {
           console.log("Restoring selected specifics:", restoredSpecifics);
           setSelectedSpecifics(restoredSpecifics);
@@ -339,7 +339,7 @@ const EditProductForm = ({
     // Shipping validation
     if (formData.shippingOption === "charge shipping") {
       if (!formData.shippingCharge.trim()) {
-      newErrors.shippingCharge = "Shipping charge is required";
+        newErrors.shippingCharge = "Shipping charge is required";
       } else {
         const charge = parseFloat(formData.shippingCharge);
         if (isNaN(charge) || charge < 0) {
@@ -392,10 +392,10 @@ const EditProductForm = ({
 
       // Specifics as JSON object
       if (selectedSpecifics.length > 0) {
-      const specificsObj = {};
-      selectedSpecifics.forEach(({ parameterName, valueName }) => {
-        specificsObj[parameterName] = valueName;
-      });
+        const specificsObj = {};
+        selectedSpecifics.forEach(({ parameterName, valueName }) => {
+          specificsObj[parameterName] = valueName;
+        });
         formDataToSend.append("specifics", JSON.stringify(specificsObj));
       }
 
@@ -414,11 +414,11 @@ const EditProductForm = ({
         formData: formDataToSend
       }));
 
-        if (updateProduct.fulfilled.match(result)) {
+      if (updateProduct.fulfilled.match(result)) {
         toast.success("Product updated successfully!");
-          onProductUpdate();
-          closeForm();
-        } else {
+        onProductUpdate();
+        closeForm();
+      } else {
         const { message } = result.payload || {};
         throw new Error(message || "Failed to update product");
       }
@@ -445,87 +445,87 @@ const EditProductForm = ({
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 z-10">
           <h2 className="text-2xl font-semibold text-gray-900">Edit Product</h2>
           <p className="text-gray-600 mt-1">Update your product information</p>
-          </div>
+        </div>
 
         <div className="p-6 space-y-6">
-    
-          
+
+
           {/* Category Selection */}
           <div className="grid md:grid-cols-2 gap-4">
-              <div>
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Category *
-                </label>
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => {
+                Category *
+              </label>
+              <select
+                value={selectedCategory}
+                onChange={(e) => {
                   console.log("Category changed to:", e.target.value);
-                    setSelectedCategory(e.target.value);
-                  }}
+                  setSelectedCategory(e.target.value);
+                }}
                 className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.category ? "border-red-500" : "border-gray-300"
                   }`}
-                >
-                  <option value="">Select Category</option>
-                  {categoryList?.data?.map((cat) => (
-                    <option key={cat._id} value={cat._id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
-                {errors.category && (
+              >
+                <option value="">Select Category</option>
+                {categoryList?.data?.map((cat) => (
+                  <option key={cat._id} value={cat._id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+              {errors.category && (
                 <p className="text-red-500 text-sm mt-1 flex items-center">
                   <AlertCircle size={16} className="mr-1" />
                   {errors.category}
                 </p>
-                )}
-              </div>
+              )}
+            </div>
 
-              <div>
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Subcategory *
-                </label>
-                <select
+                Subcategory *
+              </label>
+              <select
                 value={formData.subCategoryId || ""}
                 onChange={(e) => {
                   console.log("Subcategory changed to:", e.target.value);
                   setFormData(prev => ({ ...prev, subCategoryId: e.target.value }));
                 }}
-                  disabled={!selectedCategory}
+                disabled={!selectedCategory}
                 className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors disabled:bg-gray-100 ${errors.subCategory ? "border-red-500" : "border-gray-300"
                   }`}
-                >
-                  <option value="">Select Subcategory</option>
-                  {subCategories?.map((sub) => (
-                    <option key={sub._id} value={sub._id}>
-                      {sub.name}
-                    </option>
-                  ))}
-                </select>
-                {errors.subCategory && (
+              >
+                <option value="">Select Subcategory</option>
+                {subCategories?.map((sub) => (
+                  <option key={sub._id} value={sub._id}>
+                    {sub.name}
+                  </option>
+                ))}
+              </select>
+              {errors.subCategory && (
                 <p className="text-red-500 text-sm mt-1 flex items-center">
                   <AlertCircle size={16} className="mr-1" />
-                    {errors.subCategory}
-                  </p>
-                )}
-              </div>
+                  {errors.subCategory}
+                </p>
+              )}
             </div>
+          </div>
 
           {/* Title */}
-            <div>
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-                Product Title *
-              </label>
-              <input
-                type="text"
+              Product Title *
+            </label>
+            <input
+              type="text"
               placeholder="Enter a descriptive product title"
-                value={formData.title}
+              value={formData.title}
               maxLength={MAX_TITLE_LENGTH}
-                onChange={(e) =>
+              onChange={(e) =>
                 setFormData(prev => ({ ...prev, title: e.target.value }))
-                }
+              }
               className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.title ? "border-red-500" : "border-gray-300"
                 }`}
-              />
+            />
             <div className="flex justify-between items-center mt-1">
               {errors.title ? (
                 <p className="text-red-500 text-sm flex items-center">
@@ -539,24 +539,24 @@ const EditProductForm = ({
                 {formData.title.length}/{MAX_TITLE_LENGTH}
               </p>
             </div>
-            </div>
+          </div>
 
           {/* Description */}
-            <div>
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-                Description *
-              </label>
-              <textarea
+              Description *
+            </label>
+            <textarea
               placeholder="Provide detailed information about your product..."
-                value={formData.description}
-                maxLength={MAX_DESCRIPTION_LENGTH}
-                onChange={(e) =>
+              value={formData.description}
+              maxLength={MAX_DESCRIPTION_LENGTH}
+              onChange={(e) =>
                 setFormData(prev => ({ ...prev, description: e.target.value }))
-                }
-                rows={6}
+              }
+              rows={6}
               className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none ${errors.description ? "border-red-500" : "border-gray-300"
                 }`}
-              />
+            />
             <div className="flex justify-between items-center mt-1">
               {errors.description ? (
                 <p className="text-red-500 text-sm flex items-center">
@@ -568,74 +568,74 @@ const EditProductForm = ({
               )}
               <p className="text-sm text-gray-500">
                 {formData.description.length}/{MAX_DESCRIPTION_LENGTH}
-                </p>
-              </div>
+              </p>
             </div>
+          </div>
 
           {/* Images */}
-            <div>
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Product Images * (Maximum {MAX_IMAGES})
-              </label>
+            </label>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-4">
-                {/* Existing Images */}
-                {existingImages.map((url, index) => (
-                  <div key={`existing-${index}`} className="relative group">
-                    <img
-                      src={url}
+              {/* Existing Images */}
+              {existingImages.map((url, index) => (
+                <div key={`existing-${index}`} className="relative group">
+                  <img
+                    src={url}
                     alt={`Product ${index + 1}`}
                     className="w-full h-24 object-cover rounded-lg border border-gray-200"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeExistingImage(index)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeExistingImage(index)}
                     className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
-                    >
+                  >
                     <X size={14} />
-                    </button>
+                  </button>
                   <div className="absolute bottom-1 left-1 bg-black bg-opacity-50 text-white text-xs px-1 rounded">
                     Existing
                   </div>
-                  </div>
-                ))}
+                </div>
+              ))}
 
-                {/* New Images */}
-                {imagePreview.map((url, index) => (
-                  <div key={`new-${index}`} className="relative group">
-                    <img
-                      src={url}
-                      alt={`New ${index + 1}`}
+              {/* New Images */}
+              {imagePreview.map((url, index) => (
+                <div key={`new-${index}`} className="relative group">
+                  <img
+                    src={url}
+                    alt={`New ${index + 1}`}
                     className="w-full h-24 object-cover rounded-lg border border-blue-200"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(index)}
                     className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
-                    >
+                  >
                     <X size={14} />
-                    </button>
+                  </button>
                   <div className="absolute bottom-1 left-1 bg-blue-500 text-white text-xs px-1 rounded">
                     New
                   </div>
-                  </div>
-                ))}
+                </div>
+              ))}
 
-                {/* Upload Button */}
+              {/* Upload Button */}
               {existingImages.length + formData.images.length < MAX_IMAGES && (
                 <label className="w-full h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-gray-400 hover:bg-gray-50 transition-colors">
-                    <Upload size={20} className="text-gray-400" />
+                  <Upload size={20} className="text-gray-400" />
                   <span className="text-xs text-gray-500 mt-1">Add Image</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={handleImageUpload}
-                      className="hidden"
-                    />
-                  </label>
-                )}
-              </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                </label>
+              )}
+            </div>
 
             <div className="flex justify-between items-center">
               <p className="text-sm text-gray-500">
@@ -648,87 +648,87 @@ const EditProductForm = ({
                 </p>
               )}
             </div>
-            </div>
+          </div>
 
-            {/* Tags */}
-            <div>
+          {/* Tags */}
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-                <Tag className="inline w-4 h-4 mr-1" />
+              <Tag className="inline w-4 h-4 mr-1" />
               Tags (comma separated, max 10)
-              </label>
-              <input
-                type="text"
+            </label>
+            <input
+              type="text"
               placeholder="e.g. electronics, smartphone, android, new"
-                onChange={handleTagInput}
+              onChange={handleTagInput}
               value={formData.tags.join(", ")}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              />
-              {formData.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {formData.tags.map((tag, index) => (
-                    <span
-                      key={index}
+            />
+            {formData.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {formData.tags.map((tag, index) => (
+                  <span
+                    key={index}
                     className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full flex items-center gap-2 border"
-                    >
-                      {tag}
-                      <button
-                        type="button"
-                        onClick={() => removeTag(index)}
+                  >
+                    {tag}
+                    <button
+                      type="button"
+                      onClick={() => removeTag(index)}
                       className="text-gray-500 hover:text-gray-700"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
 
-            {/* Specifics */}
-            {specifics.length > 0 && (
-              <div>
+          {/* Specifics */}
+          {specifics.length > 0 && (
+            <div>
               <div className="flex justify-between items-center mb-3">
                 <label className="block text-sm font-medium text-gray-700">
                   Product Specifications *
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => setOpenSpecificModal(true)}
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setOpenSpecificModal(true)}
                   className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium text-sm"
-                  >
-                    <Plus size={16} />
+                >
+                  <Plus size={16} />
                   Add Specification
-                  </button>
-                </div>
+                </button>
+              </div>
 
               {selectedSpecifics.length > 0 ? (
                 <div className="space-y-2">
-                    {selectedSpecifics.map((spec, i) => (
-                      <div
-                        key={i}
-                        className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border"
-                      >
-                        <div>
-                          <span className="font-medium text-gray-900">
-                            {spec.parameterName}:
-                          </span>
-                          <span className="ml-2 text-gray-700">
-                            {spec.valueName}
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          className="text-red-500 hover:text-red-700 p-1"
-                          onClick={() =>
-                            setSelectedSpecifics((prev) =>
-                              prev.filter((_, index) => index !== i)
-                            )
-                          }
-                        >
-                          <X size={16} />
-                        </button>
+                  {selectedSpecifics.map((spec, i) => (
+                    <div
+                      key={i}
+                      className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border"
+                    >
+                      <div>
+                        <span className="font-medium text-gray-900">
+                          {spec.parameterName}:
+                        </span>
+                        <span className="ml-2 text-gray-700">
+                          {spec.valueName}
+                        </span>
                       </div>
-                    ))}
+                      <button
+                        type="button"
+                        className="text-red-500 hover:text-red-700 p-1"
+                        onClick={() =>
+                          setSelectedSpecifics((prev) =>
+                            prev.filter((_, index) => index !== i)
+                          )
+                        }
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ))}
                 </div>
               ) : (
                 <div className="text-center py-4 text-gray-500 border border-dashed border-gray-300 rounded-lg">
@@ -736,100 +736,100 @@ const EditProductForm = ({
                 </div>
               )}
 
-                    {errors.specifics && (
+              {errors.specifics && (
                 <p className="text-red-500 text-sm mt-2 flex items-center">
                   <AlertCircle size={16} className="mr-1" />
-                        {errors.specifics}
-                      </p>
-                )}
-              </div>
-            )}
+                  {errors.specifics}
+                </p>
+              )}
+            </div>
+          )}
 
-            {/* Condition */}
-            <div>
+          {/* Condition */}
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">
               Product Condition *
-              </label>
+            </label>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {conditionOptions.map((option) => (
-                  <label
-                    key={option.value}
+              {conditionOptions.map((option) => (
+                <label
+                  key={option.value}
                   className={`cursor-pointer p-4 rounded-lg border-2 transition-all ${formData.condition === option.value
-                      ? "border-blue-500 bg-blue-50"
-                        : "border-gray-200 hover:border-gray-300"
+                    ? "border-blue-500 bg-blue-50"
+                    : "border-gray-200 hover:border-gray-300"
                     }`}
-                  >
-                    <input
-                      type="radio"
-                      name="condition"
-                      value={option.value}
-                      checked={formData.condition === option.value}
-                      onChange={(e) =>
+                >
+                  <input
+                    type="radio"
+                    name="condition"
+                    value={option.value}
+                    checked={formData.condition === option.value}
+                    onChange={(e) =>
                       setFormData(prev => ({ ...prev, condition: e.target.value }))
-                      }
-                      className="sr-only"
-                    />
+                    }
+                    className="sr-only"
+                  />
                   <div className="text-sm">
                     <div className="font-medium text-gray-900">{option.label}</div>
                     <div className="text-gray-600 text-xs mt-1">{option.description}</div>
                   </div>
-                  </label>
-                ))}
-              </div>
-              {errors.condition && (
+                </label>
+              ))}
+            </div>
+            {errors.condition && (
               <p className="text-red-500 text-sm mt-2 flex items-center">
                 <AlertCircle size={16} className="mr-1" />
                 {errors.condition}
               </p>
+            )}
+          </div>
+
+          {/* Pricing */}
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                ฿
+                Price *
+              </label>
+              <input
+                type="number"
+                placeholder="0.00"
+                min="0"
+                step="0.01"
+                value={formData.fixedPrice}
+                onChange={(e) =>
+                  setFormData(prev => ({ ...prev, fixedPrice: e.target.value }))
+                }
+                className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.fixedPrice ? "border-red-500" : "border-gray-300"
+                  }`}
+              />
+              {errors.fixedPrice && (
+                <p className="text-red-500 text-sm mt-1 flex items-center">
+                  <AlertCircle size={16} className="mr-1" />
+                  {errors.fixedPrice}
+                </p>
               )}
             </div>
 
-            {/* Pricing */}
-          <div className="grid md:grid-cols-2 gap-4">
-              <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <DollarSign className="inline w-4 h-4 mr-1" />
-                Price *
-                </label>
-                <input
-                  type="number"
-                  placeholder="0.00"
-                min="0"
-                step="0.01"
-                  value={formData.fixedPrice}
-                  onChange={(e) =>
-                  setFormData(prev => ({ ...prev, fixedPrice: e.target.value }))
-                  }
-                className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.fixedPrice ? "border-red-500" : "border-gray-300"
-                  }`}
-                />
-                {errors.fixedPrice && (
-                <p className="text-red-500 text-sm mt-1 flex items-center">
-                  <AlertCircle size={16} className="mr-1" />
-                    {errors.fixedPrice}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <div className="flex items-center gap-2 mb-2">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
                 <label className="block text-sm font-medium text-gray-700">
-                    Original Price
-                  </label>
-                  <button
-                    type="button"
+                  Original Price
+                </label>
+                <button
+                  type="button"
                   onClick={() => {
                     setShowOriginPrice(!showOriginPrice);
                     if (showOriginPrice) {
                       setFormData(prev => ({ ...prev, originPrice: "" }));
                     }
                   }}
-                    className="text-sm text-blue-600 hover:text-blue-700"
-                  >
-                    {showOriginPrice ? "Hide" : "Show"}
-                  </button>
-                </div>
-                {showOriginPrice && (
+                  className="text-sm text-blue-600 hover:text-blue-700"
+                >
+                  {showOriginPrice ? "Hide" : "Show"}
+                </button>
+              </div>
+              {showOriginPrice && (
                 <>
                   <input
                     type="number"
@@ -850,120 +850,120 @@ const EditProductForm = ({
                     </p>
                   )}
                 </>
-                )}
-              </div>
+              )}
             </div>
+          </div>
 
-            {/* Shipping Options */}
-            <div>
+          {/* Shipping Options */}
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">
-                <Truck className="inline w-4 h-4 mr-1" />
+              <Truck className="inline w-4 h-4 mr-1" />
               Delivery Options
+            </label>
+
+            <div className="space-y-3">
+              <label className="flex items-start p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                <input
+                  type="radio"
+                  name="shippingOption"
+                  value="local pickup"
+                  checked={formData.shippingOption === "local pickup"}
+                  onChange={(e) =>
+                    setFormData(prev => ({
+                      ...prev,
+                      shippingOption: e.target.value,
+                      shippingCharge: "",
+                    }))
+                  }
+                  className="mt-1 mr-3"
+                />
+                <div>
+                  <div className="flex items-center gap-2 font-medium">
+                    <MapPin size={16} />
+                    Local Pickup Only
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    Buyer collects the item from your location
+                  </p>
+                </div>
               </label>
 
-              <div className="space-y-3">
               <label className="flex items-start p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                  <input
-                    type="radio"
-                    name="shippingOption"
-                    value="local pickup"
-                    checked={formData.shippingOption === "local pickup"}
-                    onChange={(e) =>
+                <input
+                  type="radio"
+                  name="shippingOption"
+                  value="free shipping"
+                  checked={formData.shippingOption === "free shipping"}
+                  onChange={(e) =>
                     setFormData(prev => ({
                       ...prev,
-                        shippingOption: e.target.value,
-                        shippingCharge: "",
+                      shippingOption: e.target.value,
+                      shippingCharge: "",
                     }))
-                    }
+                  }
                   className="mt-1 mr-3"
-                  />
-                  <div>
-                    <div className="flex items-center gap-2 font-medium">
-                      <MapPin size={16} />
-                      Local Pickup Only
-                    </div>
-                    <p className="text-sm text-gray-600">
-                    Buyer collects the item from your location
-                    </p>
-                  </div>
-                </label>
-
-              <label className="flex items-start p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                  <input
-                    type="radio"
-                    name="shippingOption"
-                    value="free shipping"
-                    checked={formData.shippingOption === "free shipping"}
-                    onChange={(e) =>
-                    setFormData(prev => ({
-                      ...prev,
-                        shippingOption: e.target.value,
-                        shippingCharge: "",
-                    }))
-                    }
-                  className="mt-1 mr-3"
-                  />
-                  <div>
+                />
+                <div>
                   <div className="font-medium text-green-700">Free Shipping</div>
-                    <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-600">
                     You cover all shipping costs
-                    </p>
-                  </div>
-                </label>
+                  </p>
+                </div>
+              </label>
 
               <label className="flex items-start p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                  <input
-                    type="radio"
-                    name="shippingOption"
-                    value="charge shipping"
-                    checked={formData.shippingOption === "charge shipping"}
-                    onChange={(e) =>
+                <input
+                  type="radio"
+                  name="shippingOption"
+                  value="charge shipping"
+                  checked={formData.shippingOption === "charge shipping"}
+                  onChange={(e) =>
                     setFormData(prev => ({ ...prev, shippingOption: e.target.value }))
-                    }
+                  }
                   className="mt-1 mr-3"
-                  />
-                  <div className="flex-1">
+                />
+                <div className="flex-1">
                   <div className="font-medium text-orange-700">Charged Shipping</div>
                   <p className="text-sm text-gray-600 mb-2">Buyer pays for shipping</p>
-                    {formData.shippingOption === "charge shipping" && (
-                      <input
-                        type="number"
+                  {formData.shippingOption === "charge shipping" && (
+                    <input
+                      type="number"
                       placeholder="Enter shipping charge"
                       min="0"
                       step="0.01"
-                        value={formData.shippingCharge}
-                        onChange={(e) =>
+                      value={formData.shippingCharge}
+                      onChange={(e) =>
                         setFormData(prev => ({ ...prev, shippingCharge: e.target.value }))
-                        }
+                      }
                       className={`w-full p-2 border rounded focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${errors.shippingCharge ? "border-red-500" : "border-gray-300"
                         }`}
-                      />
-                    )}
-                  </div>
-                </label>
-              </div>
-              {errors.shippingCharge && (
+                    />
+                  )}
+                </div>
+              </label>
+            </div>
+            {errors.shippingCharge && (
               <p className="text-red-500 text-sm mt-2 flex items-center">
                 <AlertCircle size={16} className="mr-1" />
-                  {errors.shippingCharge}
-                </p>
-              )}
+                {errors.shippingCharge}
+              </p>
+            )}
           </div>
-            </div>
+        </div>
 
         {/* Footer with action buttons */}
         <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex gap-3">
-                <button
-                  type="button"
-                  onClick={closeForm}
+          <button
+            type="button"
+            onClick={closeForm}
             disabled={loading}
             className="flex-1 bg-gray-100 text-gray-700 font-medium py-3 px-6 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSubmit}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={handleSubmit}
             disabled={loading}
             className="flex-1 bg-blue-600 text-white font-medium py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center"
           >
@@ -975,7 +975,7 @@ const EditProductForm = ({
             ) : (
               "Update Product"
             )}
-                </button>
+          </button>
         </div>
       </div>
 
@@ -1048,9 +1048,9 @@ const EditProductForm = ({
                               }))
                             }
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${isSelected
-                                ? "bg-blue-600 text-white border-blue-600"
-                                : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
-                            }`}
+                              ? "bg-blue-600 text-white border-blue-600"
+                              : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
+                              }`}
                           >
                             {val.value}
                           </button>

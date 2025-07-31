@@ -60,13 +60,34 @@ const AdminTransactions = () => {
   const [calculationModal, setCalculationModal] = useState({ show: false, data: null });
   const [disputeModal, setDisputeModal] = useState({ show: false, data: null });
   const [withdrawalDetailModal, setWithdrawalDetailModal] = useState({ show: false, data: null });
-  const [withdrawalActionModal, setWithdrawalActionModal] = useState({ show: false, data: null, action: '', notes: '' });
+  const [withdrawalActionModal, setWithdrawalActionModal] = useState({ show: false, data: null, action: '', notes: '', image: null });
   const [showFilters, setShowFilters] = useState(false);
   const [showWithdrawalFilters, setShowWithdrawalFilters] = useState(false);
 
   // Form validation
   const [errors, setErrors] = useState({});
   const [withdrawalErrors, setWithdrawalErrors] = useState({});
+  const [imagePreview, setImagePreview] = useState(null);
+
+  // Helper function to create image preview URL
+  const createImagePreview = (file) => {
+    if (file && file.type.startsWith('image/')) {
+      const url = URL.createObjectURL(file);
+      setImagePreview(url);
+      return url;
+    }
+    setImagePreview(null);
+    return null;
+  };
+
+  // Cleanup image preview URL when component unmounts or image changes
+  useEffect(() => {
+    return () => {
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [imagePreview]);
 
   // Fetch transactions list
   const fetchTransactions = async () => {
@@ -137,7 +158,7 @@ const AdminTransactions = () => {
   };
 
   // Handle withdrawal request action (approve/reject)
-  const handleWithdrawalAction = async (requestId, action, notes = '') => {
+  const handleWithdrawalAction = async (requestId, action, notes = '', image = null) => {
     try {
       setWithdrawalLoading(true);
 
@@ -151,15 +172,30 @@ const AdminTransactions = () => {
         return;
       }
 
-      const response = await authAxiosClient.post('/order/changeStatus', {
-        withdrawRequestId: requestId,
-        status: action,
-        notes: notes.trim()
+      // Create FormData to handle file upload
+      const formData = new FormData();
+      formData.append('withdrawRequestId', requestId);
+      formData.append('status', action);
+      formData.append('notes', notes.trim());
+
+      // Add image if provided
+      if (image) {
+        formData.append('image', image);
+      }
+
+      const response = await authAxiosClient.post('/order/changeStatus', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
       });
 
       if (response.data?.status === true) {
         toast.success(`Withdrawal request ${action.toLowerCase()} successfully`);
-        setWithdrawalActionModal({ show: false, data: null, action: '', notes: '' });
+        setWithdrawalActionModal({ show: false, data: null, action: '', notes: '', image: null });
+        if (imagePreview) {
+          URL.revokeObjectURL(imagePreview);
+          setImagePreview(null);
+        }
         fetchWithdrawalRequests(); // Refresh the list
       } else {
         throw new Error(response.data?.message || `Failed to ${action.toLowerCase()} withdrawal request`);
@@ -175,7 +211,7 @@ const AdminTransactions = () => {
   // Get dispute information for a transaction
   const getDisputeInfo = async (orderId) => {
     try {
-      const response = await authAxiosClient.get(`/dispute/byOrderId/${orderId}`);
+      const response = await authAxiosClient.get(`/dispute/disputeByOrderId/${orderId}`);
       if (response.data?.status === true) {
         setDisputeModal({ show: true, data: response.data.data });
       } else {
@@ -522,21 +558,16 @@ const AdminTransactions = () => {
   // Confirm withdrawal action
   const confirmWithdrawalAction = (request, action) => {
     const actionText = action === 'Approved' ? 'approve' : 'reject';
+    const confirmed = window.confirm(`Are you sure you want to ${actionText} this withdrawal request for ฿${request.amount}?`);
 
-    confirmAlert({
-      title: `Confirm ${action}`,
-      message: `Are you sure you want to ${actionText} this withdrawal request for ฿${request.amount}?`,
-      buttons: [
-        {
-          label: 'Yes',
-          onClick: () => setWithdrawalActionModal({ show: true, data: request, action, notes: '' })
-        },
-        {
-          label: 'No',
-          onClick: () => { }
-        }
-      ]
-    });
+    if (confirmed) {
+      // Clean up any existing image preview
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+        setImagePreview(null);
+      }
+      setWithdrawalActionModal({ show: true, data: request, action, notes: '', image: null });
+    }
   };
 
   // Table columns configuration for transactions
@@ -615,14 +646,14 @@ const AdminTransactions = () => {
             }`}>
             {row?.status?.toUpperCase()}
           </span>
-          {row?.sellerPayout && (
+          {/* {row?.sellerPayout && (
             <span className={`text-xs px-2 py-1 rounded-full ${row?.sellerPayout?.isPaidToSeller
               ? 'bg-green-100 text-green-800'
               : 'bg-red-100 text-red-800'
               }`}>
               {row?.sellerPayout?.isPaidToSeller ? 'Paid' : 'Unpaid'}
             </span>
-          )}
+          )} */}
           {row?.dispute && getDisputeStatusBadge(row.dispute)}
         </div>
       )
@@ -1717,6 +1748,7 @@ const AdminTransactions = () => {
             {withdrawalDetailModal.data && (
               <div className="space-y-6">
                 {/* Request Information */}
+
                 <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
                   <div>
                     <p className="text-sm text-gray-600">Request ID</p>
@@ -1754,6 +1786,20 @@ const AdminTransactions = () => {
                     </div>
                   </div>
                 </div>
+
+                {(withdrawalDetailModal?.data?.adminNotes||withdrawalDetailModal?.data?.adminImage[0]) && <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <p className="text-sm text-gray-600">Admin Notes</p>
+                    <p className="font-medium">{withdrawalDetailModal?.data?.adminNotes || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Image</p>
+                    <img src={withdrawalDetailModal?.data?.adminImage[0]} className='w-10 h-10' />
+                  </div>
+
+                </div>}
+
+
 
                 {/* Amount Breakdown */}
                 <div className="space-y-3">
@@ -1926,7 +1972,13 @@ const AdminTransactions = () => {
                 {withdrawalActionModal.action === 'Approved' ? 'Approve' : 'Reject'} Withdrawal Request
               </h2>
               <button
-                onClick={() => setWithdrawalActionModal({ show: false, data: null, action: '', notes: '' })}
+                onClick={() => {
+                  setWithdrawalActionModal({ show: false, data: null, action: '', notes: '', image: null });
+                  if (imagePreview) {
+                    URL.revokeObjectURL(imagePreview);
+                    setImagePreview(null);
+                  }
+                }}
                 className="text-gray-500 hover:text-gray-700 text-2xl"
               >
                 ×
@@ -1934,115 +1986,226 @@ const AdminTransactions = () => {
             </div>
 
             {withdrawalActionModal.data && (
-              <div className="space-y-4">
-                {/* Request Info */}
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Seller:</span>
-                      <span className="font-medium">{withdrawalActionModal.data.userId?.userName || 'N/A'}</span>
+              <div className="max-h-[90vh] overflow-y-auto">
+                <div className="space-y-4 p-1">
+                  {/* Request Info */}
+                  <div className="p-3 sm:p-4 bg-gray-50 rounded-lg">
+                    <div className="space-y-2 sm:space-y-3">
+                      <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
+                        <span className="text-sm text-gray-600">Seller:</span>
+                        <span className="font-medium break-words">
+                          {withdrawalActionModal.data.userId?.userName || 'N/A'}
+                        </span>
+                      </div>
+                      <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
+                        <span className="text-sm text-gray-600">Amount:</span>
+                        <span className="font-medium text-green-600">
+                          ฿{withdrawalActionModal.data.amount?.toFixed(2) || '0.00'}
+                        </span>
+                      </div>
+                      {(() => {
+                        const amount = withdrawalActionModal.data.amount || 0;
+                        const feeValue = withdrawalActionModal.data.withdrawfee || 0;
+                        const feeType = withdrawalActionModal.data.withdrawfeeType || 'FIXED';
+                        const calculatedFee = calculateWithdrawalFee(amount, feeValue, feeType);
+
+                        return (
+                          <>
+                            <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
+                              <span className="text-sm text-gray-600">
+                                Fee ({feeType}):
+                                {feeType === 'PERCENTAGE' && (
+                                  <span className="text-xs text-gray-500 block sm:inline sm:ml-1">
+                                    {feeValue}%
+                                  </span>
+                                )}
+                              </span>
+                              <span className="font-medium text-red-600">
+                                -฿{calculatedFee.toFixed(2)}
+                              </span>
+                            </div>
+                            <div className="flex flex-col sm:flex-row sm:justify-between border-t pt-2 gap-1 sm:gap-0">
+                              <span className="text-sm text-gray-600 font-medium">Net Transfer:</span>
+                              <span className="font-medium text-blue-600">
+                                ฿{(amount - calculatedFee).toFixed(2)}
+                              </span>
+                            </div>
+                          </>
+                        );
+                      })()}
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Amount:</span>
-                      <span className="font-medium text-green-600">
-                        ฿{withdrawalActionModal.data.amount?.toFixed(2) || '0.00'}
+                  </div>
+
+                  {/* Action Warning */}
+                  <div className={`p-3 sm:p-4 rounded-lg ${withdrawalActionModal.action === 'Approved'
+                    ? 'bg-green-50 border border-green-200'
+                    : 'bg-red-50 border border-red-200'
+                    }`}>
+                    <div className={`flex items-center space-x-2 ${withdrawalActionModal.action === 'Approved' ? 'text-green-800' : 'text-red-800'
+                      }`}>
+                      {withdrawalActionModal.action === 'Approved' ? (
+                        <FaCheck className="w-4 h-4 flex-shrink-0" />
+                      ) : (
+                        <FaTimes className="w-4 h-4 flex-shrink-0" />
+                      )}
+                      <span className="font-medium">
+                        {withdrawalActionModal.action === 'Approved' ? 'Approval Action' : 'Rejection Action'}
                       </span>
                     </div>
-                    {(() => {
-                      const amount = withdrawalActionModal.data.amount || 0;
-                      const feeValue = withdrawalActionModal.data.withdrawfee || 0;
-                      const feeType = withdrawalActionModal.data.withdrawfeeType || 'FIXED';
-                      const calculatedFee = calculateWithdrawalFee(amount, feeValue, feeType);
-
-                      return (
-                        <>
-                          <div className="flex justify-between">
-                            <span className="text-sm text-gray-600">
-                              Fee ({feeType}):
-                              {feeType === 'PERCENTAGE' && (
-                                <span className="text-xs text-gray-500 block">{feeValue}%</span>
-                              )}
-                            </span>
-                            <span className="font-medium text-red-600">
-                              -฿{calculatedFee.toFixed(2)}
-                            </span>
-                          </div>
-                          <div className="flex justify-between border-t pt-2">
-                            <span className="text-sm text-gray-600 font-medium">Net Transfer:</span>
-                            <span className="font-medium text-blue-600">
-                              ฿{(amount - calculatedFee).toFixed(2)}
-                            </span>
-                          </div>
-                        </>
-                      );
-                    })()}
                   </div>
-                </div>
 
-                {/* Action Warning */}
-                <div className={`p-3 rounded-lg ${withdrawalActionModal.action === 'Approved'
-                  ? 'bg-green-50 border border-green-200'
-                  : 'bg-red-50 border border-red-200'
-                  }`}>
-                  <div className={`flex items-center space-x-2 ${withdrawalActionModal.action === 'Approved' ? 'text-green-800' : 'text-red-800'
-                    }`}>
-                    {withdrawalActionModal.action === 'Approved' ? (
-                      <FaCheck className="w-4 h-4" />
-                    ) : (
-                      <FaTimes className="w-4 h-4" />
-                    )}
-                    <span className="font-medium">
-                      {withdrawalActionModal.action === 'Approved' ? 'Approval Action' : 'Rejection Action'}
-                    </span>
+                  {/* Notes */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Admin Notes (Optional)
+                    </label>
+                    <textarea
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                      rows="3"
+                      maxLength="500"
+                      placeholder={`Add notes for ${withdrawalActionModal.action.toLowerCase()} this request...`}
+                      value={withdrawalActionModal.notes || ''}
+                      onChange={(e) => setWithdrawalActionModal(prev => ({ ...prev, notes: e.target.value }))}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      {(withdrawalActionModal.notes || '').length}/500 characters
+                    </p>
                   </div>
-                  <p className={`text-sm mt-1 ${withdrawalActionModal.action === 'Approved' ? 'text-green-700' : 'text-red-700'
-                    }`}>
-                    {withdrawalActionModal.action === 'Approved'
-                      ? 'This action will process the withdrawal and transfer funds to the seller\'s account.'
-                      : 'This action will reject the withdrawal request and refund the amount to the seller\'s wallet.'
-                    }
-                  </p>
-                </div>
 
-                {/* Notes */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Admin Notes (Optional)
-                  </label>
-                  <textarea
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    rows="3"
-                    maxLength="500"
-                    placeholder={`Add notes for ${withdrawalActionModal.action.toLowerCase()} this request...`}
-                    value={withdrawalActionModal.notes || ''}
-                    onChange={(e) => setWithdrawalActionModal(prev => ({ ...prev, notes: e.target.value }))}
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    {(withdrawalActionModal.notes || '').length}/500 characters
-                  </p>
-                </div>
+                  {/* Image Upload - Only show for Approved actions */}
+                  {withdrawalActionModal.action === 'Approved' && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Supporting Document (Optional)
+                      </label>
+                      <div className="mt-1 flex justify-center px-4 sm:px-6 pt-4 sm:pt-5 pb-4 sm:pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                        <div className="space-y-1 text-center">
+                          <svg
+                            className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-gray-400"
+                            stroke="currentColor"
+                            fill="none"
+                            viewBox="0 0 48 48"
+                            aria-hidden="true"
+                          >
+                            <path
+                              d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                          <div className="flex text-sm text-gray-600">
+                            <label
+                              htmlFor="withdrawal-file-upload"
+                              className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
+                            >
+                              <span>Upload a file</span>
+                              <input
+                                id="withdrawal-file-upload"
+                                name="withdrawal-file-upload"
+                                type="file"
+                                className="sr-only"
+                                accept="image/*,.pdf,.doc,.docx"
+                                onChange={(e) => {
+                                  const file = e.target.files[0];
+                                  if (file) {
+                                    // Check file size (max 5MB)
+                                    if (file.size > 5 * 1024 * 1024) {
+                                      toast.error('File size must be less than 5MB');
+                                      e.target.value = '';
+                                      return;
+                                    }
+                                    setWithdrawalActionModal(prev => ({ ...prev, image: file }));
+                                    createImagePreview(file);
+                                  }
+                                }}
+                              />
+                            </label>
+                            <p className="pl-1 hidden sm:inline">or drag and drop</p>
+                          </div>
+                          <p className="text-xs text-gray-500">
+                            PNG, JPG, PDF up to 5MB
+                          </p>
+                        </div>
+                      </div>
+                      {withdrawalActionModal.image && (
+                        <div className="mt-4 p-3 sm:p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                          <div className="flex items-start justify-between mb-3">
+                            <h4 className="text-sm font-medium text-gray-700">Selected File</h4>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setWithdrawalActionModal(prev => ({ ...prev, image: null }));
+                                if (imagePreview) {
+                                  URL.revokeObjectURL(imagePreview);
+                                  setImagePreview(null);
+                                }
+                              }}
+                              className="text-red-600 hover:text-red-800 text-lg flex-shrink-0 ml-2"
+                              title="Remove file"
+                            >
+                              ✕
+                            </button>
+                          </div>
 
-                {/* Action Buttons */}
-                <div className="flex space-x-4">
-                  <Button
-                    variant={withdrawalActionModal.action === 'Approved' ? 'primary' : 'outline'}
-                    onClick={() => handleWithdrawalAction(
-                      withdrawalActionModal.data._id,
-                      withdrawalActionModal.action,
-                      withdrawalActionModal.notes
-                    )}
-                    disabled={withdrawalLoading}
-                    className={`flex-1 ${withdrawalActionModal.action === 'Rejected' ? 'border-red-300 text-red-600 hover:bg-red-50' : ''}`}
-                  >
-                    {withdrawalLoading ? 'Processing...' : `Confirm ${withdrawalActionModal.action}`}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => setWithdrawalActionModal({ show: false, data: null, action: '', notes: '' })}
-                    className="flex-1"
-                  >
-                    Cancel
-                  </Button>
+                          {/* Image Preview with Scroll Container */}
+                          {imagePreview && withdrawalActionModal.image.type.startsWith('image/') && (
+                            <div className="mb-3 max-h-48 overflow-y-auto border border-gray-300 rounded">
+                              <img
+                                src={imagePreview}
+                                alt="Preview"
+                                className="w-full object-contain shadow-sm"
+                              />
+                            </div>
+                          )}
+
+                          {/* File Info */}
+                          <div className="flex items-center text-sm text-gray-600">
+                            <span className="mr-2 flex-shrink-0">
+                              {withdrawalActionModal.image.type.startsWith('image/') ? '🖼️' :
+                                withdrawalActionModal.image.type.includes('pdf') ? '📄' : '📎'}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium truncate">{withdrawalActionModal.image.name}</p>
+                              <p className="text-xs text-gray-500">
+                                {(withdrawalActionModal.image.size / 1024 / 1024).toFixed(2)} MB • {withdrawalActionModal.image.type}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 pt-2">
+                    <Button
+                      variant={withdrawalActionModal.action === 'Approved' ? 'primary' : 'outline'}
+                      onClick={() => handleWithdrawalAction(
+                        withdrawalActionModal.data._id,
+                        withdrawalActionModal.action,
+                        withdrawalActionModal.notes,
+                        withdrawalActionModal.image
+                      )}
+                      disabled={withdrawalLoading}
+                      className={`flex-1 ${withdrawalActionModal.action === 'Rejected' ? 'border-red-300 text-red-600 hover:bg-red-50' : ''}`}
+                    >
+                      {withdrawalLoading ? 'Processing...' : `Confirm ${withdrawalActionModal.action}`}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setWithdrawalActionModal({ show: false, data: null, action: '', notes: '', image: null });
+                        if (imagePreview) {
+                          URL.revokeObjectURL(imagePreview);
+                          setImagePreview(null);
+                        }
+                      }}
+                      className="flex-1"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
                 </div>
               </div>
             )}

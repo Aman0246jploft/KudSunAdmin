@@ -104,31 +104,48 @@ export default function Thread() {
     handleFilterChange('tags', newTags);
   };
 
+  // const handleDelete = (threadId) => {
+  //   confirmAlert({
+  //     title: "Confirm to submit",
+  //     message: "Are you sure to delete this.",
+  //     buttons: [
+  //       {
+  //         label: "Yes",
+  //         onClick: () => {
+  //           dispatch(deleteThread(threadId))
+  //             .unwrap()
+  //             .then(() => {
+  //               fetchThreadsData();
+  //             })
+  //             .catch((err) => {
+  //               console.error("Failed to delete thread:", err);
+  //             });
+  //         },
+  //       },
+  //       {
+  //         label: "No",
+  //         onClick: () => { },
+  //       },
+  //     ],
+  //   });
+  // };
+
+
   const handleDelete = (threadId) => {
-    confirmAlert({
-      title: "Confirm to submit",
-      message: "Are you sure to delete this.",
-      buttons: [
-        {
-          label: "Yes",
-          onClick: () => {
-            dispatch(deleteThread(threadId))
-              .unwrap()
-              .then(() => {
-                fetchThreadsData();
-              })
-              .catch((err) => {
-                console.error("Failed to delete thread:", err);
-              });
-          },
-        },
-        {
-          label: "No",
-          onClick: () => { },
-        },
-      ],
-    });
+    const confirmDelete = window.confirm("Are you sure you want to delete this?");
+    if (!confirmDelete) return;
+
+    dispatch(deleteThread(threadId))
+      .unwrap()
+      .then(() => {
+        fetchThreadsData();
+      })
+      .catch((err) => {
+        console.error("Failed to delete thread:", err);
+      });
   };
+
+
 
   const handleToggleStatus = async (threadId) => {
     try {

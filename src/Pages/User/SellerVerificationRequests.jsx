@@ -73,7 +73,25 @@ export default function SellerVerificationRequests() {
     setModalOpen(true);
   };
 
+  // const handleStatusChange = async (request, status) => {
+  //   try {
+  //     setLoading(true);
+  //     await authAxiosClient.post("/sellerVerification/changeVerificationStatus", {
+  //       id: request._id,
+  //       status,
+  //     });
+  //     toast.success(`Request ${status.toLowerCase()} successfully`);
+  //     fetchRequests();
+  //   } catch (err) {
+  //     toast.error(err.response?.data?.message || err.message || "Failed to update status");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   const handleStatusChange = async (request, status) => {
+    const confirmed = window.confirm(`Are you sure you want to ${status.toLowerCase()} this request?`);
+    if (!confirmed) return;
+
     try {
       setLoading(true);
       await authAxiosClient.post("/sellerVerification/changeVerificationStatus", {
@@ -251,8 +269,8 @@ export default function SellerVerificationRequests() {
           <Modal
             isOpen={modalOpen}
             onClose={() => {
-                setModalOpen(false);
-                setSelectedRequest(null);
+              setModalOpen(false);
+              setSelectedRequest(null);
             }}
           >
 

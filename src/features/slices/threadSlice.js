@@ -64,7 +64,7 @@ export const updateThread = createAsyncThunk(
 export const deleteThread = createAsyncThunk(
   "thread/deleteThread",
   async (threadId) => {
-    await authAxiosClient.post(`/thread/delete/${threadId}`);
+    await authAxiosClient.get(`/thread/delete/${threadId}`);
     return threadId;
   }
 );

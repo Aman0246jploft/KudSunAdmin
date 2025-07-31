@@ -118,45 +118,34 @@ export default function SellProduct() {
       });
   };
 
-  const handleDelete = (product) => {
-    const updatedStatus = !product.isDisable;
-    console.log(
-      `Toggling status for product ${product._id} to ${updatedStatus}`
-    );
+const handleDelete = (product) => {
+  const updatedStatus = !product.isDisable;
 
-    // Create FormData
-    const formData = new FormData();
-    formData.append("isDisable", updatedStatus);
-    confirmAlert({
-      title: "Confirm to submit",
-      message: "Are you sure to delete this.",
-      buttons: [
-        {
-          label: "Yes",
-          onClick: () => {
-            dispatch(deleteProduct({ id: product._id, formData }))
-              .unwrap()
-              .then((res) => {
-                dispatch(productList({
-                  ...pagination,
-                  ...filters,
-                  deliveryFilter: shippingType,
-                  minPrice: filters.minPrice || undefined,
-                  maxPrice: filters.maxPrice || undefined,
-                }));
-              })
-              .catch((err) => {
-                console.error("Failed to update product status:", err);
-              });
-          },
-        },
-        {
-          label: "No",
-          onClick: () => { },
-        },
-      ],
-    });
-  };
+
+  // Create FormData
+  const formData = new FormData();
+  formData.append("isDisable", updatedStatus);
+
+  // Native browser confirmation
+  const confirmDelete = window.confirm("Are you sure you want to delete this?");
+  if (confirmDelete) {
+    dispatch(deleteProduct({ id: product._id, formData }))
+      .unwrap()
+      .then((res) => {
+        dispatch(productList({
+          ...pagination,
+          ...filters,
+          deliveryFilter: shippingType,
+          minPrice: filters.minPrice || undefined,
+          maxPrice: filters.maxPrice || undefined,
+        }));
+      })
+      .catch((err) => {
+        console.error("Failed to update product status:", err);
+      });
+  }
+};
+
 
   const columns = [
     {

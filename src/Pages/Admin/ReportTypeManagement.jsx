@@ -20,7 +20,7 @@ const ReportTypeManagement = () => {
   const [pageSize, setPageSize] = useState(10);
 
   const {
-    reports: reportTypes = [],
+    data: reportTypes = [],
     size = 0,
     loading: reportTypesLoading = false,
     totalReportTypes = 0,

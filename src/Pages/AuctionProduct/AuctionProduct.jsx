@@ -111,36 +111,27 @@ export default function AuctionProduct() {
         console.error("Failed to update product status:", err);
       });
   };
+const handleDelete = (product) => {
+  const updatedStatus = !product.isDisable;
 
-  const handleDelete = (product) => {
-    const updatedStatus = !product.isDisable;
-    // Create FormData
-    const formData = new FormData();
-    formData.append("isDisable", updatedStatus);
-    confirmAlert({
-      title: "Confirm to submit",
-      message: "Are you sure to delete this.",
-      buttons: [
-        {
-          label: "Yes",
-          onClick: () => {
-            dispatch(deleteProduct({ id: product._id, formData }))
-              .unwrap()
-              .then((res) => {
-                dispatch(productListAuction(pagination));
-              })
-              .catch((err) => {
-                console.error("Failed to update product status:", err);
-              });
-          },
-        },
-        {
-          label: "No",
-          onClick: () => { },
-        },
-      ],
+  // Native browser confirmation
+  const confirmDelete = window.confirm("Are you sure you want to delete this?");
+  if (!confirmDelete) return;
+
+  // Create FormData
+  const formData = new FormData();
+  formData.append("isDisable", updatedStatus);
+
+  dispatch(deleteProduct({ id: product._id, formData }))
+    .unwrap()
+    .then((res) => {
+      dispatch(productListAuction(pagination));
+    })
+    .catch((err) => {
+      console.error("Failed to update product status:", err);
     });
-  };
+};
+
 
   const columns = [
     {

@@ -45,3 +45,22 @@ body {
 .sidebar-scroll {
   scroll-behavior: smooth;
 }
+
+
+
+
+@media (max-width: 640px) {
+  .custom-responsive-div {
+    display: none;
+  }
+}
+
+/* Show only when screen width is between 100px and 500px */
+@media (min-width: 641px) and (max-width: 800px) {
+  .custom-responsive-div {
+    display: block;
+    width: 70dvw;
+  }
+}
+
+

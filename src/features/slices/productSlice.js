@@ -145,7 +145,7 @@ export const deleteProduct = createAsyncThunk(
     'product/updateSellerProduct',
     async ({ id, formData }, thunkAPI) => {
         try {
-            const res = await authAxiosClient.post(`/product/deleteProduct/${id}`, formData, {
+            const res = await authAxiosClient.get(`/product/deleteProduct/${id}`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
