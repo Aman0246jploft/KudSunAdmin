@@ -28,37 +28,35 @@ export default function Modal({ isOpen, onClose, children }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex justify-center items-center bg-black/50 transition-opacity duration-200 animate-fadeIn"
-      style={{}}
+      className="fixed inset-0 z-50 flex justify-center items-center bg-black/50 backdrop-blur-sm transition-opacity duration-200"
+      aria-modal="true"
+      role="dialog"
+      aria-labelledby="modal-title"
+      aria-describedby="modal-description"
     >
       <div
         ref={modalRef}
-        className="relative w-[90vw] max-w-md sm:max-w-lg p-4 sm:p-6 rounded-xl shadow-lg bg-white dark:bg-gray-900 overflow-y-auto max-h-[90vh] animate-scaleIn"
+        className="relative w-[90vw] max-w-md sm:max-w-lg p-6 rounded-xl shadow-2xl bg-white dark:bg-gray-900 overflow-y-auto max-h-[90vh]"
         style={{
           backgroundColor: theme.colors.background,
           color: theme.colors.textPrimary,
+          border: `1px solid ${theme.colors.border}`,
         }}
       >
+        {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors"
+          className="absolute top-3 right-3 text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors focus:outline-none"
           aria-label="Close modal"
         >
-          <FiX size={22} />
+          <FiX size={24} />
         </button>
-        <div
-          className="border rounded"
-          style={{ borderColor: theme.colors.border }}
-        >
+
+        {/* Modal content container with some padding */}
+        <div id="modal-description" className="mt-2">
           {children}
         </div>
       </div>
-      <style>{`
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .animate-fadeIn { animation: fadeIn 0.2s; }
-        @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .animate-scaleIn { animation: scaleIn 0.2s; }
-      `}</style>
     </div>
   );
 }

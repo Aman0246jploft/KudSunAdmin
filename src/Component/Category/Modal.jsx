@@ -28,7 +28,7 @@ export default function Modal({ isOpen, onClose, children }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex justify-center items-center bg-black/50 backdrop-blur-sm transition-opacity duration-200 animate-fadeIn"
+      className="fixed inset-0 z-50 flex justify-center items-center bg-black/50 backdrop-blur-sm transition-opacity duration-200"
       aria-modal="true"
       role="dialog"
       aria-labelledby="modal-title"
@@ -36,7 +36,7 @@ export default function Modal({ isOpen, onClose, children }) {
     >
       <div
         ref={modalRef}
-        className="relative w-[90vw] max-w-md sm:max-w-lg p-6 rounded-xl shadow-2xl bg-white dark:bg-gray-900 overflow-y-auto max-h-[90vh] animate-scaleIn"
+        className="relative w-[90vw] max-w-md sm:max-w-lg p-6 rounded-xl shadow-2xl bg-white dark:bg-gray-900 overflow-y-auto max-h-[90vh]"
         style={{
           backgroundColor: theme.colors.background,
           color: theme.colors.textPrimary,
@@ -57,15 +57,6 @@ export default function Modal({ isOpen, onClose, children }) {
           {children}
         </div>
       </div>
-
-      {/* Animations */}
-      <style>{`
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .animate-fadeIn { animation: fadeIn 0.2s ease forwards; }
-
-        @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .animate-scaleIn { animation: scaleIn 0.2s ease forwards; }
-      `}</style>
     </div>
   );
 }

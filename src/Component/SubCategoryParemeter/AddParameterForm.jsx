@@ -169,9 +169,9 @@ export default function AddParameterForm({ onClose, pagination, editData }) {
                 <div key={index} className="relative group">
                   {/* Value Input with Index Label */}
                   <div className="relative">
-                    <span className="absolute -top-2 left-2 px-1 text-xs text-gray-500 bg-inherit z-10">
+                    {/* <span className="absolute -top-2 left-2 px-1 text-xs text-gray-500 bg-inherit z-10">
                       #{index + 1}
-                    </span>
+                    </span> */}
                     <input
                       type="text"
                       value={val}

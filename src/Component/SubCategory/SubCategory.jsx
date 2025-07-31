@@ -70,48 +70,37 @@ export default function SubCategory() {
 
 
 
-  const handleDelete = (subCat) => {
-    confirmAlert({
-      title: "Confirm Delete",
-      message: "Are you sure you want to delete this subcategory?",
-      buttons: [
-        {
-          label: "Yes",
-          onClick: async () => {
-            try {
-              const formData = new FormData();
-              formData.append("subCategoryId", subCat._id);
-              formData.append("name", subCat.name);
-              formData.append("isDeleted", "true");
+const handleDelete = async (subCat) => {
+  const confirmed = window.confirm("Are you sure you want to delete this subcategory?");
+  if (!confirmed) return;
 
-              const result = await dispatch(
-                addSubCategory({
-                  categoryId: param?.id,
-                  formData: formData
-                })
-              );
+  try {
+    const formData = new FormData();
+    formData.append("subCategoryId", subCat._id);
+    formData.append("name", subCat.name);
+    formData.append("isDeleted", "true");
 
-              if (addSubCategory.fulfilled.match(result)) {
-                toast.success("Subcategory deleted successfully");
-                // Refresh the list
-                dispatch(subCategory({ categoryId: param?.id, pagination }));
-              } else {
-                const { message, code } = result.payload || {};
-                console.error(`Delete failed [${code}]: ${message}`);
-              }
-            } catch (error) {
-              console.error("Unexpected error:", error);
-              toast.error("Failed to delete subcategory");
-            }
-          },
-        },
-        {
-          label: "No",
-          onClick: () => { },
-        },
-      ],
-    });
-  };
+    const result = await dispatch(
+      addSubCategory({
+        categoryId: param?.id,
+        formData: formData
+      })
+    );
+
+    if (addSubCategory.fulfilled.match(result)) {
+      toast.success("Subcategory deleted successfully");
+      // Refresh the list
+      dispatch(subCategory({ categoryId: param?.id, pagination }));
+    } else {
+      const { message, code } = result.payload || {};
+      console.error(`Delete failed [${code}]: ${message}`);
+    }
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    toast.error("Failed to delete subcategory");
+  }
+};
+
 
   const columns = [
     {

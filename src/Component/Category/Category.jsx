@@ -52,35 +52,23 @@ export default function Category() {
     setIsModalOpen(true);
   }, []);
 
-  const handleDelete = useCallback((category) => {
-    confirmAlert({
-      title: "Confirm Delete",
-      message: `Are you sure you want to ${category.isDeleted ? 'restore' : 'delete'} this category?`,
-      buttons: [
-        {
-          label: "Yes",
-          onClick: async () => {
-            try {
-              await dispatch(updateCategory({ 
-                id: category._id, 
-                isDeleted: !category.isDeleted 
-              }));
-              // Refresh the list after successful update
-              fetchCategories();
-            } catch (err) {
-              console.error("Failed to update category status:", err);
-            }
-          },
-        },
-        {
-          label: "No",
-          onClick: () => {
-            // Do nothing
-          },
-        },
-      ],
-    });
-  }, [dispatch, fetchCategories]);
+const handleDelete = useCallback(async (category) => {
+  const action = category.isDeleted ? "restore" : "delete";
+  const confirmed = window.confirm(`Are you sure you want to ${action} this category?`);
+  if (!confirmed) return;
+
+  try {
+    await dispatch(updateCategory({ 
+      id: category._id, 
+      isDeleted: !category.isDeleted 
+    }));
+    // Refresh the list after successful update
+    fetchCategories();
+  } catch (err) {
+    console.error("Failed to update category status:", err);
+  }
+}, [dispatch, fetchCategories]);
+
 
   const handlePageChange = useCallback((newPage) => {
     setPagination((prev) => ({ ...prev, pageNo: newPage }));

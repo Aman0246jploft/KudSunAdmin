@@ -116,26 +116,26 @@ export default function SubCategoryParemeter() {
   };
 
   const handleDelete = async (data) => {
+    const confirmed = window.confirm("Are you sure you want to delete this parameter?");
+    if (!confirmed) return;
 
-    dispatch(deleteParameterFromSubCategory({ subCategoryId: param?.id, paramKey: data?.key }))
-      .then((result) => {
-        if (deleteParameterFromSubCategory.fulfilled.match(result)) {
-          toast.success("Parameter updated successfully");
-          dispatch(
-            subCategoryParameter({ subCategoryId: param?.id, pagination })
-          );
-          onClose();
-        } else {
-          const { message, code } = result.payload || {};
-          toast.error(`Update failed [${code}]: ${message}`);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    try {
+      const result = await dispatch(deleteParameterFromSubCategory({ subCategoryId: param?.id, paramKey: data?.key }));
 
+      if (deleteParameterFromSubCategory.fulfilled.match(result)) {
+        toast.success("Parameter Deleted successfully");
+        dispatch(subCategoryParameter({ subCategoryId: param?.id, pagination }));
+        onClose();
+      } else {
+        const { message, code } = result.payload || {};
+        toast.error(`Update failed [${code}]: ${message}`);
+      }
+    } catch (err) {
+      console.error(err);
+      // toast.error("Unexpected error occurred");
+    }
+  };
 
-  }
 
   const columns = [
     {
