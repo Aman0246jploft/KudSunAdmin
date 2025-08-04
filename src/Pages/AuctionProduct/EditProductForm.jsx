@@ -520,7 +520,7 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
           <p className="text-gray-600 mt-1">Update your auction product information</p>
         </div>
 
-        <div className="p-6 space-y-6">
+        <div className="p-6 ">
             {/* Category Selection */}
           <div className="grid md:grid-cols-2 gap-4">
               <div>
@@ -1189,7 +1189,7 @@ const EditProductForm = ({ closeForm, editMode, productData, onProductUpdate }) 
               )}
 
               {/* Parameters */}
-              <div className="space-y-6">
+              <div className="">
                 {specifics.map((param) => (
                   <div key={param._id}>
                     <h4 className="font-medium text-gray-900 mb-3">

@@ -289,11 +289,11 @@ export default function Thread() {
         }}
       >
         <div
-          className="flex flex-col lg:flex-row lg:justify-between lg:items-center px-2 py-2 gap-4 lg:gap-0"
+          className="flex flex-col xl:flex-row xl:justify-between xl:items-center px-2 py-2 gap-4 xl:gap-0"
           style={{ borderBottom: `1px solid ${theme.colors.borderLight}` }}
         >
           <div
-            className="font-semibold text-xl text-center lg:text-left"
+            className="font-semibold text-xl text-start whitespace-nowrap lg:text-left"
             style={{ color: theme.colors.textPrimary }}
           >
             Thread List

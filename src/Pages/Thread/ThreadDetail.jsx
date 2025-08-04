@@ -81,7 +81,7 @@ export default function ThreadDetail() {
                 {/* Header */}
                 <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
                     <div className="flex items-center justify-between">
-                        <h1 className="text-2xl font-bold text-gray-900">Thread Details - Admin View</h1>
+                        <h1 className="text-2xl font-bold text-gray-900">Thread Details </h1>
                         <div className="flex items-center space-x-3">
                             <span className={`px-3 py-1 rounded-full text-sm font-medium ${thread.isClosed ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
                                 }`}>

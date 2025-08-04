@@ -899,21 +899,21 @@ const AdminTransactions = () => {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 ">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 sm:gap-0">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Financial Management</h1>
           <p className="text-gray-600 mt-1 text-sm sm:text-base">Manage transactions, payouts, and withdrawal requests</p>
         </div>
         <div className="flex flex-wrap justify-start sm:justify-end gap-2">
-          <Button
+          {/* <Button
             variant="primary"
             onClick={() => window.location.href = '/admin/financial-dashboard'}
             className="flex items-center gap-2"
           >
             <FaChartLine className="w-4 h-4" />
             <span className="text-sm sm:text-base">Financial Analytics</span>
-          </Button>
+          </Button> */}
           {/* Uncomment if needed */}
           {/* <Button
       variant="outline"
@@ -929,7 +929,7 @@ const AdminTransactions = () => {
 
       {/* Tab Navigation */}
       <div className="bg-white rounded-lg shadow-sm border">
-        <div className="flex border-b border-gray-200">
+        <div className="flex md:flex-row flex-col border-b border-gray-200">
           <button
             onClick={() => setActiveTab('transactions')}
             className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'transactions'
@@ -1286,7 +1286,7 @@ const AdminTransactions = () => {
 
       {/* Enhanced Payout Calculation Modal */}
       {calculationModal.show && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex  items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Payout Calculation Details</h2>
@@ -1299,9 +1299,9 @@ const AdminTransactions = () => {
             </div>
 
             {calculationModal.data && (
-              <div className="space-y-6">
+              <div className="">
                 {/* Order Information */}
-                <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                <div className="grid md:grid-cols-2 grid-cols-1 gap-4 p-4 bg-gray-50 rounded-lg">
                   <div>
                     <p className="text-sm text-gray-600">Order Number</p>
                     <p className="font-medium">#{calculationModal.data.orderNumber}</p>
@@ -1314,12 +1314,7 @@ const AdminTransactions = () => {
                     <p className="text-sm text-gray-600">Seller</p>
                     <p className="font-medium">{calculationModal.data.seller?.name}</p>
                   </div>
-                  {/* <div>
-                    <p className="text-sm text-gray-600">Payout Completed</p>
-                    <p className={`font-medium ${calculationModal.data.isPayoutCompleted ? 'text-green-600' : 'text-red-600'}`}>
-                      {calculationModal.data.isPayoutCompleted ? 'Yes' : 'No'}
-                    </p>
-                  </div> */}
+                  
                 </div>
 
                 {/* Dispute Information (if any) */}
@@ -1676,7 +1671,7 @@ const AdminTransactions = () => {
             </div>
 
             {disputeModal.data && (
-              <div className="space-y-6">
+              <div className="">
                 {/* Dispute Overview */}
                 <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
                   <div>
@@ -1746,7 +1741,7 @@ const AdminTransactions = () => {
             </div>
 
             {withdrawalDetailModal.data && (
-              <div className="space-y-6">
+              <div className="">
                 {/* Request Information */}
 
                 <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">

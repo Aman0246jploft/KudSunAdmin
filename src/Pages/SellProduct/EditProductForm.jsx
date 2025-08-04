@@ -447,7 +447,7 @@ const EditProductForm = ({
           <p className="text-gray-600 mt-1">Update your product information</p>
         </div>
 
-        <div className="p-6 space-y-6">
+        <div className="p-6 ">
 
 
           {/* Category Selection */}
@@ -1029,7 +1029,7 @@ const EditProductForm = ({
               )}
 
               {/* Parameters */}
-              <div className="space-y-6">
+              <div className="">
                 {specifics.map((param) => (
                   <div key={param._id}>
                     <h4 className="font-medium text-gray-900 mb-3">

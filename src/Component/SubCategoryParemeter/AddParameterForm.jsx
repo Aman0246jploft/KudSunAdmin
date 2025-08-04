@@ -110,7 +110,7 @@ export default function AddParameterForm({ onClose, pagination, editData }) {
     <div className="w-full max-w-full overflow-hidden">
       <form
         onSubmit={handleSubmit}
-        className="space-y-4 sm:space-y-6 p-3 sm:p-4 md:p-6 rounded w-full"
+        className="space-y-4 sm: p-3 sm:p-4 md:p-6 rounded w-full"
         style={{
           backgroundColor: theme.colors.background,
           color: theme.colors.textPrimary,

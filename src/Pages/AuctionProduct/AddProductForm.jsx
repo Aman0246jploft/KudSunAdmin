@@ -902,7 +902,7 @@ const AddProductForm = () => {
               )}
 
               {/* Parameters */}
-              <div className="space-y-6">
+              <div className="">
                 {specifics.map((param) => (
                   <div key={param._id}>
                     <h4 className="font-semibold text-gray-900 mb-3">

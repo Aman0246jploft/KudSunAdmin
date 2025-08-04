@@ -92,7 +92,7 @@ const DisputeModal = ({ dispute, onClose, onUpdate }) => {
   /* -------------------------------- Render -------------------------------- */
   return (
     <Modal isOpen onClose={onClose} title={`Dispute – ${dispute.disputeId}`}>      
-      <div className="relative flex flex-col max-h-[80vh] p-3 md:max-h-[75vh] w-full overflow-hidden">
+      <div className="relative flex flex-col max-h-[80vh]  p-3 md:max-h-[75vh] w-full overflow-hidden">
         <h1 className='text-xl border-b-2 p-2'>Dispute Info</h1>
         {/* ─────────────────── Scrollable body ─────────────────── */}
         <div className="overflow-y-auto pr-1 flex-1 space-y-8 pb-8">

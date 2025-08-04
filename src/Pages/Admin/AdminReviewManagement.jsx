@@ -139,35 +139,43 @@ const AdminReviewManagement = () => {
   };
 
   // Handle delete confirmation
+  // const handleDeleteReview = (reviewId, reviewText) => {
+  //   confirmAlert({
+  //     title: 'Delete Review',
+  //     message: (
+  //       <div>
+  //         <p className="mb-4">Are you sure you want to delete this review?</p>
+  //         <div className="bg-gray-100 p-3 rounded text-sm max-w-md">
+  //           <strong>Review:</strong> {reviewText.length > 100 ? `${reviewText.substring(0, 100)}...` : reviewText}
+  //         </div>
+  //         <p className="mt-4 text-red-600 text-sm">
+  //           <FaExclamationTriangle className="inline mr-1" />
+  //           This will recalculate the user's average rating.
+  //         </p>
+  //       </div>
+  //     ),
+  //     buttons: [
+  //       {
+  //         label: 'Cancel',
+  //         onClick: () => { },
+  //         className: 'react-confirm-alert-button-cancel'
+  //       },
+  //       {
+  //         label: 'Delete',
+  //         onClick: () => deleteReview(reviewId, 'Deleted by admin'),
+  //         className: 'react-confirm-alert-button-confirm'
+  //       }
+  //     ]
+  //   });
+  // };
   const handleDeleteReview = (reviewId, reviewText) => {
-    confirmAlert({
-      title: 'Delete Review',
-      message: (
-        <div>
-          <p className="mb-4">Are you sure you want to delete this review?</p>
-          <div className="bg-gray-100 p-3 rounded text-sm max-w-md">
-            <strong>Review:</strong> {reviewText.length > 100 ? `${reviewText.substring(0, 100)}...` : reviewText}
-          </div>
-          <p className="mt-4 text-red-600 text-sm">
-            <FaExclamationTriangle className="inline mr-1" />
-            This will recalculate the user's average rating.
-          </p>
-        </div>
-      ),
-      buttons: [
-        {
-          label: 'Cancel',
-          onClick: () => { },
-          className: 'react-confirm-alert-button-cancel'
-        },
-        {
-          label: 'Delete',
-          onClick: () => deleteReview(reviewId, 'Deleted by admin'),
-          className: 'react-confirm-alert-button-confirm'
-        }
-      ]
-    });
+    const message = `Are you sure you want to delete this review`;
+
+    if (window.confirm(message)) {
+      deleteReview(reviewId, 'Deleted by admin');
+    }
   };
+
 
   // Handle filter changes
   const handleFilterChange = (key, value) => {
@@ -361,7 +369,7 @@ const AdminReviewManagement = () => {
 
 
   return (
-    <div className="space-y-6">
+    <div className="">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -594,7 +602,7 @@ const AdminReviewManagement = () => {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
               </div>
             ) : detailModal.data && (
-              <div className="space-y-6">
+              <div className="">
                 {/* Review Information */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Left Column */}

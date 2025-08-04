@@ -12,33 +12,31 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import {
   getMonthlyAnalytics,
-  getAvailableYears,
-  setSelectedYear
+  setSelectedYear,
 } from "../../features/slices/dashboardSlice";
 
 const MonthlyDashboardCharts = () => {
   const dispatch = useDispatch();
   const {
     monthlyAnalytics,
-    availableYears,
     selectedYear,
     loading,
-    error
+    error,
   } = useSelector((state) => state.dashboard);
 
-  const formatNumber = (value) => {
-    if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
-    if (value >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
-    return value.toString();
-  };
+  // Local fallback for selectedYear
+  const currentYear = new Date().getFullYear();
 
-
-  // Initialize component
+  // Set initial year on mount if not already set
   useEffect(() => {
-    dispatch(getAvailableYears());
-  }, [dispatch]);
+    if (!selectedYear) {
+      dispatch(setSelectedYear(currentYear));
+    }
+  }, [dispatch, selectedYear]);
 
   // Fetch data when year changes
   useEffect(() => {
@@ -47,12 +45,17 @@ const MonthlyDashboardCharts = () => {
     }
   }, [dispatch, selectedYear]);
 
-  // Handle year change
-  const handleYearChange = (year) => {
+  const handleYearChange = (date) => {
+    const year = date.getFullYear();
     dispatch(setSelectedYear(year));
   };
 
-  // Format data for charts
+  const formatNumber = (value) => {
+    if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
+    if (value >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
+    return value.toString();
+  };
+
   const formatChartData = () => {
     if (!monthlyAnalytics) return [];
 
@@ -62,13 +65,12 @@ const MonthlyDashboardCharts = () => {
       month: userItem.month,
       users: userItem.users || 0,
       revenue: revenue?.[index]?.revenue || 0,
-      productsSold: productsSold?.[index]?.productsSold || 0
+      productsSold: productsSold?.[index]?.productsSold || 0,
     })) || [];
   };
 
   const data = formatChartData();
 
-  // Loading state
   if (loading && !monthlyAnalytics) {
     return (
       <div className="p-4">
@@ -79,7 +81,6 @@ const MonthlyDashboardCharts = () => {
     );
   }
 
-  // Error state
   if (error && !monthlyAnalytics) {
     return (
       <div className="p-4">
@@ -98,37 +99,39 @@ const MonthlyDashboardCharts = () => {
         <h1 className="text-2xl font-bold">Monthly Dashboard</h1>
         <div className="flex items-center gap-2">
           {loading && <div className="text-sm text-gray-500">Loading...</div>}
-          <select
-            className="border rounded px-3 py-1 text-sm"
-            value={selectedYear}
-            onChange={(e) => handleYearChange(parseInt(e.target.value))}
-            disabled={loading}
-          >
-            {availableYears.map((year) => (
-              <option key={year} value={year}>{year}</option>
-            ))}
-          </select>
+          <DatePicker
+            selected={selectedYear ? new Date(selectedYear, 0) : null}
+            onChange={handleYearChange}
+            showYearPicker
+            dateFormat="yyyy"
+            className="border rounded px-3 py-1 text-sm cursor-pointer"
+            placeholderText="Select Year"
+          />
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Users Chart */}
         <div className="bg-white  p-4 rounded-2xl shadow">
           <h2 className="text-xl font-semibold mb-2">Users (Monthly)</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={data}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
-              <YAxis label={{ value: "Users", angle: -90, position: "insideLeft" }} tickFormatter={formatNumber} />
+              <YAxis
+                label={{
+                  value: "Users",
+                  angle: -90,
+                  position: "insideLeft",
+                }}
+                tickFormatter={formatNumber}
+              />
               <Tooltip formatter={(value) => formatNumber(value)} />
-
               <Legend />
               <Bar dataKey="users" fill="#4F46E5" />
             </BarChart>
           </ResponsiveContainer>
         </div>
 
-        {/* Revenue Chart */}
         <div className="bg-white  p-4 rounded-2xl shadow">
           <h2 className="text-xl font-semibold mb-2">Revenue (Monthly)</h2>
           <ResponsiveContainer width="100%" height={300}>
@@ -136,24 +139,41 @@ const MonthlyDashboardCharts = () => {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis
-                label={{ value: "Revenue", angle: -90, position: "insideLeft" }}
+                label={{
+                  value: "Revenue",
+                  angle: -90,
+                  position: "insideLeft",
+                }}
                 tickFormatter={formatNumber}
               />
               <Tooltip formatter={(value) => formatNumber(value)} />
               <Legend />
-              <Line type="monotone" dataKey="revenue" stroke="#10B981" strokeWidth={3} />
+              <Line
+                type="monotone"
+                dataKey="revenue"
+                stroke="#10B981"
+                strokeWidth={3}
+              />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
-        {/* Products Sold Chart */}
         <div className="bg-white  p-4 rounded-2xl shadow lg:col-span-2">
-          <h2 className="text-xl font-semibold mb-2">Total Products Sold (Monthly)</h2>
+          <h2 className="text-xl font-semibold mb-2">
+            Total Products Sold (Monthly)
+          </h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={data}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
-              <YAxis label={{ value: "Products Sold", angle: -90, position: "insideLeft" }} tickFormatter={formatNumber} />
+              <YAxis
+                label={{
+                  value: "Products Sold",
+                  angle: -90,
+                  position: "insideLeft",
+                }}
+                tickFormatter={formatNumber}
+              />
               <Tooltip formatter={(value) => formatNumber(value)} />
               <Legend />
               <Bar dataKey="productsSold" fill="#F59E0B" />

@@ -114,7 +114,7 @@ export default function VerifyResetOtp() {
         </div>
         <h2 className="text-2xl font-bold text-center mb-6">Verify OTP</h2>
 
-        <form onSubmit={handleVerify} className="space-y-6">
+        <form onSubmit={handleVerify} className="">
           <div className="flex justify-between gap-2">
             {otp.map((digit, idx) => (
               <input

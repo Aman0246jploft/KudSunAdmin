@@ -26,7 +26,7 @@ export default function Faqs() {
   }, [dispatch]);
 
   return (
-    <div className="p-4 space-y-6">
+    <div className="p-4 ">
       {loading && <p>Loading FAQs...</p>}
 
       <FaqSettings />

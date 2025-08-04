@@ -111,26 +111,26 @@ export default function AuctionProduct() {
         console.error("Failed to update product status:", err);
       });
   };
-const handleDelete = (product) => {
-  const updatedStatus = !product.isDisable;
+  const handleDelete = (product) => {
+    const updatedStatus = !product.isDisable;
 
-  // Native browser confirmation
-  const confirmDelete = window.confirm("Are you sure you want to delete this?");
-  if (!confirmDelete) return;
+    // Native browser confirmation
+    const confirmDelete = window.confirm("Are you sure you want to delete this?");
+    if (!confirmDelete) return;
 
-  // Create FormData
-  const formData = new FormData();
-  formData.append("isDisable", updatedStatus);
+    // Create FormData
+    const formData = new FormData();
+    formData.append("isDisable", updatedStatus);
 
-  dispatch(deleteProduct({ id: product._id, formData }))
-    .unwrap()
-    .then((res) => {
-      dispatch(productListAuction(pagination));
-    })
-    .catch((err) => {
-      console.error("Failed to update product status:", err);
-    });
-};
+    dispatch(deleteProduct({ id: product._id, formData }))
+      .unwrap()
+      .then((res) => {
+        dispatch(productListAuction(pagination));
+      })
+      .catch((err) => {
+        console.error("Failed to update product status:", err);
+      });
+  };
 
 
   const columns = [
@@ -243,7 +243,7 @@ const handleDelete = (product) => {
         }}
       >
         <div
-          className="flex flex-col lg:flex-row md:justify-between gap-4 px-3 py-3 border-b"
+          className="flex flex-col xl:flex-row xl:justify-between xl:items-center gap-4 px-3 py-3 border-b"
           style={{ borderColor: theme.colors.borderLight }}
         >
           {/* Title */}
@@ -255,12 +255,12 @@ const handleDelete = (product) => {
           </div>
 
           {/* Filters */}
-          <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3 w-full lg:w-auto items-center">
             {/* Shipping Type Dropdown */}
             <select
               value={shippingType}
               onChange={(e) => setShippingType(e.target.value)}
-              className="border outline-none rounded px-3 py-2 text-sm w-full sm:w-auto min-w-[120px]   focus:border-transparent"
+              className="border outline-none rounded px-3 py-2 text-sm w-full sm:w-auto min-w-[120px] focus:border-transparent"
             >
               {shippingOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -283,7 +283,7 @@ const handleDelete = (product) => {
                 }));
                 setPagination((prev) => ({ ...prev, pageNo: 1 }));
               }}
-              className="px-3 py-2 border rounded-md w-full sm:w-auto min-w-[140px]   focus:border-transparent"
+              className="px-3 py-2 border rounded-md w-full sm:w-auto min-w-[140px] focus:border-transparent"
             >
               <option value="">All Categories</option>
               {categoryList &&
@@ -307,7 +307,7 @@ const handleDelete = (product) => {
                 }));
                 setPagination((prev) => ({ ...prev, pageNo: 1 }));
               }}
-              className="px-3 py-2 border rounded-md w-full sm:w-auto min-w-[150px]   focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+              className="px-3 py-2 border rounded-md w-full sm:w-auto min-w-[150px] focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
               disabled={!selectedCategory}
             >
               <option value="">All Subcategories</option>
@@ -320,7 +320,7 @@ const handleDelete = (product) => {
 
             {/* Search Input */}
             <input
-              className="px-3 py-2 outline-none border rounded-md w-full sm:w-auto min-w-[220px] lg:min-w-[250px]   focus:border-transparent"
+              className="px-3 py-2 outline-none border rounded-md w-full sm:w-auto min-w-[220px] lg:min-w-[250px] focus:border-transparent"
               type="text"
               placeholder="Search product"
               value={filters.keyWord}
@@ -331,6 +331,7 @@ const handleDelete = (product) => {
             />
           </div>
         </div>
+
 
 
         <div className="relative overflow-x-auto" style={{ minHeight: `${minTableHeight}px` }}>

@@ -122,7 +122,7 @@ const PasswordManagement = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="p-6">
-            <div className="space-y-6">
+            <div className="">
               {/* Current Password */}
               <div className="relative">
                 <label className="block text-sm font-medium text-gray-700 mb-2">

@@ -177,16 +177,16 @@ export default function ContactUs() {
     {
       key: "serial",
       label: "S.No",
-      width: "5%",
+      // width: "5%",
       render: (_, __, rowIndex) =>
         (pagination.pageNo - 1) * pagination.size + rowIndex + 1,
     },
     {
       key: "name",
       label: "Name",
-      width: "15%",
+      // width: "5%",
       render: (_, row) => (
-        <div className="justify-end md:justify-start" title={row.name}>
+        <div className="" title={row.name}>
           {row.name}
         </div>
       ),
@@ -194,9 +194,9 @@ export default function ContactUs() {
     {
       key: "contact",
       label: "Contact",
-      width: "15%",
+      // width: "5%",
       render: (_, row) => (
-        <div className="justify-end md:justify-start" title={row.contact}>
+        <div className="" title={row.contact}>
           {row.contact}
         </div>
       ),
@@ -204,9 +204,9 @@ export default function ContactUs() {
     {
       key: "type",
       label: "Type",
-      width: "10%",
+      // width: "0%",
       render: (_, row) => (
-        <div className="justify-end md:justify-start" title={row.type}>
+        <div className="" title={row.type}>
           {row.type}
         </div>
       ),
@@ -214,7 +214,7 @@ export default function ContactUs() {
     {
       key: "desc",
       label: "Description",
-      width: "25%",
+      // width: "5%",
       render: (_, row) => (
         <div className="">
           {row.desc || "N/A"}
@@ -225,10 +225,10 @@ export default function ContactUs() {
       key: "media",
       label: "Media",
       disableTooltip: true,
-      width: "20%",
+      // width: "0%",
       render: (_, row) =>
         row.image && row.image.length > 0 ? (
-          <div className="justify-end md:justify-start">
+          <div className="">
             {row.image.slice(0, 2).map((url, index) => {
               const isVideo = url.match(/\.(mp4|webm|ogg)$/i);
               return (
@@ -237,7 +237,7 @@ export default function ContactUs() {
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="justify-end md:justify-start"
+                  className=""
                 >
                   {isVideo ? (
                     <video
@@ -257,7 +257,7 @@ export default function ContactUs() {
               );
             })}
             {row.image.length > 2 && (
-              <span className="justify-end md:justify-start">+{row.image.length - 2} more</span>
+              <span className="">+{row.image.length - 2} more</span>
             )}
           </div>
         ) : (
@@ -267,9 +267,9 @@ export default function ContactUs() {
     {
       key: "view",
       label: "Actions",
-      width: "15%",
+      // width: "5%",
       render: (_, row) => (
-        <div className="justify-end md:justify-start">
+        <div className="">
           <button
             onClick={() => openDetailModal(row)}
             className="text-blue-600 hover:underline text-xs sm:text-sm px-1"
@@ -292,7 +292,7 @@ export default function ContactUs() {
     {
       key: "createdAt",
       label: "Date",
-      width: "10%",
+      // width: "5%",
       render: (_, row) => (
         <div className="text-xs sm:text-sm">
           {new Date(row.createdAt).toLocaleDateString("en-IN")}
@@ -302,13 +302,13 @@ export default function ContactUs() {
     {
       key: "status",
       label: "Status",
-      width: "25%",
+      // width: "10%",
       render: (_, row) => (
-        <div className="justify-end md:justify-start">
+        <div className="justify-end  md:justify-start">
           <select
             value={row.isRead ? "connected" : "notconnected"}
             onChange={() => handleToggleRead(row._id, row.isRead)}
-            className="border rounded px-1 sm:px-2 py-1 text-xs sm:text-sm focus:outline-none w-full max-w-[100px] sm:max-w-none"
+            // className="border rounded px-1 sm:px-2 py-1 text-xs sm:text-sm focus:outline-none w-full bg-red-600 p-3 "
             style={{
               color: row.isRead ? "#166534" : "#4b5563",
             }}

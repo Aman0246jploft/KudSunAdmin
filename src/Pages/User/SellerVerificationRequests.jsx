@@ -166,7 +166,7 @@ export default function SellerVerificationRequests() {
                 Approve
               </button>
               <button
-                className="px-2 py-1 bg-red-500 text-white rounded text-red-500 hover:bg-red-600"
+                className="px-2 py-1 bg-red-500 text-white rounded  hover:bg-red-600"
                 onClick={() => handleStatusChange(row, "Rejected")}
               >
                 Reject
@@ -188,50 +188,65 @@ export default function SellerVerificationRequests() {
           color: theme.colors.textPrimary,
         }}
       >
-        <div className="flex justify-between items-end px-2 py-2" style={{ borderBottom: `1px solid ${theme.colors.borderLight}` }}>
-          <div className="font-semibold text-xl" style={{ color: theme.colors.textPrimary }}>
+        <div
+          className="px-4 py-4 border-b flex flex-col lg:flex-row   md:justify-between"
+          style={{ borderBottomColor: theme.colors.borderLight }}
+        >
+          {/* Title */}
+          <div
+            className="text-xl font-semibold whitespace-nowrap items-end justify-end p-2 mb-4"
+            style={{ color: theme.colors.textPrimary }}
+          >
             Seller Verification Requests
           </div>
-          <div className="flex flex-wrap gap-3 items-end">
-            {/* <input
-              type="text"
-              name="keyWord"
-              value={filters.keyWord}
-              onChange={handleFilterChange}
-              placeholder="Search by name, email, etc."
-              className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none  "
-              style={{ minWidth: "180px" }}
-            /> */}
-            <select
-              name="status"
-              value={filters.status}
-              onChange={handleFilterChange}
-              className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none  "
-              style={{ minWidth: "140px" }}
-            >
-              <option value="">All Status</option>
-              <option value="Pending">Pending</option>
-              <option value="Approved">Approved</option>
-              <option value="Rejected">Rejected</option>
-            </select>
-            <input
-              type="date"
-              name="fromDate"
-              value={filters.fromDate}
-              onChange={handleFilterChange}
-              className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none  "
-              style={{ minWidth: "140px" }}
-            />
-            <input
-              type="date"
-              name="toDate"
-              value={filters.toDate}
-              onChange={handleFilterChange}
-              className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none  "
-              style={{ minWidth: "140px" }}
-            />
+
+          {/* Filters */}
+          <div className="flex justify-end gap-4 items-end">
+            {/* Status Filter */}
+            <div className="flex flex-col">
+              <label className="text-sm font-medium text-gray-700 mb-1">Status:</label>
+              <select
+                name="status"
+                value={filters.status}
+                onChange={handleFilterChange}
+                className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                style={{ minWidth: "140px" }}
+              >
+                <option value="">All Status</option>
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+            </div>
+
+            {/* From Date */}
+            <div className="flex flex-col">
+              <label className="text-sm font-medium text-gray-700 mb-1">From:</label>
+              <input
+                type="date"
+                name="fromDate"
+                value={filters.fromDate}
+                onChange={handleFilterChange}
+                className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                style={{ minWidth: "140px" }}
+              />
+            </div>
+
+            {/* To Date */}
+            <div className="flex flex-col">
+              <label className="text-sm font-medium text-gray-700 mb-1">To:</label>
+              <input
+                type="date"
+                name="toDate"
+                value={filters.toDate}
+                onChange={handleFilterChange}
+                className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                style={{ minWidth: "140px" }}
+              />
+            </div>
           </div>
         </div>
+
         <div className="relative" style={{ minHeight: "400px" }}>
           {loading ? (
             <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: theme.colors.backgroundSecondary }}>

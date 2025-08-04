@@ -160,7 +160,7 @@ export default function AdminFinancialDashboard() {
             {subtitle && <p className="text-xs sm:text-sm opacity-60 mt-1">{subtitle}</p>}
           </div>
           <div className="flex flex-col items-end ml-2">
-            <Icon className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 opacity-60" />
+            {/* <Icon className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 opacity-60" /> */}
             {trend && (
               <div className={`flex items-center mt-2 text-xs ${trend.isPositive ? 'text-green-600' : 'text-red-600'}`}>
                 {trend.isPositive ? <MdTrendingUp className="w-3 h-3 mr-1" /> : <MdTrendingDown className="w-3 h-3 mr-1" />}
@@ -190,14 +190,14 @@ export default function AdminFinancialDashboard() {
   }
 
   return (
-    <div className="p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
+    <div className="p-3 sm:p-4 lg:p-6 space-y-4 sm:">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Financial Dashboard</h1>
           <p className="text-sm sm:text-base text-gray-600 mt-1">Complete financial analytics and money flow tracking</p>
         </div>
-        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+        {/* <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
           <Button
             variant="outline"
             onClick={() => setShowFilters(!showFilters)}
@@ -206,52 +206,83 @@ export default function AdminFinancialDashboard() {
             <FaFilter className="w-4 h-4" />
             <span>Filters</span>
           </Button>
-    
-        </div>
+
+        </div> */}
       </div>
 
       {/* Filters */}
-      {showFilters && (
+      {true && (
         <div className="bg-white rounded-lg shadow-sm border p-4">
           <h3 className="text-lg font-semibold mb-4">Date Range Filter</h3>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">From Date</label>
-              <InputField
+            {/* From Date */}
+            <div className="flex flex-col">
+              <label className="text-sm font-medium text-gray-700 mb-1">From Date</label>
+              <input
                 type="date"
                 name="dateFrom"
                 value={filters.dateFrom}
                 onChange={handleFilterChange}
+                className="w-full p-2 rounded-lg border border-gray-300    "
               />
             </div>
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">To Date</label>
-              <InputField
+
+            {/* To Date */}
+            <div className="flex flex-col">
+              <label className="text-sm font-medium text-gray-700 mb-1">To Date</label>
+              <input
                 type="date"
                 name="dateTo"
                 value={filters.dateTo}
                 onChange={handleFilterChange}
+                className="w-full p-2 rounded-lg border border-gray-300    "
               />
             </div>
-            <div className="flex flex-col sm:flex-row items-start sm:items-end space-y-2 sm:space-y-0 sm:space-x-2">
-              <Button variant="primary" onClick={applyFilters} className="w-full sm:w-auto">Apply</Button>
-              <Button variant="outline" onClick={clearFilters} className="w-full sm:w-auto">Clear</Button>
+
+            {/* Buttons */}
+            <div className="flex space-x-2  ">
+              <div className="flex flex-col">
+                <label className="text-sm font-medium text-gray-700 mb-1  opacity-0">To Date</label>
+
+                <button
+                  variant="primary"
+                  onClick={applyFilters}
+                  className="w-full p-2 rounded-lg border border-gray-300  bg-[#3B82F6] text-white  "
+                >
+                  Apply
+                </button>
+              </div>
+              <div className="flex flex-col">
+                <label className="text-sm font-medium text-gray-700 mb-1  opacity-0">To Date</label>
+
+                <button
+                  variant="primary"
+                  onClick={clearFilters}
+                  className="w-full p-2 rounded-lg border bg-[#3B82F6] border-gray-300 text-white    "
+                >
+                  Clear
+                </button>
+              </div>
+
             </div>
           </div>
         </div>
+
+
       )}
 
       {/* Tab Navigation */}
       <div className="flex flex-wrap gap-2 bg-gray-50 p-2 rounded-lg">
         <TabButton tabKey="overview" label="Overview" isActive={activeTab === 'overview'} onClick={setActiveTab} />
         <TabButton tabKey="product-analysis" label="Product Analysis" isActive={activeTab === 'product-analysis'} onClick={setActiveTab} />
-        <TabButton tabKey="money-flow" label="Money Flow" isActive={activeTab === 'money-flow'} onClick={setActiveTab} />
+        {/* <TabButton tabKey="money-flow" label="Money Flow" isActive={activeTab === 'money-flow'} onClick={setActiveTab} /> */}
         <TabButton tabKey="disputes" label="Disputes" isActive={activeTab === 'disputes'} onClick={setActiveTab} />
       </div>
 
       {/* Overview Tab */}
       {activeTab === 'overview' && dashboardData && (
-        <div className="space-y-4 sm:space-y-6">
+        <div className="space-y-4 sm:">
           {/* Key Metrics */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <StatCard
@@ -268,13 +299,13 @@ export default function AdminFinancialDashboard() {
               icon={FaPiggyBank}
               color="green"
             />
-            <StatCard
+            {/* <StatCard
               title="Seller Payouts"
               value={formatCurrency(dashboardData.overview.sellerPayouts.totalSellerPayouts)}
               subtitle={`${formatNumber(dashboardData.overview.sellerPayouts.payoutCount)} payouts`}
               icon={FaMoneyBillWave}
               color="purple"
-            />
+            /> */}
             <StatCard
               title="Disputes"
               value={formatNumber(dashboardData.overview.disputes?.reduce((sum, d) => sum + d.count, 0) || 0)}
@@ -353,7 +384,7 @@ export default function AdminFinancialDashboard() {
 
       {/* Product Analysis Tab */}
       {activeTab === 'product-analysis' && (
-        <div className="space-y-4 sm:space-y-6">
+        <div className="space-y-4 sm:">
           <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
             <h3 className="text-lg font-semibold mb-4">Product Financial Analysis</h3>
 
@@ -409,7 +440,7 @@ export default function AdminFinancialDashboard() {
 
             {/* Product Financial Data */}
             {productFinancialData && (
-              <div className="space-y-4 sm:space-y-6">
+              <div className="space-y-4 sm:">
                 <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 p-4 bg-gray-50 rounded-lg">
                   {productFinancialData.product.productImages?.[0] && (
                     <img
@@ -550,12 +581,12 @@ export default function AdminFinancialDashboard() {
 
       {/* Money Flow Tab */}
       {activeTab === 'money-flow' && (
-        <div className="space-y-4 sm:space-y-6">
+        <div className="space-y-4 sm:">
           <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
             <h3 className="text-lg font-semibold mb-4">Complete Money Flow Analysis</h3>
 
             {moneyFlowData && (
-              <div className="space-y-4 sm:space-y-6">
+              <div className="space-y-4 sm:">
                 {/* Summary */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   <StatCard
@@ -579,13 +610,13 @@ export default function AdminFinancialDashboard() {
                     icon={FaPiggyBank}
                     color="purple"
                   />
-                  <StatCard
+                  {/* <StatCard
                     title="Seller Payouts"
                     value={formatCurrency(moneyFlowData.summary.totalSellerPayouts)}
                     subtitle="Net to sellers"
                     icon={FaExchangeAlt}
                     color="yellow"
-                  />
+                  /> */}
                 </div>
 
                 {/* Detailed Flow - Mobile Card View */}
@@ -741,7 +772,7 @@ export default function AdminFinancialDashboard() {
 
       {/* Disputes Tab */}
       {activeTab === 'disputes' && dashboardData && (
-        <div className="space-y-4 sm:space-y-6">
+        <div className="space-y-4 sm:">
           <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
             <h3 className="text-lg font-semibold mb-4">Dispute Financial Impact Analysis</h3>
 
@@ -873,7 +904,7 @@ export default function AdminFinancialDashboard() {
             {moneyFlowData && (
               <div className="bg-white border rounded-lg p-4 mt-6">
                 <h4 className="font-semibold mb-3">Orders with Dispute Impact</h4>
-                
+
                 {/* Mobile Card View */}
                 <div className="lg:hidden">
                   <div className="max-h-64 overflow-y-auto">
@@ -1036,7 +1067,7 @@ export default function AdminFinancialDashboard() {
               </button>
             </div>
 
-            <div className="space-y-4 sm:space-y-6">
+            <div className="space-y-4 sm:">
               {/* Order Information */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
                 <div>

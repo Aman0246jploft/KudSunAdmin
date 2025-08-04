@@ -253,126 +253,131 @@ const handleDelete = (product) => {
           color: theme.colors.textPrimary,
         }}
       >
-        <div
-          className="flex lg:flex-row  flex-col  gap-4 px-2 py-2 border-b  lg:justify-between lg:items-center"
-          style={{ borderColor: theme.colors.borderLight }}
-        >
-          {/* Header */}
-          <div
-            className="font-semibold whitespace-nowrap text-xl text-left lg:text-left"
-            style={{ color: theme.colors.textPrimary }}
-          >
-            Product List
-          </div>
 
-          {/* Filters Section */}
-          <div className="flex xl:flex-row flex-col gap-3 w-full">
-            {/* Price & Shipping Row */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full">
-              {/* Price Range */}
-              <div className="flex items-center gap-2 w-full sm:w-auto">
-                <input
-                  type="number"
-                  min="0"
-                  placeholder="Min Price"
-                  value={filters.minPrice}
-                  onChange={(e) => {
-                    setFilters((prev) => ({ ...prev, minPrice: e.target.value }));
-                    setPagination((prev) => ({ ...prev, pageNo: 1 }));
-                  }}
-                  className="px-2 py-1 border rounded w-full sm:w-24 text-sm"
-                />
-                <span className="text-sm">-</span>
-                <input
-                  type="number"
-                  min="0"
-                  placeholder="Max Price"
-                  value={filters.maxPrice}
-                  onChange={(e) => {
-                    setFilters((prev) => ({ ...prev, maxPrice: e.target.value }));
-                    setPagination((prev) => ({ ...prev, pageNo: 1 }));
-                  }}
-                  className="px-2 py-1 border rounded w-full sm:w-24 text-sm"
-                />
-              </div>
 
-              {/* Shipping */}
-              <div className="w-full sm:w-auto">
-                <select
-                  value={shippingType}
-                  onChange={(e) => setShippingType(e.target.value)}
-                  className="border outline-none rounded px-2 py-1 text-sm w-full sm:w-40"
-                >
-                  {shippingOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
 
-            {/* Category & Subcategory */}
-            <div className="flex flex-col sm:flex-row gap-2 w-full">
-              <select
-                value={selectedCategory}
-                onChange={(e) => {
-                  const categoryId = e.target.value;
-                  setSelectedCategory(categoryId);
-                  setSelectedSubCategory("");
-                  setFilters((prev) => ({
-                    ...prev,
-                    categoryId,
-                    subCategoryId: "",
-                  }));
-                  setPagination((prev) => ({ ...prev, pageNo: 1 }));
-                }}
-                className="px-2 py-2 border rounded text-sm w-full sm:w-1/2"
-              >
-                <option value="">All Categories</option>
-                {categoryList?.data?.map((cat) => (
-                  <option key={cat._id} value={cat._id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
 
-              <select
-                value={selectedSubCategory}
-                onChange={(e) => {
-                  const subCategoryId = e.target.value;
-                  setSelectedSubCategory(subCategoryId);
-                  setFilters((prev) => ({
-                    ...prev,
-                    subCategoryId,
-                  }));
-                  setPagination((prev) => ({ ...prev, pageNo: 1 }));
-                }}
-                className="px-2 py-2 border rounded text-sm w-full sm:w-1/2"
-                disabled={!selectedCategory}
-              >
-                <option value="">All Subcategories</option>
-                {subCategories?.map((sub) => (
-                  <option key={sub._id} value={sub._id}>
-                    {sub.name}
-                  </option>
-                ))}
-              </select>
-            </div>
 
-            {/* Search Field */}
-            <input
-              className="p-2 outline-none border rounded text-sm w-full"
-              type="text"
-              placeholder="Search product"
-              value={filters.keyWord}
-              onChange={(e) => {
-                setFilters({ ...filters, keyWord: e.target.value });
-                setPagination((prev) => ({ ...prev, pageNo: 1 }));
-              }}
-            />
-          </div>
-        </div>
+
+<div
+  className="flex  xl:flex-row flex-col xl:justify-between xl:items-center gap-4 px-2 py-2 border-b"
+  style={{ borderColor: theme.colors.borderLight }}
+>
+  {/* Title */}
+  <div
+    className="font-semibold whitespace-nowrap text-xl text-left"
+    style={{ color: theme.colors.textPrimary }}
+  >
+    Product List
+  </div>
+
+  {/* Filters Section */}
+  <div className="flex flex-wrap gap-3 w-full lg:w-auto lg:flex-row items-center">
+    {/* Price Range */}
+    <div className="flex items-center gap-2 w-full sm:w-auto">
+      <input
+        type="number"
+        min="0"
+        placeholder="Min Price"
+        value={filters.minPrice}
+        onChange={(e) => {
+          setFilters((prev) => ({ ...prev, minPrice: e.target.value }));
+          setPagination((prev) => ({ ...prev, pageNo: 1 }));
+        }}
+        className="px-2 py-1 border rounded w-full sm:w-24 text-sm"
+      />
+      <span className="text-sm">-</span>
+      <input
+        type="number"
+        min="0"
+        placeholder="Max Price"
+        value={filters.maxPrice}
+        onChange={(e) => {
+          setFilters((prev) => ({ ...prev, maxPrice: e.target.value }));
+          setPagination((prev) => ({ ...prev, pageNo: 1 }));
+        }}
+        className="px-2 py-1 border rounded w-full sm:w-24 text-sm"
+      />
+    </div>
+
+    {/* Shipping */}
+    <select
+      value={shippingType}
+      onChange={(e) => setShippingType(e.target.value)}
+      className="border outline-none rounded px-2 py-1 text-sm w-full sm:w-40"
+    >
+      {shippingOptions.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </select>
+
+    {/* Category */}
+    <select
+      value={selectedCategory}
+      onChange={(e) => {
+        const categoryId = e.target.value;
+        setSelectedCategory(categoryId);
+        setSelectedSubCategory("");
+        setFilters((prev) => ({
+          ...prev,
+          categoryId,
+          subCategoryId: "",
+        }));
+        setPagination((prev) => ({ ...prev, pageNo: 1 }));
+      }}
+      className="px-2 py-2 border rounded text-sm w-full sm:w-48"
+    >
+      <option value="">All Categories</option>
+      {categoryList?.data?.map((cat) => (
+        <option key={cat._id} value={cat._id}>
+          {cat.name}
+        </option>
+      ))}
+    </select>
+
+    {/* Subcategory */}
+    <select
+      value={selectedSubCategory}
+      onChange={(e) => {
+        const subCategoryId = e.target.value;
+        setSelectedSubCategory(subCategoryId);
+        setFilters((prev) => ({
+          ...prev,
+          subCategoryId,
+        }));
+        setPagination((prev) => ({ ...prev, pageNo: 1 }));
+      }}
+      className="px-2 py-2 border rounded text-sm w-full sm:w-48"
+      disabled={!selectedCategory}
+    >
+      <option value="">All Subcategories</option>
+      {subCategories?.map((sub) => (
+        <option key={sub._id} value={sub._id}>
+          {sub.name}
+        </option>
+      ))}
+    </select>
+
+    {/* Search */}
+    <input
+      className="p-2 outline-none border rounded text-sm w-full sm:w-64"
+      type="text"
+      placeholder="Search product"
+      value={filters.keyWord}
+      onChange={(e) => {
+        setFilters({ ...filters, keyWord: e.target.value });
+        setPagination((prev) => ({ ...prev, pageNo: 1 }));
+      }}
+    />
+  </div>
+</div>
+
+
+
+
+
 
 
 

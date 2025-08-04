@@ -255,7 +255,7 @@ export default function EditThread() {
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-2xl font-bold mb-6">Edit Thread</h2>
         
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="">
           {/* Category Selection */}
           <div>
             <label className="block mb-2">Category</label>
