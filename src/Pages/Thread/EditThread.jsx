@@ -7,6 +7,7 @@ import InputField from "../../Component/Atoms/InputFields/Inputfield";
 import authAxiosClient from "../../api/authAxiosClient";
 import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
+import BackButton from "../../Component/BackButton";
 
 export default function EditThread() {
   const dispatch = useDispatch();
@@ -40,7 +41,7 @@ export default function EditThread() {
         setLoading(true);
         const response = await authAxiosClient.get(`/thread/getThreads/${id}`);
         const thread = response.data.data;
-        
+
         setFormData({
           categoryId: thread.categoryId?._id || "",
           subCategoryId: thread.subCategoryId || "",
@@ -57,10 +58,10 @@ export default function EditThread() {
 
         // Fetch subcategories if category exists
         if (thread.categoryId?._id) {
-          dispatch(subCategory({ 
-            categoryId: thread.categoryId._id, 
-            pageNo: 1, 
-            size: 10000000 
+          dispatch(subCategory({
+            categoryId: thread.categoryId._id,
+            pageNo: 1,
+            size: 10000000
           })).then((res) => {
             if (subCategory.fulfilled.match(res)) {
               setSubCategories(res.payload?.data?.data || []);
@@ -91,10 +92,10 @@ export default function EditThread() {
     }));
 
     if (categoryId) {
-      const res = await dispatch(subCategory({ 
-        categoryId, 
-        pageNo: 1, 
-        size: 10000000 
+      const res = await dispatch(subCategory({
+        categoryId,
+        pageNo: 1,
+        size: 10000000
       }));
       if (subCategory.fulfilled.match(res)) {
         setSubCategories(res.payload?.data?.data || []);
@@ -109,7 +110,7 @@ export default function EditThread() {
     if (e.key === 'Enter' || e.key === ',' || e.key === ' ') {
       e.preventDefault();
       const inputValue = e.target.value.trim();
-      
+
       if (inputValue) {
         // Split by commas and/or spaces and filter empty strings
         const newTags = inputValue
@@ -141,7 +142,7 @@ export default function EditThread() {
     //     {
     //       label: 'Yes',
     //       onClick: () => {
-       
+
     //       }
     //     },
     //     {
@@ -155,7 +156,7 @@ export default function EditThread() {
   // Bulk remove tags
   const removeAllTags = () => {
     if (formData.tags.length === 0) return;
-    
+
     confirmAlert({
       title: 'Remove All Tags',
       message: 'Are you sure you want to remove all tags?',
@@ -171,7 +172,7 @@ export default function EditThread() {
         },
         {
           label: 'No',
-          onClick: () => {}
+          onClick: () => { }
         }
       ]
     });
@@ -204,14 +205,14 @@ export default function EditThread() {
       setError(null);
 
       const formDataToSend = new FormData();
-      
+
       // Add basic fields
       formDataToSend.append('categoryId', formData.categoryId);
       formDataToSend.append('subCategoryId', formData.subCategoryId);
       formDataToSend.append('title', formData.title);
       formDataToSend.append('description', formData.description);
       formDataToSend.append('budgetFlexible', formData.budgetFlexible);
-      
+
       // Add budget if not flexible
       if (!formData.budgetFlexible) {
         formDataToSend.append('min', formData.min);
@@ -253,8 +254,12 @@ export default function EditThread() {
   return (
     <div className="p-6">
       <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-2xl font-bold mb-6">Edit Thread</h2>
-        
+        <span className="flex justify-start mb-6  gap-3  items-center">
+
+          <BackButton />
+          <h2 className="text-2xl font-bold">Edit Thread</h2>
+        </span>
+
         <form onSubmit={handleSubmit} className="">
           {/* Category Selection */}
           <div>
@@ -322,8 +327,8 @@ export default function EditThread() {
               <input
                 type="checkbox"
                 checked={formData.budgetFlexible}
-                onChange={(e) => setFormData(prev => ({ 
-                  ...prev, 
+                onChange={(e) => setFormData(prev => ({
+                  ...prev,
                   budgetFlexible: e.target.checked,
                   min: e.target.checked ? "" : prev.min,
                   max: e.target.checked ? "" : prev.max
@@ -363,7 +368,7 @@ export default function EditThread() {
                 onKeyDown={handleTagInput}
                 className="flex-1"
               />
-    
+
             </div>
             <p className="text-sm text-gray-500 mb-2">
               You can add multiple tags at once by separating them with commas or spaces

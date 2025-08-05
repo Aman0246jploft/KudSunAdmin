@@ -337,7 +337,7 @@ const Header = ({ toggleSidebar, isMobile }) => {
                     />
                     <div>
                       <p
-                        className="font-medium"
+                        className="font-medium capitalize"
                         style={{ color: theme.colors.textPrimary }}
                       >
                         {selector?.userName}

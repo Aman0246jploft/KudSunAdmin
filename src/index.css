@@ -2,7 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
+body,* {
+    text-transform: capitalize;
   @apply font-sans;
 }
 

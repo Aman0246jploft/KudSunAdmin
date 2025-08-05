@@ -17,6 +17,7 @@ import { confirmAlert } from "react-confirm-alert";
 import { toast } from "react-toastify";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import { IoArrowBackSharp } from "react-icons/io5";
+import BackButton from "../BackButton";
 
 export default function SubCategory() {
   const dispatch = useDispatch();
@@ -204,7 +205,8 @@ const handleDelete = async (subCat) => {
             className="font-semibold flex justify-center items-center text-xl gap-x-2"
             style={{ color: theme.colors.textPrimary }}
           >
-            <IoArrowBackSharp className="cursor-pointer" onClick={() => navigate(-1)} />
+            <BackButton/>
+            {/* <IoArrowBackSharp className="cursor-pointer" onClick={() => navigate(-1)} /> */}
             <span>SubCategory</span>
           </div>
 

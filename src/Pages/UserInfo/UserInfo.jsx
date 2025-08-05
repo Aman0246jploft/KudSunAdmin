@@ -24,6 +24,7 @@ import {
   FaExclamationTriangle
 } from 'react-icons/fa';
 import { MdVerified, MdStar, MdPayment } from 'react-icons/md';
+import BackButton from '../../Component/BackButton';
 
 export default function UserInfo() {
   const { id } = useParams();
@@ -354,8 +355,8 @@ export default function UserInfo() {
             <div className="flex items-center space-x-2">
               <span
                 className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${row.saleType === 'auction'
-                    ? 'bg-purple-100 text-purple-800'
-                    : 'bg-blue-100 text-blue-800'
+                  ? 'bg-purple-100 text-purple-800'
+                  : 'bg-blue-100 text-blue-800'
                   }`}
               >
                 {row.saleType === 'auction' ? '🔨 Auction' : '💰 Fixed Price'}
@@ -576,8 +577,8 @@ export default function UserInfo() {
               )}
               <span
                 className={`absolute -top-1 -right-1 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${value.saleType === 'auction'
-                    ? 'bg-purple-100 text-purple-800'
-                    : 'bg-blue-100 text-blue-800'
+                  ? 'bg-purple-100 text-purple-800'
+                  : 'bg-blue-100 text-blue-800'
                   }`}
               >
                 {value.saleType === 'auction' ? '🔨' : '💰'}
@@ -642,8 +643,8 @@ export default function UserInfo() {
         <div className="space-y-2">
           <span
             className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${value === 'buyer'
-                ? 'bg-blue-100 text-blue-800 border border-blue-200'
-                : 'bg-green-100 text-green-800 border border-green-200'
+              ? 'bg-blue-100 text-blue-800 border border-blue-200'
+              : 'bg-green-100 text-green-800 border border-green-200'
               }`}
           >
             {value === 'buyer' ? '👤 Buyer Review' : '🏪 Seller Review'}
@@ -772,10 +773,12 @@ export default function UserInfo() {
     >
       <div className="max-w-7xl mx-auto">
         {/* User Header */}
+
         <div
           className="bg-white rounded-lg shadow-sm p-6 mb-6"
           style={{ backgroundColor: theme.colors.backgroundSecondary }}
         >
+          <BackButton />
           <div className="flex items-center space-x-6">
             {/* Profile Image */}
             <div className="flex-shrink-0">
@@ -1383,8 +1386,8 @@ export default function UserInfo() {
                               <MdStar
                                 key={star}
                                 className={`w-4 h-4 ${star <= (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length)
-                                    ? 'text-yellow-400'
-                                    : 'text-gray-300'
+                                  ? 'text-yellow-400'
+                                  : 'text-gray-300'
                                   }`}
                               />
                             ))}

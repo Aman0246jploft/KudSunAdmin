@@ -18,6 +18,7 @@ import { useNavigate, useParams } from "react-router";
 import AddParameterForm from "./AddParameterForm";
 import { toast } from "react-toastify";
 import { IoArrowBackSharp } from "react-icons/io5";
+import BackButton from "../BackButton";
 
 export default function SubCategoryParemeter() {
   const dispatch = useDispatch();
@@ -248,7 +249,9 @@ export default function SubCategoryParemeter() {
             className="font-semibold flex justify-center items-center text-xl gap-x-2"
             style={{ color: theme.colors.textPrimary }}
           >
-            <IoArrowBackSharp className="cursor-pointer" onClick={() => navigate(-1)} />
+            <BackButton/>
+
+            {/* <IoArrowBackSharp className="cursor-pointer" onClick={() => navigate(-1)} /> */}
             <span> SubCategory Parameters</span>
           </div>
 
