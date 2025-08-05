@@ -11,7 +11,7 @@ import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
 import { useNavigate } from "react-router-dom"; // Fixed import
 import { format } from "date-fns";
-import { confirmAlert } from "react-confirm-alert";
+
 import "react-confirm-alert/src/react-confirm-alert.css";
 
 export default function Category() {

@@ -46,11 +46,11 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
 
 
     {
-      name: "Items",
+      name: "Products",
       icon: BsBoxSeam,
       isParent: true,
       children: [
-        { name: "Products", href: "/sellProduct", icon: AiOutlineTag },
+        { name: "Items", href: "/sellProduct", icon: AiOutlineTag },
         { name: "Auctions", href: "/auctionProduct", icon: RiAuctionLine },
         { name: "Thread", href: "/thread", icon: CiViewList },
 

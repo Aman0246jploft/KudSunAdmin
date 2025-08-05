@@ -13,7 +13,6 @@ import { FaEye } from "react-icons/fa";
 import UpdateCategoryForm from "./UpdateCategoryForm";
 import { format } from "date-fns";
 
-import { confirmAlert } from "react-confirm-alert";
 import { toast } from "react-toastify";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import { IoArrowBackSharp } from "react-icons/io5";

@@ -6,7 +6,6 @@ import Pagination from '../../Component/Atoms/Pagination/Pagination';
 import { useTheme } from '../../contexts/theme/hook/useTheme';
 import authAxiosClient from '../../api/authAxiosClient';
 import { toast } from 'react-toastify';
-import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import {
   FaStar, FaEye, FaTrash, FaFilter, FaSearch, FaUser, FaTag,

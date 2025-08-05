@@ -5,6 +5,7 @@ import { fetchThreadById } from '../../features/slices/threadSlice'
 import { FaHeart, FaComment, FaEye } from 'react-icons/fa'
 import authAxiosClient from '../../api/authAxiosClient'
 import { FaShield } from 'react-icons/fa6'
+import BackButton from '../../Component/BackButton'
 
 export default function ThreadDetail() {
     const { id } = useParams()
@@ -28,24 +29,24 @@ export default function ThreadDetail() {
     const fetchComments = async (pageNo = 1, reset = false) => {
         try {
             if (reset) {
-            setLoadingComments(true)
+                setLoadingComments(true)
             } else {
                 setLoadingMore(true)
             }
-            
+
             const response = await authAxiosClient.get(`/thread/getThreadComments/${id}?pageNo=${pageNo}&size=10`)
             if (response.data.status) {
                 const newComments = response.data.data.commentList
-                
+
                 if (reset) {
                     setComments(newComments)
                 } else {
                     setComments(prev => [...prev, ...newComments])
                 }
-                
+
                 setTotalComments(response.data.data.total)
                 setCurrentPage(pageNo)
-                
+
                 // Check if there are more comments to load
                 const totalPages = Math.ceil(response.data.data.total / 10)
                 setHasMoreComments(pageNo < totalPages)
@@ -81,7 +82,10 @@ export default function ThreadDetail() {
                 {/* Header */}
                 <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
                     <div className="flex items-center justify-between">
-                        <h1 className="text-2xl font-bold text-gray-900">Thread Details </h1>
+                        <span className='flex  justify-center items-center gap-2'>
+                            <BackButton />
+                            <h1 className="text-2xl font-bold text-gray-900">Thread Details </h1>
+                        </span>
                         <div className="flex items-center space-x-3">
                             <span className={`px-3 py-1 rounded-full text-sm font-medium ${thread.isClosed ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
                                 }`}>
@@ -98,28 +102,28 @@ export default function ThreadDetail() {
                     <h3 className="text-lg font-semibold mb-3">Thread Author Information</h3>
                     <div className="flex items-center space-x-3 mb-4">
                         <div className="relative">
-                            <img 
-                                src={thread.userId?.profileImage} 
+                            <img
+                                src={thread.userId?.profileImage}
                                 alt={thread.userId?.userName}
                                 className="w-12 h-12 rounded-full object-cover"
                             />
-                                    {thread.userId?.isLive && (
+                            {thread.userId?.isLive && (
                                 <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
                             )}
                         </div>
                         <div>
                             <div className="flex items-center space-x-2">
                                 <h4 className="font-semibold">{thread.userId?.userName}</h4>
-                                    {thread.userId?.is_Id_verified && (
+                                {thread.userId?.is_Id_verified && (
                                     <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
                                         <FaShield className="w-2 h-2 text-white" />
                                     </div>
-                                    )}
-                                    {thread.userId?.is_Preferred_seller && (
+                                )}
+                                {thread.userId?.is_Preferred_seller && (
                                     <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
                                         Preferred
                                     </span>
-                                    )}
+                                )}
                             </div>
                             <p className="text-gray-500 text-sm">{thread.userId?.provinceId?.value}</p>
                         </div>
@@ -151,6 +155,7 @@ export default function ThreadDetail() {
                             </span>
                         </div>
                     </div> */}
+                    
                 </div>
 
 
@@ -159,29 +164,29 @@ export default function ThreadDetail() {
                     <div className="lg:col-span-1">
                         <div className="bg-white rounded-lg shadow-sm p-4">
                             <div className="relative mb-4">
-                            <img 
-                                src={thread.photos[selectedImage]} 
-                                alt={thread.title}
+                                <img
+                                    src={thread.photos[selectedImage]}
+                                    alt={thread.title}
                                     className="w-full h-64 object-cover rounded-lg"
-                            />
+                                />
                                 <div className="absolute bottom-2 left-2 bg-black bg-opacity-75 text-white px-2 py-1 rounded text-sm">
                                     {selectedImage + 1} / {thread.photos.length}
                                 </div>
-                        </div>
+                            </div>
                             <div className="grid grid-cols-4 gap-2">
-                            {thread.photos.map((photo, index) => (
-                                <img 
-                                    key={index}
-                                    src={photo} 
-                                    alt={`${thread.title} ${index + 1}`}
+                                {thread.photos.map((photo, index) => (
+                                    <img
+                                        key={index}
+                                        src={photo}
+                                        alt={`${thread.title} ${index + 1}`}
                                         className={`w-full h-16 object-cover rounded cursor-pointer border-2 ${selectedImage === index ? 'border-blue-500' : 'border-gray-200'
                                             }`}
-                                    onClick={() => setSelectedImage(index)}
-                                />
-                            ))}
+                                        onClick={() => setSelectedImage(index)}
+                                    />
+                                ))}
+                            </div>
                         </div>
                     </div>
-                </div>
 
                     {/* Right Column - Thread Info */}
                     <div className="lg:col-span-1">
@@ -292,7 +297,7 @@ export default function ThreadDetail() {
                 </div>
 
                 {/* Comments Section */}
-                    <div className="mt-6 bg-white rounded-lg shadow-sm p-4">
+                <div className="mt-6 bg-white rounded-lg shadow-sm p-4">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="text-lg font-semibold">Comments ({totalComments})</h3>
                         {loadingComments && (
@@ -313,8 +318,8 @@ export default function ThreadDetail() {
                                             {/* Comment Header */}
                                             <div className="flex items-start space-x-3 mb-3">
                                                 <div className="relative flex-shrink-0">
-                                                    <img 
-                                                        src={comment.author?.profileImage} 
+                                                    <img
+                                                        src={comment.author?.profileImage}
                                                         alt={comment.author?.userName}
                                                         className="w-10 h-10 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
                                                         onClick={() => window.open(`/user/${comment.author?._id}`, '_blank')}
@@ -326,13 +331,13 @@ export default function ThreadDetail() {
                                                 </div>
                                                 <div className="flex-1">
                                                     <div className="flex items-center space-x-2 mb-1">
-                                                        <h4 
+                                                        <h4
                                                             className="font-semibold text-sm cursor-pointer hover:text-blue-600 transition-colors"
                                                             onClick={() => window.open(`/user/${comment.author?._id}`, '_blank')}
                                                         >
                                                             {comment.author?.userName}
                                                         </h4>
-                                                        
+
                                                         {comment.author?.is_Preferred_seller && (
                                                             <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
                                                                 Preferred
@@ -359,9 +364,9 @@ export default function ThreadDetail() {
                                                     <div className="mb-3">
                                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                                                             {comment.photos.map((photo, index) => (
-                                                                <img 
+                                                                <img
                                                                     key={index}
-                                                                    src={photo} 
+                                                                    src={photo}
                                                                     alt={`Comment photo ${index + 1}`}
                                                                     className="w-full h-20 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
                                                                     onClick={() => window.open(photo, '_blank')}
@@ -378,43 +383,42 @@ export default function ThreadDetail() {
                                                         <p className="text-sm font-medium text-gray-700 mb-2">Associated Products:</p>
                                                         <div className="space-y-2">
                                                             {comment.associatedProducts.map((product) => (
-                                                                <div 
-                                                                    key={product._id} 
+                                                                <div
+                                                                    key={product._id}
                                                                     className="border rounded-lg p-3 bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
                                                                     onClick={() => window.open(`/productInfo/${product._id}`, '_blank')}
                                                                     title="Click to view product details"
                                                                 >
                                                                     <div className="flex gap-3">
                                                                         <div className="w-16 h-16 flex-shrink-0">
-                                        {product.productImages?.length > 0 ? (
-                                            <img 
-                                                src={product.productImages[0]} 
-                                                alt={product.title}
-                                                className="w-full h-full object-cover rounded-lg"
-                                            />
-                                        ) : (
+                                                                            {product.productImages?.length > 0 ? (
+                                                                                <img
+                                                                                    src={product.productImages[0]}
+                                                                                    alt={product.title}
+                                                                                    className="w-full h-full object-cover rounded-lg"
+                                                                                />
+                                                                            ) : (
                                                                                 <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
-                                                    <span className="text-gray-400 text-xs">No image</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="flex-1">
+                                                                                    <span className="text-gray-400 text-xs">No image</span>
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                        <div className="flex-1">
                                                                             <h5 className="font-medium text-sm mb-1">{product.title}</h5>
                                                                             <p className="text-xs text-gray-600 mb-1 line-clamp-2">{product.description}</p>
                                                                             <div className="flex items-center justify-between">
                                                                                 <span className="text-sm font-medium text-green-600">
-                                                        {product.saleType === 'fixed' ? (
-                                                        `฿${product.fixedPrice?.toLocaleString()}`
-                                                        ) : (
+                                                                                    {product.saleType === 'fixed' ? (
+                                                                                        `฿${product.fixedPrice?.toLocaleString()}`
+                                                                                    ) : (
                                                                                         `Auction`
-                                                        )}
-                                                    </span>
-                                                <span className={`px-2 py-1 rounded text-xs ${
-                                                    product.isSold ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
-                                                }`}>
-                                                    {product.isSold ? 'Sold' : 'Available'}
-                                                </span>
-                                            </div>
+                                                                                    )}
+                                                                                </span>
+                                                                                <span className={`px-2 py-1 rounded text-xs ${product.isSold ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+                                                                                    }`}>
+                                                                                    {product.isSold ? 'Sold' : 'Available'}
+                                                                                </span>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -434,8 +438,8 @@ export default function ThreadDetail() {
                                                                 <div key={reply._id} className="bg-gray-50 rounded-lg p-3">
                                                                     <div className="flex items-start space-x-2 mb-2">
                                                                         <div className="relative flex-shrink-0">
-                                                                            <img 
-                                                                                src={reply.author?.profileImage} 
+                                                                            <img
+                                                                                src={reply.author?.profileImage}
                                                                                 alt={reply.author?.userName}
                                                                                 className="w-8 h-8 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
                                                                                 onClick={() => window.open(`/user/${reply.author?._id}`, '_blank')}
@@ -447,7 +451,7 @@ export default function ThreadDetail() {
                                                                         </div>
                                                                         <div className="flex-1">
                                                                             <div className="flex items-center space-x-2 mb-1">
-                                                                                <h5 
+                                                                                <h5
                                                                                     className="font-medium text-sm cursor-pointer hover:text-blue-600 transition-colors"
                                                                                     onClick={() => window.open(`/user/${reply.author?._id}`, '_blank')}
                                                                                 >
@@ -469,12 +473,12 @@ export default function ThreadDetail() {
                                                             ))}
                                                         </div>
                                                     </div>
-                                            )}
+                                                )}
                                             </div>
                                         </div>
                                     ))}
                                 </div>
-                                
+
                                 {/* Load More Button */}
                                 {hasMoreComments && (
                                     <div className="mt-4 border-t pt-4 text-center">
@@ -494,7 +498,7 @@ export default function ThreadDetail() {
                                         </button>
                                     </div>
                                 )}
-                                
+
                                 {/* End of Comments Indicator */}
                                 {!hasMoreComments && comments.length > 0 && (
                                     <div className="mt-4 border-t pt-4 text-center">
@@ -512,7 +516,7 @@ export default function ThreadDetail() {
                                 </div>
                             </div>
                         )}
-                        </div>
+                    </div>
 
                     {/* Comments Summary Footer */}
                     <div className="mt-4 flex items-center justify-between text-sm text-gray-500 border-t pt-3">
