@@ -60,7 +60,7 @@ export default function Login() {
         } else {
           const { message, code } = result.payload || {};
           console.error(`Login failed [${code}]: ${message}`);
-          toast.error(message || "Login failed");
+          // toast.error(message || "Login failed");
         }
       })
       .catch((error) => {
