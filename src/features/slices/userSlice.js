@@ -151,6 +151,29 @@ export const userList = createAsyncThunk(
     }
 );
 
+export const exportUserList = createAsyncThunk(
+    'user/exportUserList',
+    async (queryParams = {}, thunkAPI) => {
+        try {
+            // Fetch all users for export by setting a large page size
+            const exportParams = {
+                ...queryParams,
+                pageNo: 1,
+                size: 999999, // Large number to get all records
+            };
+            const res = await authAxiosClient.get('/user/userList', { params: exportParams });
+            return res?.data?.data;
+        } catch (err) {
+            let message = capitalizeFirstLetter(err.message)
+            toast.error(message)
+            return thunkAPI.rejectWithValue({
+                message: err.message,
+                code: err.responseCode || 500,
+            });
+        }
+    }
+);
+
 
 
 export const getLoginProfile = createAsyncThunk(

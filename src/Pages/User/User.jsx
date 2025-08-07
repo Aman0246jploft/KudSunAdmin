@@ -8,6 +8,7 @@ import { IoInformationCircle } from "react-icons/io5";
 import {
   adminChangeUserPassword,
   userList as fetchUserList,
+  exportUserList,
   hardDelete,
   softDelete,
   update,
@@ -25,6 +26,12 @@ import { RiTriangularFlagLine } from "react-icons/ri";
 import { toast } from "react-toastify";
 import { byUser } from "../../features/slices/settingSlice";
 import { useNavigate } from 'react-router-dom';
+import { 
+  exportToCSV, 
+  exportToExcel, 
+  formatUserDataForExport, 
+  generateFilename 
+} from "../../utils/exportUtils";
 
 
 export default function User() {
@@ -59,6 +66,7 @@ export default function User() {
 
   const [sellerRequestDetails, setSellerRequestDetails] = useState(null);
   const [sellerRequestLoading, setSellerRequestLoading] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
 
   const handleSort = (newSortBy, newSortOrder) => {
     setSortBy(newSortBy);
@@ -358,6 +366,65 @@ export default function User() {
     }
   };
 
+  // Export handlers
+  const handleExportCSV = async () => {
+    setExportLoading(true);
+    try {
+      const isDisable = userStatusFilter === "enabled" ? false : userStatusFilter === "disabled" ? true : undefined;
+      const exportFilters = {
+        showSellerRequests,
+        reported: showReportedRequests,
+        isFlagedReported: showFlageduser,
+        registrationDateStart,
+        registrationDateEnd,
+        sortBy,
+        sortOrder,
+        keyWord,
+        ...(isDisable !== undefined && { isDisable })
+      };
+
+      const result = await dispatch(exportUserList(exportFilters)).unwrap();
+      const formattedData = formatUserDataForExport(result.users || []);
+      const filename = generateFilename('users', exportFilters);
+      exportToCSV(formattedData, filename);
+      toast.success('Users exported to CSV successfully');
+    } catch (error) {
+      console.error('Export failed:', error);
+      toast.error('Failed to export users');
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
+  const handleExportExcel = async () => {
+    setExportLoading(true);
+    try {
+      const isDisable = userStatusFilter === "enabled" ? false : userStatusFilter === "disabled" ? true : undefined;
+      const exportFilters = {
+        showSellerRequests,
+        reported: showReportedRequests,
+        isFlagedReported: showFlageduser,
+        registrationDateStart,
+        registrationDateEnd,
+        sortBy,
+        sortOrder,
+        keyWord,
+        ...(isDisable !== undefined && { isDisable })
+      };
+
+      const result = await dispatch(exportUserList(exportFilters)).unwrap();
+      const formattedData = formatUserDataForExport(result.users || []);
+      const filename = generateFilename('users', exportFilters);
+      exportToExcel(formattedData, filename, 'Users');
+      toast.success('Users exported to Excel successfully');
+    } catch (error) {
+      console.error('Export failed:', error);
+      toast.error('Failed to export users');
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
   const columns = [
 
 
@@ -564,10 +631,28 @@ export default function User() {
         <div className="px-4 py-4 border-b" style={{ borderBottomColor: theme.colors.borderLight }}>
           {/* Title */}
           <div
-            className="text-xl font-semibold mb-4 lg:mb-6"
+            className="text-xl font-semibold mb-4 lg:mb-6 flex justify-between items-center"
             style={{ color: theme.colors.textPrimary }}
           >
-            Account List
+            <span>Account List</span>
+            
+            {/* Export Buttons */}
+            <div className="flex gap-2">
+              <button
+                onClick={handleExportCSV}
+                disabled={exportLoading}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {exportLoading ? 'Exporting...' : 'Export CSV'}
+              </button>
+              <button
+                onClick={handleExportExcel}
+                disabled={exportLoading}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {exportLoading ? 'Exporting...' : 'Export Excel'}
+              </button>
+            </div>
           </div>
 
           {/* Filters */}

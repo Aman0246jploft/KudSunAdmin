@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchThreads, deleteThread, toggleThreadStatus } from "../../features/slices/threadSlice";
+import { fetchThreads, deleteThread, toggleThreadStatus, exportThreads } from "../../features/slices/threadSlice";
 import { mainCategory, subCategory } from "../../features/slices/categorySlice";
 import DataTable from "../../Component/Table/DataTable";
 import Button from "../../Component/Atoms/Button/Button";
@@ -12,6 +12,13 @@ import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 import { useTheme } from "../../contexts/theme/hook/useTheme";
 import Pagination from "../../Component/Atoms/Pagination/Pagination";
+import {
+  exportToCSV,
+  exportToExcel,
+  formatThreadDataForExport,
+  generateFilename
+} from "../../utils/exportUtils";
+import { toast } from "react-toastify";
 
 export default function Thread() {
   const dispatch = useDispatch();
@@ -39,6 +46,7 @@ export default function Thread() {
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
   const [subCategories, setSubCategories] = useState([]);
   const [tags, setTags] = useState([]);
+  const [exportLoading, setExportLoading] = useState(false);
 
   // Fetch categories on mount
   useEffect(() => {
@@ -180,6 +188,57 @@ export default function Thread() {
     setTags([]);
   };
 
+  // Export handlers
+  const handleExportCSV = async () => {
+    setExportLoading(true);
+    try {
+      // Remove empty filters before sending to backend
+      const exportFilters = Object.entries(filters).reduce((acc, [key, value]) => {
+        if (value !== "" && value !== null && value !== undefined &&
+          (Array.isArray(value) ? value.length > 0 : true)) {
+          acc[key] = value;
+        }
+        return acc;
+      }, {});
+
+      const result = await dispatch(exportThreads(exportFilters)).unwrap();
+      const formattedData = formatThreadDataForExport(result.data?.products || []);
+      const filename = generateFilename('threads', exportFilters);
+      exportToCSV(formattedData, filename);
+      toast.success('Threads exported to CSV successfully');
+    } catch (error) {
+      console.error('Export failed:', error);
+      toast.error('Failed to export threads');
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
+  const handleExportExcel = async () => {
+    setExportLoading(true);
+    try {
+      // Remove empty filters before sending to backend
+      const exportFilters = Object.entries(filters).reduce((acc, [key, value]) => {
+        if (value !== "" && value !== null && value !== undefined &&
+          (Array.isArray(value) ? value.length > 0 : true)) {
+          acc[key] = value;
+        }
+        return acc;
+      }, {});
+
+      const result = await dispatch(exportThreads(exportFilters)).unwrap();
+      const formattedData = formatThreadDataForExport(result.data?.products || []);
+      const filename = generateFilename('threads', exportFilters);
+      exportToExcel(formattedData, filename, 'Threads');
+      toast.success('Threads exported to Excel successfully');
+    } catch (error) {
+      console.error('Export failed:', error);
+      toast.error('Failed to export threads');
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
   // Table columns configuration
   const columns = [
     {
@@ -292,14 +351,52 @@ export default function Thread() {
           className="flex flex-col xl:flex-row xl:justify-between xl:items-center px-2 py-2 gap-4 xl:gap-0"
           style={{ borderBottom: `1px solid ${theme.colors.borderLight}` }}
         >
-          <div
-            className="font-semibold text-xl text-start whitespace-nowrap lg:text-left"
-            style={{ color: theme.colors.textPrimary }}
-          >
-            Thread List
+          <div className="flex justify-between items-center w-full xl:w-auto">
+            <div
+              className="font-semibold text-xl text-start whitespace-nowrap lg:text-left"
+              style={{ color: theme.colors.textPrimary }}
+            >
+              Thread List
+            </div>
+            
+            {/* Export Buttons for mobile */}
+            <div className="flex gap-2 xl:hidden">
+              <button
+                onClick={handleExportCSV}
+                disabled={exportLoading}
+                className="px-3 py-1.5 bg-green-600 text-white rounded text-sm font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {exportLoading ? 'Exporting...' : 'CSV'}
+              </button>
+              <button
+                onClick={handleExportExcel}
+                disabled={exportLoading}
+                className="px-3 py-1.5 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {exportLoading ? 'Exporting...' : 'Excel'}
+              </button>
+            </div>
           </div>
 
           <div className="flex flex-col lg:flex-row lg:justify-center lg:items-center gap-3">
+            {/* Export Buttons for larger screens */}
+            <div className="hidden xl:flex gap-2">
+              <button
+                onClick={handleExportCSV}
+                disabled={exportLoading}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {exportLoading ? 'Exporting...' : 'Export CSV'}
+              </button>
+              <button
+                onClick={handleExportExcel}
+                disabled={exportLoading}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {exportLoading ? 'Exporting...' : 'Export Excel'}
+              </button>
+            </div>
+
             <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
               <div className="flex gap-2 items-center">
                 <input

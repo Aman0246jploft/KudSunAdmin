@@ -51,6 +51,31 @@ export const productList = createAsyncThunk(
     }
 );
 
+export const exportProductList = createAsyncThunk(
+    'product/exportNormalProducts',
+    async (queryParams, thunkAPI) => {
+        try {
+            // Fetch all products for export by setting a large page size
+            const exportParams = {
+                ...queryParams,
+                pageNo: 1,
+                size: 999999, // Large number to get all records
+                includeSold: false
+            };
+            const res = await authAxiosClient.get('/product/showNormalProducts', { params: exportParams });
+            return res.data;
+        } catch (err) {
+            console.error(`Export Product [${err.response?.status || 500}]: ${err.message}`);
+            let message = capitalizeFirstLetter(err.response?.data?.message || err.message);
+            toast.error(message);
+            return thunkAPI.rejectWithValue({
+                message: err.response?.data?.message || err.message,
+                code: err.response?.status || 500,
+            });
+        }
+    }
+);
+
 
 
 export const productListAuction = createAsyncThunk(
@@ -61,6 +86,31 @@ export const productListAuction = createAsyncThunk(
             return res.data;
         } catch (err) {
             console.error(`Add Product [${err.response?.status || 500}]: ${err.message}`);
+            let message = capitalizeFirstLetter(err.response?.data?.message || err.message);
+            toast.error(message);
+            return thunkAPI.rejectWithValue({
+                message: err.response?.data?.message || err.message,
+                code: err.response?.status || 500,
+            });
+        }
+    }
+);
+
+export const exportAuctionList = createAsyncThunk(
+    'product/exportAuctionProducts',
+    async (queryParams, thunkAPI) => {
+        try {
+            // Fetch all auction products for export by setting a large page size
+            const exportParams = {
+                ...queryParams,
+                pageNo: 1,
+                size: 999999, // Large number to get all records
+                includeSold: true
+            };
+            const res = await authAxiosClient.get('/product/showAuctionProducts', { params: exportParams });
+            return res.data;
+        } catch (err) {
+            console.error(`Export Auction [${err.response?.status || 500}]: ${err.message}`);
             let message = capitalizeFirstLetter(err.response?.data?.message || err.message);
             toast.error(message);
             return thunkAPI.rejectWithValue({

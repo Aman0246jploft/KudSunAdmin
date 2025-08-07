@@ -10,6 +10,20 @@ export const fetchThreads = createAsyncThunk(
   }
 );
 
+export const exportThreads = createAsyncThunk(
+  "thread/exportThreads",
+  async (params) => {
+    // Fetch all threads for export by setting a large page size
+    const exportParams = {
+      ...params,
+      pageNo: 1,
+      size: 999999, // Large number to get all records
+    };
+    const response = await authAxiosClient.get("/thread/getThreads", { params: exportParams });
+    return response.data;
+  }
+);
+
 export const fetchThreadById = createAsyncThunk(
   "thread/fetchThreadById",
   async (threadId) => {

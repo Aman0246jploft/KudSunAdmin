@@ -4,6 +4,7 @@ import {
   deleteProduct,
   productList,
   productListAuction,
+  exportAuctionList,
   toggleProductDisable,
 } from "../../features/slices/productSlice";
 import Modal from "./Modal";
@@ -20,6 +21,13 @@ import { useNavigate } from "react-router";
 import { FaCircleInfo } from "react-icons/fa6";
 import { mainCategory, subCategory } from "../../features/slices/categorySlice";
 import EditProductForm from "./EditProductForm";
+import {
+  exportToCSV,
+  exportToExcel,
+  formatAuctionDataForExport,
+  generateFilename
+} from "../../utils/exportUtils";
+import { toast } from "react-toastify";
 
 export default function AuctionProduct() {
   const dispatch = useDispatch();
@@ -53,6 +61,7 @@ export default function AuctionProduct() {
   );
 
   const { products = [], total = 0 } = productsListAuction || {};
+  const [exportLoading, setExportLoading] = useState(false);
 
   useEffect(() => {
     const payload = {
@@ -227,6 +236,53 @@ export default function AuctionProduct() {
     setPagination((prev) => ({ ...prev, pageNo: newPage }));
   };
 
+  // Export handlers
+  const handleExportCSV = async () => {
+    setExportLoading(true);
+    try {
+      const exportParams = {
+        ...filters,
+        deliveryFilter: shippingType,
+        minPrice: filters.minPrice || undefined,
+        maxPrice: filters.maxPrice || undefined,
+      };
+
+      const result = await dispatch(exportAuctionList(exportParams)).unwrap();
+      const formattedData = formatAuctionDataForExport(result.data?.products || []);
+      const filename = generateFilename('auctions', exportParams);
+      exportToCSV(formattedData, filename);
+      toast.success('Auctions exported to CSV successfully');
+    } catch (error) {
+      console.error('Export failed:', error);
+      toast.error('Failed to export auctions');
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
+  const handleExportExcel = async () => {
+    setExportLoading(true);
+    try {
+      const exportParams = {
+        ...filters,
+        deliveryFilter: shippingType,
+        minPrice: filters.minPrice || undefined,
+        maxPrice: filters.maxPrice || undefined,
+      };
+
+      const result = await dispatch(exportAuctionList(exportParams)).unwrap();
+      const formattedData = formatAuctionDataForExport(result.data?.products || []);
+      const filename = generateFilename('auctions', exportParams);
+      exportToExcel(formattedData, filename, 'Auctions');
+      toast.success('Auctions exported to Excel successfully');
+    } catch (error) {
+      console.error('Export failed:', error);
+      toast.error('Failed to export auctions');
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
   const rowHeight = 40;
   const headerHeight = 56;
   const fixedRows = pagination.size;
@@ -246,16 +302,54 @@ export default function AuctionProduct() {
           className="flex flex-col xl:flex-row xl:justify-between xl:items-center gap-4 px-3 py-3 border-b"
           style={{ borderColor: theme.colors.borderLight }}
         >
-          {/* Title */}
-          <div
-            className="font-semibold whitespace-nowrap text-xl lg:text-2xl"
-            style={{ color: theme.colors.textPrimary }}
-          >
-            Auction List
+          {/* Title and Export Buttons */}
+          <div className="flex justify-between items-center w-full xl:w-auto">
+            <div
+              className="font-semibold whitespace-nowrap text-xl lg:text-2xl"
+              style={{ color: theme.colors.textPrimary }}
+            >
+              Auction List
+            </div>
+            
+            {/* Export Buttons for mobile */}
+            <div className="flex gap-2 xl:hidden">
+              <button
+                onClick={handleExportCSV}
+                disabled={exportLoading}
+                className="px-3 py-1.5 bg-green-600 text-white rounded text-sm font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {exportLoading ? 'Exporting...' : 'CSV'}
+              </button>
+              <button
+                onClick={handleExportExcel}
+                disabled={exportLoading}
+                className="px-3 py-1.5 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {exportLoading ? 'Exporting...' : 'Excel'}
+              </button>
+            </div>
           </div>
 
           {/* Filters */}
           <div className="flex flex-wrap gap-3 w-full lg:w-auto items-center">
+            {/* Export Buttons for larger screens */}
+            <div className="hidden xl:flex gap-2">
+              <button
+                onClick={handleExportCSV}
+                disabled={exportLoading}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {exportLoading ? 'Exporting...' : 'Export CSV'}
+              </button>
+              <button
+                onClick={handleExportExcel}
+                disabled={exportLoading}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {exportLoading ? 'Exporting...' : 'Export Excel'}
+              </button>
+            </div>
+
             {/* Shipping Type Dropdown */}
             <select
               value={shippingType}
