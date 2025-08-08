@@ -128,22 +128,22 @@ export default function FeeSetting() {
       label: "Name",
       width: "15%",
     },
-    {
-      key: "type",
-      label: "Type",
-      width: "15%",
-      render: (_, row) => (
-        <select
-          value={row.type}
-          onChange={(e) => handleTypeChange(row._id, e.target.value)}
-          className="border rounded px-1 py-0.5"
-          style={{ width: "100%" }}
-        >
-          <option value="PERCENTAGE">PERCENTAGE</option>
-          <option value="FIXED">FIXED</option>
-        </select>
-      ),
-    },
+    // {
+    //   key: "type",
+    //   label: "Type",
+    //   width: "15%",
+    //   render: (_, row) => (
+    //     <select
+    //       value={row.type}
+    //       onChange={(e) => handleTypeChange(row._id, e.target.value)}
+    //       className="border rounded px-1 py-0.5"
+    //       style={{ width: "100%" }}
+    //     >
+    //       <option value="PERCENTAGE">PERCENTAGE</option>
+    //       <option value="FIXED">FIXED</option>
+    //     </select>
+    //   ),
+    // },
     {
       key: "value",
       label: "Value",
