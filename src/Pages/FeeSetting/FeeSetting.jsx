@@ -5,7 +5,7 @@ import { contactUsList, feeSettingList, markAsreadContactUs, updateFee } from ".
 import Pagination from "../../Component/Atoms/Pagination/Pagination";
 import DataTable from "../../Component/Table/DataTable";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
-import { FiTrash2, FiCheckCircle, FiSlash } from "react-icons/fi";
+import { FiTrash2, FiCheckCircle, FiSlash, FiEdit2, FiCheck, FiX } from "react-icons/fi";
 import Modal from "./Modal";
 
 export default function FeeSetting() {
@@ -22,9 +22,6 @@ export default function FeeSetting() {
   const { data, total } = feeSettingList2 || {};
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedFaq, setSelectedFaq] = useState(null);
-
-  
-
 
   useEffect(() => {
     dispatch(feeSettingList(pagination))
@@ -94,7 +91,6 @@ export default function FeeSetting() {
     }
   };
 
-
   const handleKeyDown = (e, row) => {
     if (e.key === "Enter") {
       saveEdit(row);
@@ -102,6 +98,7 @@ export default function FeeSetting() {
       cancelEditing();
     }
   };
+
   const handleTypeChange = async (id, newType) => {
     try {
       await dispatch(updateFee({ id, type: newType })).unwrap();
@@ -115,7 +112,6 @@ export default function FeeSetting() {
     }
   };
 
-
   const columns = [
     {
       key: "serial",
@@ -128,47 +124,49 @@ export default function FeeSetting() {
       label: "Name",
       width: "15%",
     },
-    // {
-    //   key: "type",
-    //   label: "Type",
-    //   width: "15%",
-    //   render: (_, row) => (
-    //     <select
-    //       value={row.type}
-    //       onChange={(e) => handleTypeChange(row._id, e.target.value)}
-    //       className="border rounded px-1 py-0.5"
-    //       style={{ width: "100%" }}
-    //     >
-    //       <option value="PERCENTAGE">PERCENTAGE</option>
-    //       <option value="FIXED">FIXED</option>
-    //     </select>
-    //   ),
-    // },
     {
       key: "value",
       label: "Value",
-      width: "15%",
+      width: "5%",
       render: (_, row) =>
         editingRowId === row._id ? (
-          <input
-            type="number"
-            name="value"
-            value={editingValues.value}
-            onChange={handleInputChange}
-            onBlur={() => saveEdit(row)}
-            onKeyDown={(e) => handleKeyDown(e, row)}
-            className="border rounded px-1 py-0.5 w-full"
-            maxLength={2}
-            min={0}
-            max={99}
-          />
+          <div className="flex items-center gap-1">
+            <input
+              type="number"
+              name="value"
+              value={editingValues.value}
+              onChange={handleInputChange}
+              onKeyDown={(e) => handleKeyDown(e, row)}
+              className="border rounded px-1 py-0.5 flex-1 text-sm"
+              maxLength={2}
+              min={0}
+              max={99}
+              autoFocus
+            />
+            <button
+              onClick={() => saveEdit(row)}
+              className="p-0.5 rounded hover:bg-green-100 text-green-600"
+              title="Save"
+            >
+              <FiCheck size={25} />
+            </button>
+            <button
+              onClick={cancelEditing}
+              className="p-0.5 rounded hover:bg-red-100 text-red-600"
+              title="Cancel"
+            >
+              <FiX size={25} />
+            </button>
+          </div>
         ) : (
-          <div
-            onDoubleClick={() => startEditing(row)}
-            style={{ cursor: "pointer" }}
-            title="Double click to edit"
-          >
-            {row.value}
+          <div className="flex items-center justify-between group cursor-pointer" onClick={() => startEditing(row)}>
+            <span>{row.value}</span>
+            <button
+              className="p-0.5 rounded hover:bg-gray-100 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"
+              title="Click to edit"
+            >
+              <FiEdit2 size={12} />
+            </button>
           </div>
         ),
     },
@@ -176,15 +174,20 @@ export default function FeeSetting() {
       key: "actions",
       label: "Status",
       width: "10%",
+      headerStyle: { textAlign: "right" },
+      cellStyle: { textAlign: "right" },
+
       render: (_, row) => (
-        <button
-          onClick={() => handleToggleRead(row._id, row.isActive)}
-          className="p-1 rounded hover:bg-gray-200"
-          title={row.isActive ? "Mark as Unread" : "Mark as Read"}
-          style={{ color: row.isActive ? "green" : "gray" }}
-        >
-          {row.isActive ? <span className=" text-green-800"> Active </span> : <span> InActive </span>}
-        </button>
+        <div className="flex justify-end">
+          <button
+            onClick={() => handleToggleRead(row._id, row.isActive)}
+            className="p-1 rounded hover:bg-gray-200"
+            title={row.isActive ? "Mark as Inactive" : "Mark as Active"}
+            style={{ color: row.isActive ? "green" : "gray" }}
+          >
+            {row.isActive ? <span className="text-green-800">Active</span> : <span>InActive</span>}
+          </button>
+        </div>
       ),
     },
   ];
@@ -239,7 +242,7 @@ export default function FeeSetting() {
             </div>
           ) : (
             <div className="px-1 pt-1">
-              <DataTable columns={columns} data={data&&data?.filter((e)=>e.name !== "TAX")} />
+              <DataTable columns={columns} data={data && data?.filter((e) => e.name !== "TAX")} />
             </div>
           )}
         </div>
