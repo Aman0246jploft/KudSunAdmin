@@ -89,11 +89,20 @@ const ProductInfo = () => {
               <BackButton />
               <h1 className="text-2xl font-bold text-gray-900"> Product Details</h1>
             </span>
-            <span className={`px-3 py-1 rounded-full text-sm font-medium ${isAuction
-              ? 'bg-red-100 text-red-700'
-              : 'bg-green-100 text-green-700'
-              }`}>
-              {isAuction ? 'Auction Product' : 'Fixed Price Product'}
+            <span className=" flex gap-2">
+
+              <span className={`px-3 py-1 rounded-full text-sm font-medium ${isAuction
+                ? 'bg-red-100 text-red-700'
+                : 'bg-green-100 text-green-700'
+                }`}>
+                {isAuction ? 'Auction Product' : 'Fixed Price Product'}
+              </span>
+              <span className={`px-3 py-1 rounded-full text-sm font-medium ${productData?.isSold
+                ? 'bg-red-100 text-red-700'
+                : 'bg-green-100 text-green-700'
+                }`}>
+                {productData?.isSold ? 'Sold' : 'Unsold'}
+              </span>
             </span>
           </div>
         </div>
@@ -277,7 +286,7 @@ const ProductInfo = () => {
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm text-gray-600">Original Price</span>
                   <span className="text-sm line-through text-gray-400">
-                    ${productData?.originPrice}
+                     ฿{productData?.originPrice}
                   </span>
                 </div>
               )}
@@ -286,7 +295,7 @@ const ProductInfo = () => {
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Shipping</span>
                   <span className="text-sm text-gray-700">
-                    {productData?.deliveryType === 'free_shipping' ? 'Free' : `$${productData?.shippingCharge || 0}`}
+                    {productData?.deliveryType === 'free_shipping' ? 'Free' : ` ฿${productData?.shippingCharge || 0}`}
                   </span>
                 </div>
               )}
