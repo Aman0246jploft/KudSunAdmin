@@ -162,14 +162,14 @@ const ProfilePage = () => {
 
                 )}
 
-                <div>
+                <div className='hidden'>
                     <label className="block mb-1  font-medium">Profile Image</label>
                     <input
                         type="file"
                         name="profileImage" // MUST match backend multer.single('profileImage')
                         accept="image/*"
                         onChange={handleChange}
-                        className="block w-full  text-sm file:mr-4 file:py-2 file:px-4
+                        className="block w-full   text-sm file:mr-4 file:py-2 file:px-4
               file:rounded-full file:border-0
               file:text-sm file:font-semibold
               file:bg-blue-50 file:text-blue-700
@@ -184,7 +184,7 @@ const ProfilePage = () => {
                         name="userName"
                         value={formData.userName}
                         onChange={handleChange}
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+                        className="w-full border   border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
                         required
                     />
                 </div>
