@@ -6,6 +6,7 @@ import { FaHeart, FaComment, FaEye } from 'react-icons/fa'
 import authAxiosClient from '../../api/authAxiosClient'
 import { FaShield } from 'react-icons/fa6'
 import BackButton from '../../Component/BackButton'
+import Image from '../../Component/Atoms/Image/Image'
 
 export default function ThreadDetail() {
     const { id } = useParams()
@@ -102,7 +103,7 @@ export default function ThreadDetail() {
                     <h3 className="text-lg font-semibold mb-3">Thread Author Information</h3>
                     <div className="flex items-center space-x-3 mb-4">
                         <div className="relative">
-                            <img
+                            <Image
                                 src={thread.userId?.profileImage}
                                 alt={thread.userId?.userName}
                                 className="w-12 h-12 rounded-full object-cover"
@@ -164,7 +165,7 @@ export default function ThreadDetail() {
                     <div className="lg:col-span-1">
                         <div className="bg-white rounded-lg shadow-sm p-4">
                             <div className="relative mb-4">
-                                <img
+                                <Image
                                     src={thread.photos[selectedImage]}
                                     alt={thread.title}
                                     className="w-full h-64 object-cover rounded-lg"
@@ -175,7 +176,7 @@ export default function ThreadDetail() {
                             </div>
                             <div className="grid grid-cols-4 gap-2">
                                 {thread.photos.map((photo, index) => (
-                                    <img
+                                    <Image
                                         key={index}
                                         src={photo}
                                         alt={`${thread.title} ${index + 1}`}
@@ -318,7 +319,7 @@ export default function ThreadDetail() {
                                             {/* Comment Header */}
                                             <div className="flex items-start space-x-3 mb-3">
                                                 <div className="relative flex-shrink-0">
-                                                    <img
+                                                    <Image
                                                         src={comment.author?.profileImage}
                                                         alt={comment.author?.userName}
                                                         className="w-10 h-10 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
@@ -364,7 +365,7 @@ export default function ThreadDetail() {
                                                     <div className="mb-3">
                                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                                                             {comment.photos.map((photo, index) => (
-                                                                <img
+                                                                <Image
                                                                     key={index}
                                                                     src={photo}
                                                                     alt={`Comment photo ${index + 1}`}
@@ -392,7 +393,7 @@ export default function ThreadDetail() {
                                                                     <div className="flex gap-3">
                                                                         <div className="w-16 h-16 flex-shrink-0">
                                                                             {product.productImages?.length > 0 ? (
-                                                                                <img
+                                                                                <Image
                                                                                     src={product.productImages[0]}
                                                                                     alt={product.title}
                                                                                     className="w-full h-full object-cover rounded-lg"
@@ -438,7 +439,7 @@ export default function ThreadDetail() {
                                                                 <div key={reply._id} className="bg-gray-50 rounded-lg p-3">
                                                                     <div className="flex items-start space-x-2 mb-2">
                                                                         <div className="relative flex-shrink-0">
-                                                                            <img
+                                                                            <Image
                                                                                 src={reply.author?.profileImage}
                                                                                 alt={reply.author?.userName}
                                                                                 className="w-8 h-8 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity"

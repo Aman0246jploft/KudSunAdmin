@@ -310,7 +310,7 @@ export default function AuctionProduct() {
             >
               Auction List
             </div>
-            
+
             {/* Export Buttons for mobile */}
             <div className="flex gap-2 xl:hidden">
               <button
@@ -332,23 +332,7 @@ export default function AuctionProduct() {
 
           {/* Filters */}
           <div className="flex flex-wrap gap-3 w-full lg:w-auto items-center">
-            {/* Export Buttons for larger screens */}
-            <div className="hidden xl:flex gap-2">
-              <button
-                onClick={handleExportCSV}
-                disabled={exportLoading}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {exportLoading ? 'Exporting...' : 'Export CSV'}
-              </button>
-              <button
-                onClick={handleExportExcel}
-                disabled={exportLoading}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {exportLoading ? 'Exporting...' : 'Export Excel'}
-              </button>
-            </div>
+
 
             {/* Shipping Type Dropdown */}
             <select
@@ -423,6 +407,26 @@ export default function AuctionProduct() {
                 setPagination((prev) => ({ ...prev, pageNo: 1 }));
               }}
             />
+
+
+            {/* Export Buttons for larger screens */}
+            <div className="hidden xl:flex gap-2">
+              <button
+                onClick={handleExportCSV}
+                disabled={exportLoading}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {exportLoading ? 'Exporting...' : 'Export CSV'}
+              </button>
+              <button
+                onClick={handleExportExcel}
+                disabled={exportLoading}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {exportLoading ? 'Exporting...' : 'Export Excel'}
+              </button>
+            </div>
+
           </div>
         </div>
 

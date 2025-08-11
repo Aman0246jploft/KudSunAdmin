@@ -358,7 +358,7 @@ export default function Thread() {
             >
               Thread List
             </div>
-            
+
             {/* Export Buttons for mobile */}
             <div className="flex gap-2 xl:hidden">
               <button
@@ -379,23 +379,7 @@ export default function Thread() {
           </div>
 
           <div className="flex flex-col lg:flex-row lg:justify-center lg:items-center gap-3">
-            {/* Export Buttons for larger screens */}
-            <div className="hidden xl:flex gap-2">
-              <button
-                onClick={handleExportCSV}
-                disabled={exportLoading}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {exportLoading ? 'Exporting...' : 'Export CSV'}
-              </button>
-              <button
-                onClick={handleExportExcel}
-                disabled={exportLoading}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {exportLoading ? 'Exporting...' : 'Export Excel'}
-              </button>
-            </div>
+
 
             <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
               <div className="flex gap-2 items-center">
@@ -465,6 +449,26 @@ export default function Thread() {
               value={filters.keyWord}
               onChange={(e) => handleFilterChange("keyWord", e.target.value)}
             />
+
+
+
+            {/* Export Buttons for larger screens */}
+            <div className="hidden xl:flex gap-2">
+              <button
+                onClick={handleExportCSV}
+                disabled={exportLoading}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {exportLoading ? 'Exporting...' : 'Export CSV'}
+              </button>
+              <button
+                onClick={handleExportExcel}
+                disabled={exportLoading}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {exportLoading ? 'Exporting...' : 'Export Excel'}
+              </button>
+            </div>
           </div>
         </div>
 

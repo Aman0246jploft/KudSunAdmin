@@ -13,6 +13,7 @@ import {
   FaSortAmountDown, FaSortAmountUp, FaUserTie, FaShoppingCart
 } from 'react-icons/fa';
 import { MdCategory, MdSubdirectoryArrowRight, MdVerified } from 'react-icons/md';
+import Image from '../../Component/Atoms/Image/Image';
 
 const AdminReviewManagement = () => {
   const { theme } = useTheme();
@@ -228,34 +229,34 @@ const AdminReviewManagement = () => {
   // Table columns
   const columns = [
     {
-      key: 'reviewDetails',
-      label: 'reviewDetails',
-      render: (_, row) => {
-
-        return (
-          <div className="space-y-1">
-            <div className="flex items-center space-x-2">
-              <RatingDisplay rating={row?.rating} />
-              <span className="text-sm font-medium">{row?.rating}/5</span>
-            </div>
-            <p className="text-sm text-gray-600 max-w-xs truncate">
-              {row.reviewText}
-            </p>
-            <div className="flex items-center space-x-2 text-xs text-gray-500">
-              <FaCalendar className="w-3 h-3" />
-              {new Date(row.createdAt).toLocaleDateString()}
-            </div>
+      key: 'Product',
+      label: 'product',
+      render: (_, row) => (
+        <div className="flex items-center space-x-3">
+          <Image
+            src={row.product?.productImages?.[0] || '/default-product.png'}
+            alt="Product"
+            className="w-12 h-12 rounded object-cover"
+          />
+          <div>
+            <p className="font-medium text-sm max-w-xs truncate">{row.product?.title}</p>
+            <p className="text-xs text-gray-500">{row.category?.name}</p>
+            {row.product?.fixedPrice && (
+              <p className="text-xs font-medium text-green-600">
+                ฿{row.product.fixedPrice.toFixed(2)}
+              </p>
+            )}
           </div>
-        )
-      }
-
+        </div>
+      )
     },
+
     {
       key: 'reviewer',
       label: 'reviewer',
       render: (_, row) => (
         <div className="flex items-center space-x-3">
-          <img
+          <Image
             src={row.reviewer?.profileImage || '/default-avatar.png'}
             alt="Reviewer"
             className="w-10 h-10 rounded-full object-cover"
@@ -283,7 +284,7 @@ const AdminReviewManagement = () => {
 
         return (
           <div className="flex items-center space-x-3">
-            <img
+            <Image
               src={row.reviewedUser?.profileImage || '/default-avatar.png'}
               alt="Reviewed User"
               className="w-10 h-10 rounded-full object-cover"
@@ -312,27 +313,29 @@ const AdminReviewManagement = () => {
       }
     },
     {
-      key: 'Product',
-      label: 'product',
-      render: (_, row) => (
-        <div className="flex items-center space-x-3">
-          <img
-            src={row.product?.productImages?.[0] || '/default-product.png'}
-            alt="Product"
-            className="w-12 h-12 rounded object-cover"
-          />
-          <div>
-            <p className="font-medium text-sm max-w-xs truncate">{row.product?.title}</p>
-            <p className="text-xs text-gray-500">{row.category?.name}</p>
-            {row.product?.fixedPrice && (
-              <p className="text-xs font-medium text-green-600">
-                ฿{row.product.fixedPrice.toFixed(2)}
-              </p>
-            )}
+      key: 'reviewDetails',
+      label: 'reviewDetails',
+      render: (_, row) => {
+
+        return (
+          <div className="space-y-1">
+            <div className="flex items-center space-x-2">
+              <RatingDisplay rating={row?.rating} />
+              <span className="text-sm font-medium">{row?.rating}/5</span>
+            </div>
+            <p className="text-sm text-gray-600 max-w-xs truncate">
+              {row.reviewText}
+            </p>
+            <div className="flex items-center space-x-2 text-xs text-gray-500">
+              <FaCalendar className="w-3 h-3" />
+              {new Date(row.createdAt).toLocaleDateString()}
+            </div>
           </div>
-        </div>
-      )
+        )
+      }
+
     },
+
     {
       key: 'Actions',
       label: 'actions',
@@ -376,14 +379,14 @@ const AdminReviewManagement = () => {
           <p className="text-gray-600 mt-1">Manage and moderate platform reviews</p>
         </div>
         <div className="flex space-x-3">
-          <Button
+          {/* <Button
             variant="outline"
             onClick={() => setShowFilters(!showFilters)}
             className="flex items-center space-x-2"
           >
             <FaFilter className="w-4 h-4" />
             <span>Filters</span>
-          </Button>
+          </Button> */}
           {/* <Button
             variant="primary"
             onClick={applyFilters}
@@ -395,9 +398,9 @@ const AdminReviewManagement = () => {
         </div>
       </div>
 
-      {/* Advanced Filters */}
-      {showFilters && (
-        <div className="bg-white rounded-lg shadow-sm border p-6">
+      {/* Advanced Filters  showFilters||*/} 
+      {true && (
+        <div className="bg-white mb-2 rounded-lg shadow-sm border p-6">
           <h3 className="text-lg font-semibold mb-4">Advanced Filters</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Search */}
@@ -563,7 +566,7 @@ const AdminReviewManagement = () => {
                         <h3 className="font-semibold mb-2">Review Images</h3>
                         <div className="grid grid-cols-2 gap-2">
                           {detailModal.data.reviewImages.map((image, index) => (
-                            <img
+                            <Image
                               key={index}
                               src={image}
                               alt={`Review image ${index + 1}`}
@@ -584,7 +587,7 @@ const AdminReviewManagement = () => {
                         Reviewer Information
                       </h3>
                       <div className="flex items-center space-x-3 mb-3">
-                        <img
+                        <Image
                           src={detailModal.data.reviewer?.profileImage || '/default-avatar.png'}
                           alt="Reviewer"
                           className="w-12 h-12 rounded-full object-cover"
@@ -625,7 +628,7 @@ const AdminReviewManagement = () => {
                         Reviewed User Information
                       </h3>
                       <div className="flex items-center space-x-3 mb-3">
-                        <img
+                        <Image
                           src={detailModal.data.reviewedUser?.profileImage || '/default-avatar.png'}
                           alt="Reviewed User"
                           className="w-12 h-12 rounded-full object-cover"
@@ -668,7 +671,7 @@ const AdminReviewManagement = () => {
                     Product Information
                   </h3>
                   <div className="flex items-center space-x-4">
-                    <img
+                    <Image
                       src={detailModal.data.product?.productImages?.[0] || '/default-product.png'}
                       alt="Product"
                       className="w-20 h-20 rounded object-cover"

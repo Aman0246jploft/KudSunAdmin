@@ -126,12 +126,12 @@ export default function FeeSetting() {
     },
     {
       key: "value",
-      label: "Value",
+      label: "Fee",
       width: "5%",
       render: (_, row) =>
         editingRowId === row._id ? (
           <div className="flex items-center gap-1">
-            <input
+             <input
               type="number"
               name="value"
               value={editingValues.value}
@@ -160,7 +160,7 @@ export default function FeeSetting() {
           </div>
         ) : (
           <div className="flex items-center justify-between group cursor-pointer" onClick={() => startEditing(row)}>
-            <span>{row.value}</span>
+            <span>฿{row.value}</span>
             <button
               className="p-0.5 rounded hover:bg-gray-100 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"
               title="Click to edit"

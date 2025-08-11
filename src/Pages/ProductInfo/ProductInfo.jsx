@@ -254,10 +254,10 @@ const ProductInfo = () => {
         <div className="">
           <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
             <h2 className="text-xl font-bold text-gray-900 mb-3">
-              {productData?.title}
+              Title: {productData?.title}
             </h2>
             <p className="text-gray-600 mb-4 text-sm leading-relaxed">
-              {productData?.description}
+              Description: {productData?.description}
             </p>
 
             {productData?.tags?.length > 0 && (
