@@ -110,7 +110,7 @@ function App() {
               <Route path="/subcategory/:id" element={<SubCategory />} />
               <Route path="/chat" element={<Chat />} />
 
-              <Route path="/ProfilePage" element={<ProfilePage />} />
+              <Route path="/profilePage" element={<ProfilePage />} />
 
               <Route path="/report-type-management" element={<ReportTypeManagement />} />
               <Route path="/dispute-type-management" element={<DisputeTypeManagement />} />

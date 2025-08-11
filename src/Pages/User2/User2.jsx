@@ -222,7 +222,7 @@ export default function User2() {
   };
 
   const fetchUserReports = async (userId, pageNo = 1, size = 5) => {
-    console.log("userIduserId", userId);
+
     try {
       setReportLoading(true);
       // Include pagination parameters in the API call
@@ -566,7 +566,7 @@ export default function User2() {
                 </p>
               </div>
             </div>
-          )  : (
+          ) : (
             <div className="px-1 pt-1">
               <DataTable
                 columns={columns}

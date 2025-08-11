@@ -29,6 +29,9 @@ const ProfilePage = () => {
             const res = await authAxiosClient.get('/user/getProfile');
             const data = res.data?.data;
 
+            console.log("5555554444",data)
+
+
             setFormData({
                 image: null,
                 userName: data.userName || '',
