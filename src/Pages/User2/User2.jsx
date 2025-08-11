@@ -566,19 +566,7 @@ export default function User2() {
                 </p>
               </div>
             </div>
-          ) : error ? (
-            <div
-              className="absolute inset-0 flex items-center justify-center"
-              style={{ backgroundColor: theme.colors.backgroundSecondary }}
-            >
-              <div
-                className="text-center font-semibold"
-                style={{ color: theme.colors.error }}
-              >
-                Error: {error}
-              </div>
-            </div>
-          ) : (
+          )  : (
             <div className="px-1 pt-1">
               <DataTable
                 columns={columns}
