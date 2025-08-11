@@ -139,6 +139,7 @@ export const userList = createAsyncThunk(
     async (queryParams = {}, thunkAPI) => {
         try {
             const res = await authAxiosClient.get('/user/userList', { params: queryParams });
+
             return res?.data?.data;
         } catch (err) {
             let message = capitalizeFirstLetter(err.message)
@@ -356,6 +357,7 @@ const userSlice = createSlice({
                 state.error = null;
             })
             .addCase(userList.fulfilled, (state, action) => {
+                console.log("666666>>>",action.payload)
                 state.loading = false;
                 state.userList = action.payload;
             })

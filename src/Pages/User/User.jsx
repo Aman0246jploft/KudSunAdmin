@@ -26,11 +26,11 @@ import { RiTriangularFlagLine } from "react-icons/ri";
 import { toast } from "react-toastify";
 import { byUser } from "../../features/slices/settingSlice";
 import { useNavigate } from 'react-router-dom';
-import { 
-  exportToCSV, 
-  exportToExcel, 
-  formatUserDataForExport, 
-  generateFilename 
+import {
+  exportToCSV,
+  exportToExcel,
+  formatUserDataForExport,
+  generateFilename
 } from "../../utils/exportUtils";
 
 
@@ -635,7 +635,7 @@ export default function User() {
             style={{ color: theme.colors.textPrimary }}
           >
             <span>Account List</span>
-            
+
             {/* Export Buttons */}
             <div className="flex gap-2">
               <button
@@ -764,18 +764,6 @@ export default function User() {
                 >
                   Loading users...
                 </p>
-              </div>
-            </div>
-          ) : error ? (
-            <div
-              className="absolute inset-0 flex items-center justify-center"
-              style={{ backgroundColor: theme.colors.backgroundSecondary }}
-            >
-              <div
-                className="text-center font-semibold"
-                style={{ color: theme.colors.error }}
-              >
-                Error: {error}
               </div>
             </div>
           ) : (

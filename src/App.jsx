@@ -29,6 +29,7 @@ import PrivacyPolicy from "./Pages/PrivacyPolicy/PrivacyPolicy";
 import AuctionRules from "./Pages/AuctionRules/AuctionRules";
 import DisputeManagement from "./Pages/Dispute/DisputeManagement";
 import AdminTransactions from "./Pages/Admin/AdminTransactions";
+import ErrorBoundary from "./Component/ErrorBoundary/ErrorBoundary";
 
 import SellerVerificationRequests from "./Pages/User/SellerVerificationRequests";
 import AdminFinancialDashboard from "./Pages/Admin/AdminFinancialDashboard";
@@ -61,10 +62,11 @@ const User = lazy(() => import("./Pages/User/User"));
 
 function App() {
   return (
-    <Router>
-      <NetworkStatus />
-      <Suspense fallback={<Loader />}>
-        <Routes>
+    <ErrorBoundary>
+      <Router>
+        <NetworkStatus />
+        <Suspense fallback={<Loader />}>
+          <Routes>
           {/* Public Routes */}
           <Route element={<PublicRoute />}>
             <Route path="/login" element={<Login />} />
@@ -141,6 +143,7 @@ function App() {
         </Routes>
       </Suspense>
     </Router>
+    </ErrorBoundary>
   );
 }
 
