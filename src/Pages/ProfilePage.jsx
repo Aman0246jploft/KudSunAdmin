@@ -28,10 +28,6 @@ const ProfilePage = () => {
         try {
             const res = await authAxiosClient.get('/user/getProfile');
             const data = res.data?.data;
-
-            console.log("5555554444",data)
-
-
             setFormData({
                 image: null,
                 userName: data.userName || '',
@@ -167,13 +163,13 @@ const ProfilePage = () => {
                 )}
 
                 <div>
-                    <label className="block mb-1 hidden font-medium">Profile Image</label>
+                    <label className="block mb-1  font-medium">Profile Image</label>
                     <input
                         type="file"
                         name="profileImage" // MUST match backend multer.single('profileImage')
                         accept="image/*"
                         onChange={handleChange}
-                        className="block w-full hidden text-sm file:mr-4 file:py-2 file:px-4
+                        className="block w-full  text-sm file:mr-4 file:py-2 file:px-4
               file:rounded-full file:border-0
               file:text-sm file:font-semibold
               file:bg-blue-50 file:text-blue-700
