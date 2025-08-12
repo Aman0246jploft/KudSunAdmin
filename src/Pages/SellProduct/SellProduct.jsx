@@ -363,7 +363,7 @@ export default function SellProduct() {
           </div>
 
           {/* Filters Section */}
-          <div className="flex flex-wrap justify-center gap-3 w-full lg:w-auto lg:flex-row items-center">
+          <div className="flex  justify-center gap-3 w-full lg:w-auto lg:flex-row items-center">
             {/* Export Buttons for larger screens */}
 
             {/* Price Range */}
