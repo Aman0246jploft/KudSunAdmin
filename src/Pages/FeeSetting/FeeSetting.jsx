@@ -126,7 +126,7 @@ export default function FeeSetting() {
     },
     {
       key: "value",
-      label: "Fee",
+      label: "Fee %",
       width: "5%",
       render: (_, row) =>
         editingRowId === row._id ? (
