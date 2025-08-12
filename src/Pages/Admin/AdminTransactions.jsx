@@ -491,9 +491,9 @@ const AdminTransactions = () => {
   // Get withdrawal status badge
   const getWithdrawalStatusBadge = (status) => {
     const statusColors = {
-      'pending': 'bg-yellow-100 text-yellow-800',
-      'Approved': 'bg-green-100 text-green-800',
-      'Rejected': 'bg-red-100 text-red-800'
+      'pending': ' text-yellow-800',
+      'Approved': ' text-green-800',
+      'Rejected': ' text-red-800'
     };
 
     return (
@@ -787,7 +787,9 @@ const AdminTransactions = () => {
           );
         } else if (isBank) {
           return (
-            <div className="flex flex-col md:justify-start justify-end">
+            <div className="flex flex-col items-end md:items-start md:justify-start justify-end">
+      
+
               <span className="font-medium text-sm text-green-600 flex items-center">
                 <span className="mr-1">🏦</span>
                 {method.bankName || 'Bank Transfer'}
@@ -795,6 +797,7 @@ const AdminTransactions = () => {
               <span className="text-xs text-gray-500">
                 ****{method.accountNumber.slice(-4)}
               </span>
+     
             </div>
           );
         } else {

@@ -900,7 +900,7 @@ export default function UserInfo() {
               { key: 'overview', label: 'Overview', icon: FaUser },
               { key: 'products', label: 'Products', icon: FaStore },
               { key: 'threads', label: 'Threads', icon: FaComments },
-              { key: 'transactions', label: 'Transactions', icon: FaShoppingCart },
+              // { key: 'transactions', label: 'Transactions', icon: FaShoppingCart },
               // { key: 'reviews', label: 'Reviews', icon: MdStar }
             ].map((tab) => {
               const Icon = tab.icon;

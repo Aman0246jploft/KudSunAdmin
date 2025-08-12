@@ -330,169 +330,160 @@ export default function SellProduct() {
 
 
 
-        <div
-          className="flex  xl:flex-row flex-col xl:justify-between xl:items-center gap-8 px-2 py-2 border-b"
-          style={{ borderColor: theme.colors.borderLight }}
-        >
-          {/* Title and Export Buttons */}
-          <div className="flex justify-between items-center w-full xl:w-auto">
-            <div
-              className="font-semibold whitespace-nowrap text-xl text-left"
-              style={{ color: theme.colors.textPrimary }}
-            >
-              Product List
-            </div>
+<div
+  className="flex flex-col gap-4 px-4 py-3 border-b"
+  style={{ borderColor: theme.colors.borderLight }}
+>
+  {/* Title and Mobile Export Buttons */}
+  <div className="flex justify-between items-center w-full">
+    <h2
+      className="font-semibold text-xl"
+      style={{ color: theme.colors.textPrimary }}
+    >
+      Product List
+    </h2>
 
-            {/* Export Buttons */}
-            <div className="flex gap-2 xl:hidden">
-              <button
-                onClick={handleExportCSV}
-                disabled={exportLoading}
-                className="px-3 py-1.5 bg-green-600 text-white rounded text-sm font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {exportLoading ? 'Exporting...' : 'CSV'}
-              </button>
-              <button
-                onClick={handleExportExcel}
-                disabled={exportLoading}
-                className="px-3 py-1.5 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {exportLoading ? 'Exporting...' : 'Excel'}
-              </button>
-            </div>
-          </div>
+    {/* Mobile Export Buttons */}
+    <div className="flex gap-2 xl:hidden">
+      <button
+        onClick={handleExportCSV}
+        disabled={exportLoading}
+        className="px-3 py-1.5 bg-green-600 text-white rounded text-sm font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+      >
+        {exportLoading ? 'Exporting...' : 'CSV'}
+      </button>
+      <button
+        onClick={handleExportExcel}
+        disabled={exportLoading}
+        className="px-3 py-1.5 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+      >
+        {exportLoading ? 'Exporting...' : 'Excel'}
+      </button>
+    </div>
+  </div>
 
-          {/* Filters Section */}
-          <div className="flex  justify-center gap-3 w-full lg:w-auto lg:flex-row items-center">
-            {/* Export Buttons for larger screens */}
+  {/* Filters and Export Buttons Row */}
+  <div className="flex flex-wrap items-center gap-3 w-full">
 
-            {/* Price Range */}
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              <input
-                type="number"
-                min="0"
-                placeholder="Min Price"
-                value={filters.minPrice}
-                onChange={(e) => {
-                  setFilters((prev) => ({ ...prev, minPrice: e.target.value }));
-                  setPagination((prev) => ({ ...prev, pageNo: 1 }));
-                }}
-                className="px-2 py-1 border rounded w-full sm:w-24 text-sm"
-              />
-              <span className="text-sm">-</span>
-              <input
-                type="number"
-                min="0"
-                placeholder="Max Price"
-                value={filters.maxPrice}
-                onChange={(e) => {
-                  setFilters((prev) => ({ ...prev, maxPrice: e.target.value }));
-                  setPagination((prev) => ({ ...prev, pageNo: 1 }));
-                }}
-                className="px-2 py-1 border rounded w-full sm:w-24 text-sm"
-              />
-            </div>
+    {/* Price Inputs */}
+    <div className="flex items-center gap-1 min-w-[220px]">
+      <input
+        type="number"
+        min="0"
+        placeholder="Min Price"
+        value={filters.minPrice}
+        onChange={(e) => {
+          setFilters((prev) => ({ ...prev, minPrice: e.target.value }));
+          setPagination((prev) => ({ ...prev, pageNo: 1 }));
+        }}
+        className="px-3 py-1 border rounded w-24 text-sm"
+      />
+      <span className="text-sm px-1">-</span>
+      <input
+        type="number"
+        min="0"
+        placeholder="Max Price"
+        value={filters.maxPrice}
+        onChange={(e) => {
+          setFilters((prev) => ({ ...prev, maxPrice: e.target.value }));
+          setPagination((prev) => ({ ...prev, pageNo: 1 }));
+        }}
+        className="px-3 py-1 border rounded w-24 text-sm"
+      />
+    </div>
 
-            {/* Shipping */}
-            <select
-              value={shippingType}
-              onChange={(e) => setShippingType(e.target.value)}
-              className="border outline-none rounded px-2 py-1 text-sm w-full sm:w-40"
-            >
-              {shippingOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+    {/* Shipping */}
+    <select
+      value={shippingType}
+      onChange={(e) => setShippingType(e.target.value)}
+      className="border rounded px-3 py-1 text-sm min-w-[140px]"
+    >
+      {shippingOptions.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </select>
 
-            {/* Category */}
-            <select
-              value={selectedCategory}
-              onChange={(e) => {
-                const categoryId = e.target.value;
-                setSelectedCategory(categoryId);
-                setSelectedSubCategory("");
-                setFilters((prev) => ({
-                  ...prev,
-                  categoryId,
-                  subCategoryId: "",
-                }));
-                setPagination((prev) => ({ ...prev, pageNo: 1 }));
-              }}
-              className="px-2 py-2 border rounded text-sm w-full sm:w-48"
-            >
-              <option value="">All Categories</option>
-              {categoryList?.data?.map((cat) => (
-                <option key={cat._id} value={cat._id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
+    {/* Category */}
+    <select
+      value={selectedCategory}
+      onChange={(e) => {
+        const categoryId = e.target.value;
+        setSelectedCategory(categoryId);
+        setSelectedSubCategory('');
+        setFilters((prev) => ({
+          ...prev,
+          categoryId,
+          subCategoryId: '',
+        }));
+        setPagination((prev) => ({ ...prev, pageNo: 1 }));
+      }}
+      className="border rounded px-3 py-1 text-sm min-w-[180px]"
+    >
+      <option value="">All Categories</option>
+      {categoryList?.data?.map((cat) => (
+        <option key={cat._id} value={cat._id}>
+          {cat.name}
+        </option>
+      ))}
+    </select>
 
-            {/* Subcategory */}
-            <select
-              value={selectedSubCategory}
-              onChange={(e) => {
-                const subCategoryId = e.target.value;
-                setSelectedSubCategory(subCategoryId);
-                setFilters((prev) => ({
-                  ...prev,
-                  subCategoryId,
-                }));
-                setPagination((prev) => ({ ...prev, pageNo: 1 }));
-              }}
-              className="px-2 py-2 border rounded text-sm w-full sm:w-48"
-              disabled={!selectedCategory}
-            >
-              <option value="">All Subcategories</option>
-              {subCategories?.map((sub) => (
-                <option key={sub._id} value={sub._id}>
-                  {sub.name}
-                </option>
-              ))}
-            </select>
+    {/* Subcategory */}
+    <select
+      value={selectedSubCategory}
+      onChange={(e) => {
+        const subCategoryId = e.target.value;
+        setSelectedSubCategory(subCategoryId);
+        setFilters((prev) => ({
+          ...prev,
+          subCategoryId,
+        }));
+        setPagination((prev) => ({ ...prev, pageNo: 1 }));
+      }}
+      className="border rounded px-3 py-1 text-sm min-w-[180px]"
+      disabled={!selectedCategory}
+    >
+      <option value="">All Subcategories</option>
+      {subCategories?.map((sub) => (
+        <option key={sub._id} value={sub._id}>
+          {sub.name}
+        </option>
+      ))}
+    </select>
 
-            {/* Search */}
-            <input
-              className="p-2 outline-none border rounded text-sm w-full sm:w-64"
-              type="text"
-              placeholder="Search product"
-              value={filters.keyWord}
-              onChange={(e) => {
-                setFilters({ ...filters, keyWord: e.target.value });
-                setPagination((prev) => ({ ...prev, pageNo: 1 }));
-              }}
-            />
+    {/* Search Input */}
+    <input
+      type="text"
+      placeholder="Search product"
+      value={filters.keyWord}
+      onChange={(e) => {
+        setFilters({ ...filters, keyWord: e.target.value });
+        setPagination((prev) => ({ ...prev, pageNo: 1 }));
+      }}
+      className="flex-grow min-w-[200px] px-3 py-1 border rounded text-sm"
+    />
 
+    {/* Desktop Export Buttons */}
+    <div className="hidden xl:flex gap-2 flex-shrink-0">
+      <button
+        onClick={handleExportCSV}
+        disabled={exportLoading}
+        className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+      >
+        {exportLoading ? 'Exporting...' : 'Export CSV'}
+      </button>
+      <button
+        onClick={handleExportExcel}
+        disabled={exportLoading}
+        className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+      >
+        {exportLoading ? 'Exporting...' : 'Export Excel'}
+      </button>
+    </div>
+  </div>
+</div>
 
-
-
-
-
-
-
-
-
-            <div className="hidden xl:flex gap-2">
-              <button
-                onClick={handleExportCSV}
-                disabled={exportLoading}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {exportLoading ? 'Exporting...' : 'Export CSV'}
-              </button>
-              <button
-                onClick={handleExportExcel}
-                disabled={exportLoading}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {exportLoading ? 'Exporting...' : 'Export Excel'}
-              </button>
-            </div>
-
-          </div>
-        </div>
 
 
 

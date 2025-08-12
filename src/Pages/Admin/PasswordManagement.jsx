@@ -95,7 +95,7 @@ const PasswordManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className=" bg-gray-50 py-8">
       <div className="max-w-2xl mx-auto px-4">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-sm border mb-6">
@@ -202,7 +202,7 @@ const PasswordManagement = () => {
               </div>
 
               {/* Password Requirements */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="bg-blue-50 hidden border border-blue-200 rounded-lg p-4">
                 <h4 className="text-sm font-medium text-blue-900 mb-2">Password Requirements:</h4>
                 <ul className="text-xs text-blue-800 space-y-1">
                   <li className="flex items-center gap-2">
