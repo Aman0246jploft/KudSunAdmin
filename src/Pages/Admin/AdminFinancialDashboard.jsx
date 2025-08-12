@@ -1035,7 +1035,7 @@ export default function AdminFinancialDashboard() {
             )}
 
             {/* Additional Insights */}
-            {dashboardData.overview.disputes && dashboardData.overview.disputes.length > 0 && (
+            {/* {dashboardData.overview.disputes && dashboardData.overview.disputes.length > 0 && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-6">
                 <h4 className="font-semibold text-yellow-800 mb-2 flex items-center">
                   <MdInfo className="w-5 h-5 mr-2" />
@@ -1048,7 +1048,7 @@ export default function AdminFinancialDashboard() {
                   <p>• Consider implementing preventive measures for high-dispute categories</p>
                 </div>
               </div>
-            )}
+            )} */}
           </div>
         </div>
       )}

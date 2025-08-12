@@ -475,14 +475,14 @@ const AdminTransactions = () => {
     if (!dispute) return null;
 
     const statusColors = {
-      'PENDING': 'bg-yellow-100 text-yellow-800',
-      'UNDER_REVIEW': 'bg-blue-100 text-blue-800',
-      'RESOLVED': 'bg-green-100 text-green-800',
-      'CANCELLED': 'bg-gray-100 text-gray-800'
+      'PENDING': ' text-yellow-800',
+      'UNDER_REVIEW': ' text-blue-800',
+      'RESOLVED': ' text-green-800',
+      'CANCELLED': ' text-gray-800'
     };
 
     return (
-      <span className={`text-xs px-2 py-1 rounded-full ${statusColors[dispute.status] || 'bg-gray-100 text-gray-800'}`}>
+      <span className={`text-xs px-2 py-1 rounded-full ${statusColors[dispute.status] || 'text-gray-800'}`}>
         {dispute.status}
       </span>
     );
@@ -497,7 +497,7 @@ const AdminTransactions = () => {
     };
 
     return (
-      <span className={`text-xs px-2 py-1 rounded-full ${statusColors[status] || 'bg-gray-100 text-gray-800'}`}>
+      <span className={`text-xs px-2 py-1 rounded-full ${statusColors[status] || 'text-gray-800'}`}>
         {status}
       </span>
     );
@@ -639,10 +639,10 @@ const AdminTransactions = () => {
       width: "12%",
       render: (_, row) => (
         <div className="flex flex-col md:justify-start justify-end space-y-1">
-          <span className={`text-xs px-2 py-1 rounded-full ${row?.status === 'completed' ? 'bg-green-100 text-green-800' :
-            row?.status === 'delivered' ? 'bg-blue-100 text-blue-800' :
-              row?.status === 'shipped' ? 'bg-yellow-100 text-yellow-800' :
-                'bg-gray-100 text-gray-800'
+          <span className={`text-xs px-2 py-1 rounded-full ${row?.status === 'completed' ? ' text-green-800' :
+            row?.status === 'delivered' ? ' text-blue-800' :
+              row?.status === 'shipped' ? ' text-yellow-800' :
+                'text-gray-800'
             }`}>
             {row?.status?.toUpperCase()}
           </span>
@@ -1508,7 +1508,7 @@ const AdminTransactions = () => {
                       {/* Fee Settings Info */}
                       {calculationModal.data.payoutCalculation?.feeSettings && (
                         <div className="mt-4 pt-3 border-t border-gray-200">
-                          <details className="text-sm text-gray-600">
+                          <div className="text-sm text-gray-600">
                             <summary className="cursor-pointer font-medium hover:text-gray-800">
                               View Fee Settings Details
                             </summary>
@@ -1523,7 +1523,7 @@ const AdminTransactions = () => {
                                 <div>Withdrawal Fee: {calculationModal.data.payoutCalculation.feeSettings.withdrawalFee.value}{calculationModal.data.payoutCalculation.feeSettings.withdrawalFee.type === 'PERCENTAGE' ? '%' : ' ฿'}</div>
                               )}
                             </div>
-                          </details>
+                          </div>
                         </div>
                       )}
                     </div>
