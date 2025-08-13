@@ -195,7 +195,6 @@ const AddProductForm = () => {
     ) {
       newErrors.shippingCharge = "Shipping charge is required";
     }
-    console.log(newErrors);
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };

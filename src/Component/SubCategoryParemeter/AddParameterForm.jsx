@@ -20,7 +20,6 @@ export default function AddParameterForm({ onClose, pagination, editData }) {
     editData?.values?.map((val) => val.value) || [""]
   );
 
-  console.log("editDataeditData", editData)
 
   const isEdit = !!editData;
 
@@ -52,7 +51,7 @@ export default function AddParameterForm({ onClose, pagination, editData }) {
       toast.error("Both key and at least one value are required.");
       return;
     }
-    console.log("654654", trimmedKey, trimmedValues)
+
 
     // Move this line up here so it's available in both add and edit flows
     const formData = new FormData();

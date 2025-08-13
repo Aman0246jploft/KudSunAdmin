@@ -47,8 +47,6 @@ export default function Location() {
     e.preventDefault();
     if (!formData.value.trim()) return toast.warning("Value cannot be empty");
 
-console.log("formData",formData)
-
     try {
       if (formMode === "create") {
         await authAxiosClient.post("/location/create", {

@@ -31,7 +31,6 @@ export default function CommentModal() {
       dispatch(getProductComment({ id, pagination }))
         .then((result) => {
           if (getProductComment.fulfilled.match(result)) {
-            console.log("Comments loaded successfully");
           } else {
             const { message, code } = result.payload || {};
             console.error(`Comment failed [${code}]: ${message}`);
@@ -201,7 +200,6 @@ export default function CommentModal() {
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
-    console.log("Selected files:", files);
     setSelectedImages(files);
   };
 

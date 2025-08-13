@@ -35,7 +35,6 @@ export const addComment = createAsyncThunk(
 export const getProductComment = createAsyncThunk(
     'product/getProductComment',
     async ({ id, pagination }, thunkAPI) => {
-        console.log("id , pagination", id, pagination)
         try {
             const res = await authAxiosClient.get(`/product/getProductComment/${id}`, pagination, {
                 headers: {
@@ -62,7 +61,6 @@ export const getProductComment = createAsyncThunk(
 export const getProductCommentReply = createAsyncThunk(
     'product/getProductCommentReply',
     async ({ parentId, pageNo = 1, size = 10 }, thunkAPI) => {
-        console.log("id , pagination", id, pagination)
         try {
             const res = await authAxiosClient.get(`/product/getProductCommentReply/${parentId}?pageNo=${pageNo}&size=${size}`, {
                 headers: {

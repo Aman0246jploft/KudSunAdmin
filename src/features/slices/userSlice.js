@@ -357,7 +357,6 @@ const userSlice = createSlice({
                 state.error = null;
             })
             .addCase(userList.fulfilled, (state, action) => {
-                console.log("666666>>>",action.payload)
                 state.loading = false;
                 state.userList = action.payload;
             })

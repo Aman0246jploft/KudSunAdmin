@@ -74,7 +74,7 @@ const CancelTypeManagement  = () => {
   };
 
   const handleDelete = async (id) => {
-    console.log(id)
+
     if (window.confirm('Are you sure you want to delete this report type?')) {
       try {
         await dispatch(deleteCancelType(id)).unwrap();

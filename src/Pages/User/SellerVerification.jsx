@@ -8,7 +8,6 @@ export default function SellerVerification({ onClose, data, onActionComplete }) 
 
   const verification = data?.sellerVerification?.[0];
   const dispatch = useDispatch();
-  console.log("STATus",verification?.verificationStatus)
 
   if (!verification) {
     return (

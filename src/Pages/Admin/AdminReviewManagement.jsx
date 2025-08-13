@@ -71,7 +71,7 @@ const AdminReviewManagement = () => {
       });
 
       const response = await authAxiosClient.get(`/reviewManagement/admin/reviews?${queryParams}`);
-      // console.log("8888888",response)
+      
       if (response.data?.status) {
         setReviews(response.data.data.reviews || []);
         setTotalRecords(response.data.data.pagination.totalRecords || 0);

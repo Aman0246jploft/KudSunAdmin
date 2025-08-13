@@ -102,8 +102,6 @@ const handleChange = (e) => {
     //   .then(...)
     //   .catch(...)
 
-    console.log("Submitting category:", formData);
-
     onClose();
   };
 

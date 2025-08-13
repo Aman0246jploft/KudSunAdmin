@@ -192,9 +192,9 @@ const DisputeManagement = () => {
               placeholder="Search disputes..."
               className="border rounded px-3 py-2 w-full sm:w-auto"
             />
-            <Button type="submit" variant="secondary" className="w-full sm:w-auto">
+            {/* <Button type="submit" variant="secondary" className="w-full sm:w-auto">
               Search
-            </Button>
+            </Button> */}
           </form>
         </div>
 

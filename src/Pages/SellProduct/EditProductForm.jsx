@@ -77,8 +77,6 @@ const EditProductForm = ({
           valueId: spec.valueId || spec.valueID,
           valueName: spec.valueName,
         }));
-        console.log("Initial product specifics:", productData.specifics);
-        console.log("Mapped specifics:", initialSpecifics);
         setSelectedSpecifics(initialSpecifics);
       }
     }
@@ -151,7 +149,6 @@ const EditProductForm = ({
     ).then((res) => {
       if (subCategoryParameter.fulfilled.match(res)) {
         const fetchedSpecifics = res.payload?.data?.parameters || [];
-        console.log("Fetched specifics for subcategory:", formData.subCategoryId, fetchedSpecifics);
         setSpecifics(fetchedSpecifics);
 
         // If we have selectedSpecifics but they're not in the new list, clear them
@@ -197,7 +194,6 @@ const EditProductForm = ({
           });
 
         if (restoredSpecifics.length > 0) {
-          console.log("Restoring selected specifics:", restoredSpecifics);
           setSelectedSpecifics(restoredSpecifics);
         }
       }
@@ -459,7 +455,6 @@ const EditProductForm = ({
               <select
                 value={selectedCategory}
                 onChange={(e) => {
-                  console.log("Category changed to:", e.target.value);
                   setSelectedCategory(e.target.value);
                 }}
                 className={`w-full p-3 border rounded-lg   focus:border-blue-500 transition-colors ${errors.category ? "border-red-500" : "border-gray-300"
@@ -487,7 +482,6 @@ const EditProductForm = ({
               <select
                 value={formData.subCategoryId || ""}
                 onChange={(e) => {
-                  console.log("Subcategory changed to:", e.target.value);
                   setFormData(prev => ({ ...prev, subCategoryId: e.target.value }));
                 }}
                 disabled={!selectedCategory}

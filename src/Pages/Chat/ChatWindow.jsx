@@ -522,7 +522,6 @@ const handleAddToCart = async (productData) => {
 
     // Add to cart logic here
     // You can integrate with your cart system
-    console.log('Adding to cart:', productData);
     
     // Example cart integration:
     // const cartItem = {

@@ -78,7 +78,6 @@ const PasswordManagement = () => {
         confirmPassword: formData.confirmNewPassword
       });
 
-      console.log(response)
       if (response.data.status) {
         toast.success('Password updated successfully');
         setFormData({

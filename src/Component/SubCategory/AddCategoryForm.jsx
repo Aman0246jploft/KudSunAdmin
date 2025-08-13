@@ -73,8 +73,6 @@ export default function AddCategoryForm({ onClose, pagination }) {
     //   .then(...)
     //   .catch(...)
 
-    console.log("Submitting category:", formData);
-
     onClose();
   };
 

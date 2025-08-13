@@ -14,7 +14,7 @@ export const useSocket = () => {
     const socket = io(socketURL, {
       auth: { token: user },
     });
-    console.log("1111111", socket);
+
 
     socketRef.current = socket;
 

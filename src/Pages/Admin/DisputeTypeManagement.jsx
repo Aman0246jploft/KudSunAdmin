@@ -74,7 +74,6 @@ const DisputeTypeManagement = () => {
   };
 
   const handleDelete = async (id) => {
-    console.log(id)
     if (window.confirm('Are you sure you want to delete this report type?')) {
       try {
         await dispatch(deleteDisputeType(id)).unwrap();

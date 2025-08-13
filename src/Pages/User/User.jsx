@@ -250,7 +250,6 @@ export default function User() {
 
 
   const fetchUserReports = async (userId, pageNo = 1, size = 5) => {
-    console.log("userIduserId", userId);
     try {
       setReportLoading(true);
       // Include pagination parameters in the API call
