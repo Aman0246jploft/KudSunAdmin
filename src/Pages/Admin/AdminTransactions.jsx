@@ -6,7 +6,7 @@ import Pagination from '../../Component/Atoms/Pagination/Pagination';
 import { useTheme } from '../../contexts/theme/hook/useTheme';
 import authAxiosClient from '../../api/authAxiosClient';
 import { toast } from 'react-toastify';
-import { confirmAlert } from 'react-confirm-alert'; 
+import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import { FaEye, FaMoneyBillWave, FaCalculator, FaExclamationTriangle, FaFilter, FaCalendar, FaCheck, FaTimes, FaClock, FaWallet } from 'react-icons/fa';
 import { MdPayment, MdInfo } from 'react-icons/md';
@@ -788,7 +788,7 @@ const AdminTransactions = () => {
         } else if (isBank) {
           return (
             <div className="flex flex-col items-end md:items-start md:justify-start justify-end">
-      
+
 
               <span className="font-medium text-sm text-green-600 flex items-center">
                 <span className="mr-1">🏦</span>
@@ -797,7 +797,7 @@ const AdminTransactions = () => {
               <span className="text-xs text-gray-500">
                 ****{method.accountNumber.slice(-4)}
               </span>
-     
+
             </div>
           );
         } else {
@@ -880,6 +880,11 @@ const AdminTransactions = () => {
     }
   ];
 
+  useEffect(() => {
+    // Always fetch both on first render
+    fetchTransactions();
+    fetchWithdrawalRequests();
+  }, []); // empty dependency = first render only
   // Load data based on active tab
   useEffect(() => {
     if (activeTab === 'transactions') {
@@ -1317,7 +1322,7 @@ const AdminTransactions = () => {
                     <p className="text-sm text-gray-600">Seller</p>
                     <p className="font-medium">{calculationModal.data.seller?.name}</p>
                   </div>
-                  
+
                 </div>
 
                 {/* Dispute Information (if any) */}
@@ -1785,7 +1790,7 @@ const AdminTransactions = () => {
                   </div>
                 </div>
 
-                {(withdrawalDetailModal?.data?.adminNotes||withdrawalDetailModal?.data?.adminImage[0]) && <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                {(withdrawalDetailModal?.data?.adminNotes || withdrawalDetailModal?.data?.adminImage[0]) && <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
                   <div>
                     <p className="text-sm text-gray-600">Admin Notes</p>
                     <p className="font-medium">{withdrawalDetailModal?.data?.adminNotes || 'N/A'}</p>
