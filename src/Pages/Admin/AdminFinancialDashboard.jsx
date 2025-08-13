@@ -74,7 +74,7 @@ export default function AdminFinancialDashboard() {
     } catch (error) {
       console.error('Product search error:', error);
     }
-  };
+  };  
 
   const fetchProductFinancials = async (productId) => {
     try {

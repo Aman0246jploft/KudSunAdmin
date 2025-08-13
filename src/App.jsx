@@ -39,6 +39,7 @@ import ReportTypeManagement from "./Pages/Admin/ReportTypeManagement";
 import PasswordManagement from "./Pages/Admin/PasswordManagement";
 import DisputeTypeManagement from "./Pages/Admin/DisputeTypeManagement";
 import CancelTypeManagement from "./Pages/Admin/CancelTypeManagement ";
+import WithDrawlSetting from "./Pages/WithDrawlSetting/WithDrawlSetting";
 
 
 
@@ -67,82 +68,79 @@ function App() {
         <NetworkStatus />
         <Suspense fallback={<Loader />}>
           <Routes>
-          {/* Public Routes */}
-          <Route element={<PublicRoute />}>
-            <Route path="/login" element={<Login />} />
+            {/* Public Routes */}
+            <Route element={<PublicRoute />}>
+              <Route path="/login" element={<Login />} />
 
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/verify-reset-otp" element={<VerifyResetOtp />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-          </Route>
-
-          {/* Private Routes */}
-          <Route element={<PrivateRoute />}>
-            <Route element={<LayoutWrapper />}>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/user" element={<User />} />
-              <Route path="/user/:id" element={<UserInfo />} />
-              <Route path="/sellProduct" element={<SellProduct />} />
-              <Route path="/auctionProduct" element={<AuctionProduct />} />
-              <Route path="/thread" element={<Thread />} />
-              <Route path="/thread/edit/:id" element={<EditThread />} />
-
-
-              <Route path="/passwordManagement" element={<PasswordManagement />} />
-
-
-              <Route path="/thread/:id" element={<ThreadDetail />} />
-
-
-              <Route path="/productInfo/:id" element={<ProductInfo />} />
-              <Route path="/Setting" element={<Setting />} />
-              <Route path="/faq" element={<Faqs />} />
-              <Route path="/contact_us" element={<ContactUs />} />
-              <Route path="/feeSetting" element={<FeeSetting />} />
-              <Route path="/location" element={<Location />} />
-              <Route path="/bank" element={<Bank />} />
-              <Route path="/carrier" element={<Carrier />} />
-
-              <Route path="/StaticSettings" element={<StaticSettings />} />
-
-              <Route path="/category" element={<Category />} />
-              <Route path="/subcategory/:id" element={<SubCategory />} />
-              <Route path="/chat" element={<Chat />} />
-
-              <Route path="/profilePage" element={<ProfilePage />} />
-
-              <Route path="/report-type-management" element={<ReportTypeManagement />} />
-              <Route path="/dispute-type-management" element={<DisputeTypeManagement />} />
-
-              <Route path="/dispute-cancel-management" element={<CancelTypeManagement />} />
-
-
-
-
-
-
-              <Route
-                path="/subcategoryParameter/:id"
-                element={<SubCategoryParemeter />}
-              />
-
-              <Route path="/video-section" element={<VideoSection />} />
-              <Route path="/terms-of-service" element={<TermsOfService />} />
-              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/auction-rules" element={<AuctionRules />} />
-
-              <Route path="/disputeManagement" element={<DisputeManagement />} />
-              <Route path="/admin/transactions" element={<AdminTransactions />} />
-              <Route path="/admin/financial-dashboard" element={<AdminFinancialDashboard />} />
-              <Route path="/admin/review-management" element={<AdminReviewManagement />} />
-              <Route path="/seller-verification-requests" element={<SellerVerificationRequests />} />
-
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/verify-reset-otp" element={<VerifyResetOtp />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
             </Route>
-          </Route>
-        </Routes>
-      </Suspense>
-    </Router>
+
+            {/* Private Routes */}
+            <Route element={<PrivateRoute />}>
+              <Route element={<LayoutWrapper />}>
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/user" element={<User />} />
+                <Route path="/user/:id" element={<UserInfo />} />
+                <Route path="/sellProduct" element={<SellProduct />} />
+                <Route path="/auctionProduct" element={<AuctionProduct />} />
+                <Route path="/thread" element={<Thread />} />
+                <Route path="/thread/edit/:id" element={<EditThread />} />
+
+
+                <Route path="/passwordManagement" element={<PasswordManagement />} />
+
+
+                <Route path="/thread/:id" element={<ThreadDetail />} />
+
+
+                <Route path="/productInfo/:id" element={<ProductInfo />} />
+                <Route path="/Setting" element={<Setting />} />
+                <Route path="/faq" element={<Faqs />} />
+                <Route path="/contact_us" element={<ContactUs />} />
+                <Route path="/feeSetting" element={<FeeSetting />} />
+                <Route path="/location" element={<Location />} />
+                <Route path="/bank" element={<Bank />} />
+                <Route path="/carrier" element={<Carrier />} />
+
+                <Route path="/StaticSettings" element={<StaticSettings />} />
+
+                <Route path="/category" element={<Category />} />
+                <Route path="/subcategory/:id" element={<SubCategory />} />
+                <Route path="/chat" element={<Chat />} />
+
+                <Route path="/profilePage" element={<ProfilePage />} />
+
+                <Route path="/report-type-management" element={<ReportTypeManagement />} />
+                <Route path="/dispute-type-management" element={<DisputeTypeManagement />} />
+
+                <Route path="/dispute-cancel-management" element={<CancelTypeManagement />} />
+
+                <Route path="/wSetting" element={<WithDrawlSetting />} />
+
+                <Route
+                  path="/subcategoryParameter/:id"
+                  element={<SubCategoryParemeter />}
+                />
+
+                <Route path="/video-section" element={<VideoSection />} />
+                <Route path="/terms-of-service" element={<TermsOfService />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="/auction-rules" element={<AuctionRules />} />
+
+                <Route path="/disputeManagement" element={<DisputeManagement />} />
+                <Route path="/admin/transactions" element={<AdminTransactions />} />
+                <Route path="/admin/financial-dashboard" element={<AdminFinancialDashboard />} />
+                <Route path="/admin/review-management" element={<AdminReviewManagement />} />
+                <Route path="/seller-verification-requests" element={<SellerVerificationRequests />} />
+
+              </Route>
+            </Route>
+          </Routes>
+        </Suspense>
+      </Router>
     </ErrorBoundary>
   );
 }
