@@ -17,6 +17,7 @@ import { toast } from "react-toastify";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import { IoArrowBackSharp } from "react-icons/io5";
 import BackButton from "../BackButton";
+import Image from "../Atoms/Image/Image";
 
 export default function SubCategory() {
   const dispatch = useDispatch();
@@ -121,7 +122,7 @@ const handleDelete = async (subCat) => {
       width: "25%",
       render: (value) =>
         value ? (
-          <img
+          <Image
             src={value}
             alt="category"
             className="w-20 h-12 object-cover rounded"

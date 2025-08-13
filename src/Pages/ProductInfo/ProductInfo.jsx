@@ -112,7 +112,7 @@ const ProductInfo = () => {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm p-4">
               <div className="relative mb-4">
-                <img
+                <Image
                   src={productData?.productImages?.[selectedImage]}
                   alt="Product"
                   className="w-full h-64 object-cover rounded-lg"
@@ -124,7 +124,7 @@ const ProductInfo = () => {
 
               <div className="grid grid-cols-4 gap-2">
                 {productData?.productImages?.map((img, index) => (
-                  <img
+                  <Image
                     key={index}
                     src={img}
                     alt={`Product ${index + 1}`}

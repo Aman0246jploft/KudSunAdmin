@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom"; // Fixed import
 import { format } from "date-fns";
 
 import "react-confirm-alert/src/react-confirm-alert.css";
+import Image from "../Atoms/Image/Image";
 
 export default function Category() {
   const dispatch = useDispatch();
@@ -105,7 +106,7 @@ const handleDelete = useCallback(async (category) => {
       return <span className="text-gray-400">No image</span>;
     }
     return (
-      <img
+      <Image
         src={imageUrl}
         alt="category"
         className="w-20 h-12 object-cover rounded"
@@ -135,6 +136,7 @@ const handleDelete = useCallback(async (category) => {
       key: "image",
       label: "Image",
       width: "25%",
+      disableTooltip: true,
       render: renderImage,
     },
     {
