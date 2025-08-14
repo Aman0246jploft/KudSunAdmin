@@ -206,7 +206,7 @@ if (["Maximum Amount", "Minimum Amount"].includes(formData.name)) {
           style={{ borderColor: theme.colors.borderLight }}
         >
           <h2 style={{ color: theme.colors.textPrimary }} className="text-xl font-semibold">
-            Withdrawl Management
+            Withdrawal Management
           </h2>
 
 
