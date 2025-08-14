@@ -343,7 +343,7 @@ const AdminTransactions = () => {
     if (withdrawalFilters.dateFrom && withdrawalFilters.dateTo) {
       const fromDate = new Date(withdrawalFilters.dateFrom);
       const toDate = new Date(withdrawalFilters.dateTo);
-
+      
       if (fromDate >= toDate) {
         newErrors.dateRange = 'From date must be before to date';
       }
@@ -1444,12 +1444,12 @@ const AdminTransactions = () => {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <h3 className="font-semibold">Payout Calculation Breakdown</h3>
-                    {calculationModal.data.payoutCalculation?.isEstimated && (
+                    {calculationModal?.data?.payoutCalculation?.isEstimated && (
                       <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded">
                         Estimated
                       </span>
                     )}
-                    {!calculationModal.data.payoutCalculation?.isEstimated && (
+                    {!calculationModal?.data?.payoutCalculation?.isEstimated && (
                       <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">
                         Processed
                       </span>
@@ -1459,73 +1459,73 @@ const AdminTransactions = () => {
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <div className="space-y-3">
                       {/* Show original amount if different from product cost (due to dispute) */}
-                      {calculationModal.data.payoutCalculation?.originalProductCost !== calculationModal.data.payoutCalculation?.productCost && (
+                      {calculationModal?.data?.payoutCalculation?.originalProductCost !== calculationModal?.data?.payoutCalculation?.productCost && (
                         <>
                           <div className="flex justify-between items-center text-gray-600">
                             <span>Original Order Amount:</span>
-                            <span className="font-medium">฿{calculationModal.data.payoutCalculation?.originalProductCost?.toFixed(2)}</span>
+                            <span className="font-medium">฿{calculationModal?.data?.payoutCalculation?.originalProductCost?.toFixed(2)}</span>
                           </div>
                           <div className="flex justify-between items-center">
                             <span>Amount After Dispute Adjustment:</span>
-                            <span className="font-medium ">฿{calculationModal.data.payoutCalculation?.productCost?.toFixed(2)}</span>
+                            <span className="font-medium ">฿{calculationModal?.data?.payoutCalculation?.productCost?.toFixed(2)}</span>
                           </div>
                         </>
                       )}
 
-                      {calculationModal.data.payoutCalculation?.originalProductCost === calculationModal.data.payoutCalculation?.productCost && (
+                      {calculationModal?.data?.payoutCalculation?.originalProductCost === calculationModal?.data?.payoutCalculation?.productCost && (
                         <div className="flex justify-between items-center">
                           <span>Product Cost:</span>
-                          <span className="font-medium">฿{calculationModal.data.payoutCalculation?.productCost?.toFixed(2)}</span>
+                          <span className="font-medium">฿{calculationModal?.data?.payoutCalculation?.productCost?.toFixed(2)}</span>
                         </div>
                       )}
 
                       <hr className="border-gray-200" />
 
                       <div className="flex justify-between items-center ">
-                        <span>Service Charge ({calculationModal.data.payoutCalculation?.serviceChargeType}):</span>
-                        <span>-฿{calculationModal.data.payoutCalculation?.serviceCharge?.toFixed(2)}</span>
+                        <span>Service Charge ({calculationModal?.data?.payoutCalculation?.serviceChargeType}):</span>
+                        <span>-฿{calculationModal?.data?.payoutCalculation?.serviceCharge?.toFixed(2)}</span>
                       </div>
 
                       <div className="flex justify-between items-center ">
-                        <span>Tax Charge ({calculationModal.data.payoutCalculation?.taxChargeType}):</span>
-                        <span>-฿{calculationModal.data.payoutCalculation?.taxCharge?.toFixed(2)}</span>
+                        <span>Tax Charge ({calculationModal?.data?.payoutCalculation?.taxChargeType}):</span>
+                        <span>-฿{calculationModal?.data?.payoutCalculation?.taxCharge?.toFixed(2)}</span>
                       </div>
 
                       <hr className="border-gray-300" />
 
                       <div className="flex justify-between items-center font-medium text-lg">
                         <span>Net Amount (Before Withdrawal):</span>
-                        <span className="">฿{calculationModal.data.payoutCalculation?.netAmount?.toFixed(2)}</span>
+                        <span className="">฿{calculationModal?.data?.payoutCalculation?.netAmount?.toFixed(2)}</span>
                       </div>
 
                       <div className="flex justify-between items-center ">
-                        <span>Withdrawal Fee ({calculationModal.data.payoutCalculation?.withdrawalFeeType}):</span>
-                        <span>-฿{calculationModal.data.payoutCalculation?.withdrawalFee?.toFixed(2)}</span>
+                        <span>Withdrawal Fee ({calculationModal?.data?.payoutCalculation?.withdrawalFeeType}):</span>
+                        <span>-฿{calculationModal?.data?.payoutCalculation?.withdrawalFee?.toFixed(2)}</span>
                       </div>
 
                       <hr className="border-gray-400" />
 
                       <div className="flex justify-between items-center font-bold text-xl ">
                         <span>Final Payout Amount:</span>
-                        <span>฿{calculationModal.data.payoutCalculation?.netAmountAfterWithdrawalFee?.toFixed(2)}</span>
+                        <span>฿{calculationModal?.data?.payoutCalculation?.netAmountAfterWithdrawalFee?.toFixed(2)}</span>
                       </div>
 
                       {/* Fee Settings Info */}
-                      {calculationModal.data.payoutCalculation?.feeSettings && (
+                      {calculationModal?.data?.payoutCalculation?.feeSettings && (
                         <div className="mt-4 pt-3 border-t border-gray-200">
                           <div className="text-sm text-gray-600">
                             <summary className="cursor-pointer font-medium hover:text-gray-800">
                               View Fee Settings Details
                             </summary>
                             <div className="mt-2 space-y-1 pl-4">
-                              {calculationModal.data.payoutCalculation.feeSettings.serviceCharge && (
-                                <div>Service Charge: {calculationModal.data.payoutCalculation.feeSettings.serviceCharge.value}{calculationModal.data.payoutCalculation.feeSettings.serviceCharge.type === 'PERCENTAGE' ? '%' : ' ฿'}</div>
+                              {calculationModal?.data?.payoutCalculation?.feeSettings?.serviceCharge && (
+                                <div>Service Charge: {calculationModal?.data?.payoutCalculation?.feeSettings?.serviceCharge.value}{calculationModal?.data?.payoutCalculation?.feeSettings?.serviceCharge.type === 'PERCENTAGE' ? '%' : ' ฿'}</div>
                               )}
-                              {calculationModal.data.payoutCalculation.feeSettings.tax && (
-                                <div>Tax: {calculationModal.data.payoutCalculation.feeSettings.tax.value}{calculationModal.data.payoutCalculation.feeSettings.tax.type === 'PERCENTAGE' ? '%' : ' ฿'}</div>
+                              {calculationModal?.data?.payoutCalculation.feeSettings.tax && (
+                                <div>Tax: {calculationModal?.data?.payoutCalculation.feeSettings.tax.value}{calculationModal?.data?.payoutCalculation.feeSettings.tax.type === 'PERCENTAGE' ? '%' : ' ฿'}</div>
                               )}
-                              {calculationModal.data.payoutCalculation.feeSettings.withdrawalFee && (
-                                <div>Withdrawal Fee: {calculationModal.data.payoutCalculation.feeSettings.withdrawalFee.value}{calculationModal.data.payoutCalculation.feeSettings.withdrawalFee.type === 'PERCENTAGE' ? '%' : ' ฿'}</div>
+                              {calculationModal?.data?.payoutCalculation.feeSettings.withdrawalFee && (
+                                <div>Withdrawal Fee: {calculationModal?.data?.payoutCalculation.feeSettings.withdrawalFee.value}{calculationModal?.data?.payoutCalculation.feeSettings.withdrawalFee.type === 'PERCENTAGE' ? '%' : ' ฿'}</div>
                               )}
                             </div>
                           </div>
@@ -1542,13 +1542,13 @@ const AdminTransactions = () => {
                   <div className="space-y-2">
                     <p><strong>Note:</strong> The final payout amount is what the seller will receive after all platform fees and charges.</p>
 
-                    {calculationModal.data.payoutCalculation?.isEstimated && (
+                    {calculationModal?.data?.payoutCalculation?.isEstimated && (
                       <p className="text-yellow-700">
                         <strong>Estimated Calculation:</strong> These amounts are estimated based on current fee settings. Actual amounts may vary when payment is processed.
                       </p>
                     )}
 
-                    {!calculationModal.data.payoutCalculation?.isEstimated && (
+                    {!calculationModal?.data?.payoutCalculation?.isEstimated && (
                       <p className="">
                         <strong>Processed Payment:</strong> These amounts reflect the actual processed payment transaction.
                       </p>
@@ -1561,7 +1561,7 @@ const AdminTransactions = () => {
                       </p>
                     )}
 
-                    {calculationModal.data.payoutCalculation?.hasDispute && !calculationModal.data.payoutCalculation?.isDisputeResolved && (
+                    {calculationModal?.data?.payoutCalculation?.hasDispute && !calculationModal?.data?.payoutCalculation?.isDisputeResolved && (
                       <p className="text-red-700">
                         <strong>Pending Dispute:</strong> This order has an unresolved dispute. Final payout amounts may change based on dispute resolution.
                       </p>
