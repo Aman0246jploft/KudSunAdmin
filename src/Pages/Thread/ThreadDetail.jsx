@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import { fetchThreadById } from '../../features/slices/threadSlice'
 import { FaHeart, FaComment, FaEye } from 'react-icons/fa'
 import authAxiosClient from '../../api/authAxiosClient'
@@ -19,6 +19,7 @@ export default function ThreadDetail() {
     const [currentPage, setCurrentPage] = useState(1)
     const [hasMoreComments, setHasMoreComments] = useState(true)
     const [loadingMore, setLoadingMore] = useState(false)
+    const navigate = useNavigate()
 
     useEffect(() => {
         if (id) {
@@ -323,7 +324,7 @@ export default function ThreadDetail() {
                                                         src={comment.author?.profileImage}
                                                         alt={comment.author?.userName}
                                                         className="w-10 h-10 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
-                                                        onClick={() => window.open(`/user/${comment.author?._id}`, '_blank')}
+                                                        onClick={() => navigate(`/user/${comment.author?._id}`)}
                                                         title={`View ${comment.author?.userName}'s profile`}
                                                     />
                                                     {comment.author?.isLive && (
@@ -334,7 +335,7 @@ export default function ThreadDetail() {
                                                     <div className="flex items-center space-x-2 mb-1">
                                                         <h4
                                                             className="font-semibold text-sm cursor-pointer hover:text-blue-600 transition-colors"
-                                                            onClick={() => window.open(`/user/${comment.author?._id}`, '_blank')}
+                                                            onClick={() => navigate(`/user/${comment.author?._id}`)}
                                                         >
                                                             {comment.author?.userName}
                                                         </h4>
@@ -370,7 +371,7 @@ export default function ThreadDetail() {
                                                                     src={photo}
                                                                     alt={`Comment photo ${index + 1}`}
                                                                     className="w-full h-20 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
-                                                                    onClick={() => window.open(photo, '_blank')}
+                                                                    onClick={() => navigate(photo)}
                                                                     title="Click to view full size"
                                                                 />
                                                             ))}
@@ -387,7 +388,7 @@ export default function ThreadDetail() {
                                                                 <div
                                                                     key={product._id}
                                                                     className="border rounded-lg p-3 bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
-                                                                    onClick={() => window.open(`/productInfo/${product._id}`, '_blank')}
+                                                                    onClick={() => navigate(`/productInfo/${product._id}`)}
                                                                     title="Click to view product details"
                                                                 >
                                                                     <div className="flex gap-3">
@@ -443,7 +444,7 @@ export default function ThreadDetail() {
                                                                                 src={reply.author?.profileImage}
                                                                                 alt={reply.author?.userName}
                                                                                 className="w-8 h-8 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
-                                                                                onClick={() => window.open(`/user/${reply.author?._id}`, '_blank')}
+                                                                                onClick={() => navigate(`/user/${reply.author?._id}`)}
                                                                                 title={`View ${reply.author?.userName}'s profile`}
                                                                             />
                                                                             {reply.author?.isLive && (
@@ -454,7 +455,7 @@ export default function ThreadDetail() {
                                                                             <div className="flex items-center space-x-2 mb-1">
                                                                                 <h5
                                                                                     className="font-medium text-sm cursor-pointer hover:text-blue-600 transition-colors"
-                                                                                    onClick={() => window.open(`/user/${reply.author?._id}`, '_blank')}
+                                                                                    onClick={() => navigate(`/user/${reply.author?._id}`)}
                                                                                 >
                                                                                     {reply.author?.userName}
                                                                                 </h5>

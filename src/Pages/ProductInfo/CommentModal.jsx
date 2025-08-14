@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import {
   getProductComment,
   getProductCommentReply,
@@ -25,6 +25,7 @@ export default function CommentModal() {
   const [repliesData, setRepliesData] = useState({});
   const [loadingReplies, setLoadingReplies] = useState({});
   const [selectedImages, setSelectedImages] = useState([]);
+  const navigate  = useNavigate()
 
   useEffect(() => {
     if (id) {
@@ -306,7 +307,7 @@ export default function CommentModal() {
                               src={photo}
                               alt={`Comment image ${index + 1}`}
                               className="w-20 h-20 object-cover rounded-lg cursor-pointer hover:opacity-80"
-                              onClick={() => window.open(photo, "_blank")}
+                              onClick={() => navigate(photo)}
                             />
                           ))}
                         </div>
@@ -425,7 +426,7 @@ export default function CommentModal() {
                                             src={photo}
                                             alt={`Reply image ${index + 1}`}
                                             className="w-16 h-16 object-cover rounded cursor-pointer hover:opacity-80"
-                                            onClick={() => window.open(photo, "_blank")}
+                                            onClick={() => navigate(photo)}
                                           />
                                         ))}
                                       </div>
@@ -473,7 +474,7 @@ export default function CommentModal() {
                                               src={photo}
                                               alt={`Reply image ${index + 1}`}
                                               className="w-16 h-16 object-cover rounded cursor-pointer hover:opacity-80"
-                                              onClick={() => window.open(photo, "_blank")}
+                                              onClick={() => navigate(photo)}
                                             />
                                           ))}
                                         </div>

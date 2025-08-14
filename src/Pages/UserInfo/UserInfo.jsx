@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useTheme } from '../../contexts/theme/hook/useTheme';
 import authAxiosClient from '../../api/authAxiosClient';
 import DataTable from '../../Component/Table/DataTable';
@@ -55,6 +55,8 @@ export default function UserInfo() {
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+
+  const navigate = useNavigate()
 
   // Tab data states
   const [products, setProducts] = useState([]);
@@ -426,7 +428,7 @@ export default function UserInfo() {
       label: 'Actions',
       render: (value, row) => (
         <button
-          onClick={() => window.open(`/productInfo/${row._id}`, '_blank')}
+          onClick={() => navigate(`/productInfo/${row._id}`)}
           className="text-xs transition-all duration-200 whitespace-nowrap flex rounded-lg p-2 hover:scale-105"
           style={{
             backgroundColor: theme.colors.buttonSecondary,
@@ -476,7 +478,7 @@ export default function UserInfo() {
       label: 'Actions',
       render: (value, row) => (
         <button
-          onClick={() => window.open(`/thread/${row._id}`, '_blank')}
+          onClick={() => navigate(`/thread/${row._id}`)}
           className="text-xs transition-all duration-200 whitespace-nowrap flex rounded-lg p-2 hover:scale-105"
           style={{
             backgroundColor: theme.colors.buttonSecondary,
@@ -682,7 +684,7 @@ export default function UserInfo() {
       render: (value, row) => (
         <div className="flex space-x-2">
           <Button
-            onClick={() => window.open(`/productInfo/${row.product?._id}`, '_blank')}
+            onClick={() => navigate(`/productInfo/${row.product?._id}`)}
             className="text-xs transition-all duration-200 hover:scale-105"
             style={{
               backgroundColor: theme.colors.buttonSecondary,

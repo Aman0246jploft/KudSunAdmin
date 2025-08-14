@@ -24,7 +24,7 @@ const ProductInfo = () => {
   const [selectedImage, setSelectedImage] = useState(0);
 
   useEffect(() => {
-    dispatch(getProducts({ productId: params?.id }))
+    dispatch(getProducts({ productId: params?.id}))
       .then((result) => {
         if (!getProducts.fulfilled.match(result)) {
           const { message, code } = result.payload || {};
