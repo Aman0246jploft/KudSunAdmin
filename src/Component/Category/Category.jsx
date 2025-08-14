@@ -26,7 +26,7 @@ export default function Category() {
   const { categoryList, loading, error } = useSelector(
     (state) => state.category || {}
   );
-  
+
   // Safe destructuring with default values
   const { data = [], total = 0 } = categoryList || {};
 
@@ -53,22 +53,22 @@ export default function Category() {
     setIsModalOpen(true);
   }, []);
 
-const handleDelete = useCallback(async (category) => {
-  const action = category.isDeleted ? "restore" : "delete";
-  const confirmed = window.confirm(`Are you sure you want to ${action} this category?`);
-  if (!confirmed) return;
+  const handleDelete = useCallback(async (category) => {
+    const action = category.isDeleted ? "restore" : "delete";
+    const confirmed = window.confirm(`Are you sure you want to ${action} this category?`);
+    if (!confirmed) return;
 
-  try {
-    await dispatch(updateCategory({ 
-      id: category._id, 
-      isDeleted: !category.isDeleted 
-    }));
-    // Refresh the list after successful update
-    fetchCategories();
-  } catch (err) {
-    console.error("Failed to update category status:", err);
-  }
-}, [dispatch, fetchCategories]);
+    try {
+      await dispatch(updateCategory({
+        id: category._id,
+        isDeleted: !category.isDeleted
+      }));
+      // Refresh the list after successful update
+      fetchCategories();
+    } catch (err) {
+      console.error("Failed to update category status:", err);
+    }
+  }, [dispatch, fetchCategories]);
 
 
   const handlePageChange = useCallback((newPage) => {
@@ -132,12 +132,25 @@ const handleDelete = useCallback(async (category) => {
       width: "25%",
       render: (value) => value || "N/A",
     },
+    // {
+    //   key: "image",
+    //   label: "Image",
+    //   width: "25%",
+    //   disableTooltip: true,
+    //   render: renderImage,
+    // },
     {
       key: "image",
       label: "Image",
       width: "25%",
       disableTooltip: true,
-      render: renderImage,
+      // No inline textAlign here
+      cellStyle: {},
+      render: (value, row, rowIndex) => (
+        <div className=" flex justify-end md:justify-start   "> {/* ✅ text-right only on small screens */}
+          {renderImage(value, row, rowIndex)}
+        </div>
+      )
     },
     {
       key: "subCategoryCount",
@@ -156,7 +169,7 @@ const handleDelete = useCallback(async (category) => {
       label: "Actions",
       width: "10%",
       render: (_, row) => (
-        <div className="flex gap-2">
+        <div className="flex gap-2 justify-end md:justify-start">
           <button
             onClick={() => handleViewSubCategory(row?._id)}
             className="p-1 rounded hover:bg-gray-200 transition-colors"

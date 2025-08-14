@@ -232,7 +232,7 @@ const AdminReviewManagement = () => {
       key: 'Product',
       label: 'product',
       render: (_, row) => (
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center md:justify-start justify-end  space-x-3">
           <Image
             src={row.product?.productImages?.[0] || '/default-product.png'}
             alt="Product"
@@ -255,7 +255,7 @@ const AdminReviewManagement = () => {
       key: 'reviewer',
       label: 'reviewer',
       render: (_, row) => (
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center md:justify-start justify-end space-x-3">
           <Image
             src={row.reviewer?.profileImage || '/default-avatar.png'}
             alt="Reviewer"
@@ -283,7 +283,7 @@ const AdminReviewManagement = () => {
       render: (_, row) => {
 
         return (
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center md:justify-start justify-end space-x-3">
             <Image
               src={row.reviewedUser?.profileImage || '/default-avatar.png'}
               alt="Reviewed User"
@@ -318,7 +318,7 @@ const AdminReviewManagement = () => {
       render: (_, row) => {
 
         return (
-          <div className="space-y-1">
+          <div className="space-y-1 md:justify-start justify-end flex" >
             <div className="flex items-center space-x-2">
               <RatingDisplay rating={row?.rating} />
               <span className="text-sm font-medium">{row?.rating}/5</span>
@@ -326,10 +326,10 @@ const AdminReviewManagement = () => {
             <p className="text-sm text-gray-600 max-w-xs truncate">
               {row.reviewText}
             </p>
-            <div className="flex items-center space-x-2 text-xs text-gray-500">
+            {/* <div className="flex items-center space-x-2 text-xs text-gray-500">
               <FaCalendar className="w-3 h-3" />
               {new Date(row.createdAt).toLocaleDateString()}
-            </div>
+            </div> */}
           </div>
         )
       }
@@ -340,7 +340,7 @@ const AdminReviewManagement = () => {
       key: 'Actions',
       label: 'actions',
       render: (_, row) => (
-        <div className="flex items-center space-x-2">
+        <div className="flex md:justify-start justify-end items-center space-x-2">
           <Button
             variant="outline"
             size="sm"

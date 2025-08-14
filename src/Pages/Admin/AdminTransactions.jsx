@@ -583,11 +583,11 @@ const AdminTransactions = () => {
       label: 'Order Info',
       width: "15%",
       render: (_, row) => (
-        <div className="flex flex-col space-y-1">
+        <div className="flex flex-col justify-end md:justify-start space-y-1">
           <span className="font-medium text-sm">{row.orderIdFor}</span>
           <span className="text-xs text-gray-500">{new Date(row.orderDate).toLocaleDateString()}</span>
           {hasDispute(row) && (
-            <div className="flex items-center space-x-1">
+            <div className="flex justify-end md:justify-start items-center space-x-1">
               <span className="text-xs text-orange-600">Has Dispute</span>
             </div>
           )}
