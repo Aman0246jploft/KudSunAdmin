@@ -5,7 +5,8 @@ import { useTheme } from "../../contexts/theme/hook/useTheme";
 import { toast } from "react-toastify";
 import Modal from "./Modal"; // Generic modal wrapper
 import authAxiosClient from "../../api/authAxiosClient";
-
+import { RiDeleteBin6Line } from "react-icons/ri";
+import { FiEdit } from "react-icons/fi";
 export default function Location() {
   const { theme } = useTheme();
 
@@ -73,7 +74,7 @@ export default function Location() {
   const handleDelete = async (key) => {
     if (!window.confirm("Are you sure you want to delete this location?")) return;
     try {
-      await authAxiosClient.post(`/location/update`,{id: key, isDeleted:true});
+      await authAxiosClient.post(`/location/update`, { id: key, isDeleted: true });
       toast.success("Deleted successfully");
       fetchAll();
     } catch (err) {
@@ -139,18 +140,19 @@ export default function Location() {
                         + District
                       </button>
                       <button
-                        className="text-green-600 hover:underline"
+                        className="text-gray-600 hover:underline"
                         onClick={() =>
                           openForm("edit", { key: parent.key, value: parent.value, parentId: null })
                         }
                       >
-                        Edit
+                        <FiEdit />
                       </button>
                       <button
                         className="text-red-600 hover:underline"
                         onClick={() => handleDelete(parent.key)}
                       >
-                        Delete
+                        <RiDeleteBin6Line />
+
                       </button>
                     </td>
                   </tr>
@@ -161,7 +163,7 @@ export default function Location() {
                       <td className="px-4 py-1 capitalize">{child.value}</td>
                       <td className="px-4 py-1 text-right space-x-2">
                         <button
-                          className="text-green-600 hover:underline"
+                          className="text-gray-600 hover:underline"
                           onClick={() =>
                             openForm("edit", {
                               key: child.key,
@@ -170,13 +172,15 @@ export default function Location() {
                             })
                           }
                         >
-                          Edit
+                          <FiEdit />
+
                         </button>
                         <button
                           className="text-red-600 hover:underline"
                           onClick={() => handleDelete(child.key)}
                         >
-                          Delete
+
+                          <RiDeleteBin6Line />
                         </button>
                       </td>
                     </tr>

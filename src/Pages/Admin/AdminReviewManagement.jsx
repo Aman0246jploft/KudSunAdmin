@@ -242,7 +242,7 @@ const AdminReviewManagement = () => {
             <p className="font-medium text-sm max-w-xs truncate">{row.product?.title}</p>
             <p className="text-xs text-gray-500">{row.category?.name}</p>
             {row.product?.fixedPrice && (
-              <p className="text-xs font-medium text-green-600">
+              <p className="text-xs font-medium ">
                 ฿{row.product.fixedPrice.toFixed(2)}
               </p>
             )}
@@ -265,7 +265,7 @@ const AdminReviewManagement = () => {
             <p className="font-medium text-sm">{row.reviewer?.userName}</p>
             <p className="text-xs text-gray-500">{row.reviewer?.email}</p>
             <div className="flex items-center space-x-2 mt-1">
-              <span className={`text-xs px-2 py-1 rounded ${row.raterRole === 'buyer' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
+              <span className={`text-xs px-2 py-1 rounded ${row.raterRole === 'buyer' ? ' text-blue-800' : ' text-green-800'
                 }`}>
                 {row.raterRole}
               </span>
@@ -543,8 +543,8 @@ const AdminReviewManagement = () => {
                         <RatingDisplay rating={detailModal.data.rating} size="lg" />
                         <span className="text-2xl font-bold">{detailModal.data.rating}/5</span>
                         <span className={`px-3 py-1 rounded-full text-sm ${detailModal.data.raterRole === 'buyer'
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-green-100 text-green-800'
+                          ? ' text-blue-800'
+                          : ' text-green-800'
                           }`}>
                           {detailModal.data.raterRole === 'buyer' ? 'Buyer Rating Seller' : 'Seller Rating Buyer'}
                         </span>
@@ -685,16 +685,16 @@ const AdminReviewManagement = () => {
                           {detailModal.data.product?.category?.name}
                         </span>
                         {detailModal.data.product?.fixedPrice && (
-                          <span className="text-sm font-medium text-green-600">
+                          <span className="text-sm font-medium ">
                             ฿{detailModal.data.product.fixedPrice.toFixed(2)}
                           </span>
                         )}
-                        <span className={`text-xs px-2 py-1 rounded ${detailModal.data.product?.condition === 'new'
+                        {/* <span className={`text-xs px-2 py-1 rounded ${detailModal.data.product?.condition === 'new'
                           ? 'bg-green-100 text-green-800'
                           : 'bg-yellow-100 text-yellow-800'
                           }`}>
                           {detailModal.data.product?.condition}
-                        </span>
+                        </span> */}
                       </div>
                     </div>
                   </div>

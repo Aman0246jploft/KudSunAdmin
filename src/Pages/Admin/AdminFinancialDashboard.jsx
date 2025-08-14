@@ -144,11 +144,11 @@ export default function AdminFinancialDashboard() {
 
   const StatCard = ({ title, value, subtitle, icon: Icon, trend, color = "blue" }) => {
     const colorClasses = {
-      blue: "bg-blue-50 border-blue-200 text-blue-800",
-      green: "bg-green-50 border-green-200 text-green-800",
-      red: "bg-red-50 border-red-200 text-red-800",
-      yellow: "bg-yellow-50 border-yellow-200 text-yellow-800",
-      purple: "bg-purple-50 border-purple-200 text-purple-800"
+      // blue: "bg-blue-50 border-blue-200 text-blue-800",
+      // green: "bg-green-50 border-green-200 text-green-800",
+      // red: "bg-red-50 border-red-200 text-red-800",
+      // yellow: "bg-yellow-50 border-yellow-200 text-yellow-800",
+      // purple: "bg-purple-50 border-purple-200 text-purple-800"
     };
 
     return (
@@ -162,7 +162,7 @@ export default function AdminFinancialDashboard() {
           <div className="flex flex-col items-end ml-2">
             {/* <Icon className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 opacity-60" /> */}
             {trend && (
-              <div className={`flex items-center mt-2 text-xs ${trend.isPositive ? 'text-green-600' : 'text-red-600'}`}>
+              <div className={`flex items-center mt-2 text-xs ${trend.isPositive ? '' : 'text-red-600'}`}>
                 {trend.isPositive ? <MdTrendingUp className="w-3 h-3 mr-1" /> : <MdTrendingDown className="w-3 h-3 mr-1" />}
                 <span className="text-xs">{trend.value}</span>
               </div>
@@ -324,7 +324,7 @@ export default function AdminFinancialDashboard() {
                   <div key={index} className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-3 bg-gray-50 rounded space-y-1 sm:space-y-0">
                     <span className="font-medium text-sm sm:text-base">{rev._id.replace(/_/g, ' ')}</span>
                     <div className="text-left sm:text-right">
-                      <span className="font-bold text-green-600 text-sm sm:text-base">{formatCurrency(rev.totalAmount)}</span>
+                      <span className="font-bold  text-sm sm:text-base">{formatCurrency(rev.totalAmount)}</span>
                       <span className="text-xs text-gray-500 block">{formatNumber(rev.count)} transactions</span>
                     </div>
                   </div>
@@ -666,20 +666,20 @@ export default function AdminFinancialDashboard() {
                             {/* Financial Details */}
                             <div className="grid grid-cols-2 gap-3">
                               <div className="bg-blue-50 rounded p-2">
-                                <p className="text-xs font-medium text-blue-700">Buyer Paid</p>
-                                <p className="text-sm font-bold text-blue-600">
+                                <p className="text-xs font-medium ">Buyer Paid</p>
+                                <p className="text-sm font-bold ">
                                   {formatCurrency(order.moneyFlow.buyerPayment.grandTotal)}
                                 </p>
                               </div>
                               <div className="bg-green-50 rounded p-2">
-                                <p className="text-xs font-medium text-green-700">Platform Revenue</p>
-                                <p className="text-sm font-bold text-green-600">
+                                <p className="text-xs font-medium ">Platform Revenue</p>
+                                <p className="text-sm font-bold ">
                                   {formatCurrency(order.moneyFlow.platformRevenue.totalPlatformRevenue)}
                                 </p>
                               </div>
                               <div className="bg-purple-50 rounded p-2 col-span-2">
-                                <p className="text-xs font-medium text-purple-700">Seller Received</p>
-                                <p className="text-sm font-bold text-purple-600">
+                                <p className="text-xs font-medium ">Seller Received</p>
+                                <p className="text-sm font-bold ">
                                   {formatCurrency(
                                     order.moneyFlow.sellerPayouts
                                       .filter(txn => txn.tnxType === 'credit')
@@ -730,17 +730,17 @@ export default function AdminFinancialDashboard() {
                               </div>
                             </td>
                             <td className="p-3 text-right">
-                              <span className="font-medium text-blue-600 text-sm">
+                              <span className="font-medium  text-sm">
                                 {formatCurrency(order.moneyFlow.buyerPayment.grandTotal)}
                               </span>
                             </td>
                             <td className="p-3 text-right">
-                              <span className="font-medium text-green-600 text-sm">
+                              <span className="font-medium  text-sm">
                                 {formatCurrency(order.moneyFlow.platformRevenue.totalPlatformRevenue)}
                               </span>
                             </td>
                             <td className="p-3 text-right">
-                              <span className="font-medium text-purple-600 text-sm">
+                              <span className="font-medium  text-sm">
                                 {formatCurrency(
                                   order.moneyFlow.sellerPayouts
                                     .filter(txn => txn.tnxType === 'credit')
@@ -853,7 +853,7 @@ export default function AdminFinancialDashboard() {
                             {dispute._id === 'BUYER' ? 'Buyer Refunds' :
                               dispute._id === 'SELLER' ? 'Seller Protection' : dispute._id}
                           </span>
-                          <span className={`font-medium ${dispute._id === 'BUYER' ? 'text-red-600' : 'text-green-600'
+                          <span className={`font-medium ${dispute._id === 'BUYER' ? 'text-red-600' : ''
                             }`}>
                             {formatCurrency(estimatedImpact)}
                           </span>
@@ -875,26 +875,26 @@ export default function AdminFinancialDashboard() {
               <div className="bg-white border rounded-lg p-4">
                 <h4 className="font-semibold mb-3">Dispute Analysis</h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="text-center p-4 bg-blue-50 rounded">
-                    <div className="text-xl sm:text-2xl font-bold text-blue-600">
+                  <div className="text-center p-4  border  rounded">
+                    <div className="text-xl sm:text-2xl font-bold ">
                       {dashboardData.overview.disputes.reduce((sum, d) => sum + d.count, 0)}
                     </div>
-                    <div className="text-xs sm:text-sm text-blue-700">Total Disputes</div>
+                    <div className="text-xs sm:text-sm ">Total Disputes</div>
                   </div>
-                  <div className="text-center p-4 bg-green-50 rounded">
-                    <div className="text-xl sm:text-2xl font-bold text-green-600">
+                  <div className="text-center p-4 border rounded">
+                    <div className="text-xl sm:text-2xl font-bold ">
                       {formatCurrency(dashboardData.overview.disputes.reduce((sum, d) => sum + d.totalOrderValue, 0))}
                     </div>
-                    <div className="text-xs sm:text-sm text-green-700">Total Disputed Value</div>
+                    <div className="text-xs sm:text-sm ">Total Disputed Value</div>
                   </div>
-                  <div className="text-center p-4 bg-purple-50 rounded">
-                    <div className="text-xl sm:text-2xl font-bold text-purple-600">
+                  <div className="text-center p-4 border  rounded">
+                    <div className="text-xl sm:text-2xl font-bold ">
                       {dashboardData.overview.disputes.reduce((sum, d) => sum + d.count, 0) > 0
                         ? ((dashboardData.overview.disputes.reduce((sum, d) => sum + d.totalOrderValue, 0) /
                           dashboardData.overview.disputes.reduce((sum, d) => sum + d.count, 0))).toFixed(0)
                         : '0'}
                     </div>
-                    <div className="text-xs sm:text-sm text-purple-700">Avg Dispute Value</div>
+                    <div className="text-xs sm:text-sm ">Avg Dispute Value</div>
                   </div>
                 </div>
               </div>
@@ -948,8 +948,8 @@ export default function AdminFinancialDashboard() {
                           {/* Financial Details */}
                           <div className="grid grid-cols-2 gap-3">
                             <div className="bg-blue-50 rounded p-2">
-                              <p className="text-xs font-medium text-blue-700">Order Value</p>
-                              <p className="text-sm font-bold text-blue-600">
+                              <p className="text-xs font-medium ">Order Value</p>
+                              <p className="text-sm font-bold ">
                                 {formatCurrency(order.moneyFlow.buyerPayment.grandTotal)}
                               </p>
                             </div>
@@ -1134,7 +1134,7 @@ export default function AdminFinancialDashboard() {
                     </div>
                     <div className="flex justify-between font-bold text-base sm:text-lg col-span-1 sm:col-span-2 border-t pt-2">
                       <span>Total Paid:</span>
-                      <span className="text-blue-600">{formatCurrency(detailModal.data.moneyFlow.buyerPayment.grandTotal)}</span>
+                      <span className="">{formatCurrency(detailModal.data.moneyFlow.buyerPayment.grandTotal)}</span>
                     </div>
                   </div>
                 </div>
@@ -1168,7 +1168,7 @@ export default function AdminFinancialDashboard() {
                     </div>
                     <div className="flex justify-between font-bold text-base sm:text-lg col-span-1 sm:col-span-2 border-t pt-2">
                       <span>Total Platform Revenue:</span>
-                      <span className="text-green-600">{formatCurrency(detailModal.data.moneyFlow.platformRevenue.totalPlatformRevenue)}</span>
+                      <span className="">{formatCurrency(detailModal.data.moneyFlow.platformRevenue.totalPlatformRevenue)}</span>
                     </div>
                   </div>
                 </div>
@@ -1190,7 +1190,7 @@ export default function AdminFinancialDashboard() {
                             </div>
                             <div className="flex justify-between">
                               <span>Status:</span>
-                              <span className={`font-medium ${payout.tnxStatus === 'completed' ? 'text-green-600' : 'text-orange-600'}`}>
+                              <span className={`font-medium ${payout.tnxStatus === 'completed' ? '' : 'text-orange-600'}`}>
                                 {payout.tnxStatus.toUpperCase()}
                               </span>
                             </div>
@@ -1259,15 +1259,15 @@ export default function AdminFinancialDashboard() {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span>Buyer Paid:</span>
-                      <span className="font-medium text-blue-600">{formatCurrency(detailModal.data.moneyFlow.buyerPayment.grandTotal)}</span>
+                      <span className="font-medium ">{formatCurrency(detailModal.data.moneyFlow.buyerPayment.grandTotal)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Platform Earned:</span>
-                      <span className="font-medium text-green-600">{formatCurrency(detailModal.data.moneyFlow.platformRevenue.totalPlatformRevenue)}</span>
+                      <span className="font-medium ">{formatCurrency(detailModal.data.moneyFlow.platformRevenue.totalPlatformRevenue)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Seller Received:</span>
-                      <span className="font-medium text-purple-600">
+                      <span className="font-medium ">
                         {formatCurrency(
                           detailModal.data.moneyFlow.sellerPayouts
                             .filter(txn => txn.tnxType === 'credit')

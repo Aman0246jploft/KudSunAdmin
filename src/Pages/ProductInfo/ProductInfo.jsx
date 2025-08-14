@@ -24,7 +24,7 @@ const ProductInfo = () => {
   const [selectedImage, setSelectedImage] = useState(0);
 
   useEffect(() => {
-    dispatch(getProducts({ productId: params?.id}))
+    dispatch(getProducts({ productId: params?.id }))
       .then((result) => {
         if (!getProducts.fulfilled.match(result)) {
           const { message, code } = result.payload || {};
@@ -168,7 +168,7 @@ const ProductInfo = () => {
               <div className="space-y-2">
                 {/* <div className="flex justify-between py-1">
                   <span className="text-gray-600 text-sm">Email</span>
-                  <span className="font-medium text-sm">{productData?.seller?.email}</span>
+                  <span className="font-medium text-sm">{productData?.seller?.email}</span> 
                 </div> */}
                 {/* {JSON.stringify(productData?.seller)}
                 <div className="flex justify-between py-1">
@@ -267,7 +267,7 @@ const ProductInfo = () => {
                     key={index}
                     className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs"
                   >
-                    #{tag}
+                    {tag}
                   </span>
                 ))}
               </div>
@@ -286,7 +286,7 @@ const ProductInfo = () => {
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm text-gray-600">Original Price</span>
                   <span className="text-sm line-through text-gray-400">
-                     ฿{productData?.originPrice}
+                    ฿{productData?.originPrice}
                   </span>
                 </div>
               )}

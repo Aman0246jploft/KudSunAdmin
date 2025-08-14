@@ -476,7 +476,7 @@ const AdminTransactions = () => {
 
     const statusColors = {
       'PENDING': ' text-yellow-800',
-      'UNDER_REVIEW': ' text-blue-800',
+      'UNDER_REVIEW': ' ',
       'RESOLVED': ' text-green-800',
       'CANCELLED': ' text-gray-800'
     };
@@ -622,11 +622,11 @@ const AdminTransactions = () => {
       width: "15%",
       render: (_, row) => (
         <div className="flex flex-col space-y-1">
-          <div className="flex justify-between">
+          <div className="flex gap-2 md:justify-start justify-end items-center">
             <span className="text-xs text-gray-500">Buyer:</span>
             <span className="text-sm font-medium">฿{row?.buyerPayment?.grandTotal?.toFixed(2) || '0.00'}</span>
           </div>
-          <div className="flex justify-between">
+          <div className="flex gap-2 md:justify-start justify-end items-center">
             <span className="text-xs text-gray-500">Seller:</span>
             <span className="text-sm font-medium">฿{row?.sellerPayout?.payoutAmount?.toFixed(2) || '0.00'}</span>
           </div>
@@ -640,7 +640,7 @@ const AdminTransactions = () => {
       render: (_, row) => (
         <div className="flex flex-col md:justify-start justify-end space-y-1">
           <span className={`text-xs px-2 py-1 rounded-full ${row?.status === 'completed' ? ' text-green-800' :
-            row?.status === 'delivered' ? ' text-blue-800' :
+            row?.status === 'delivered' ? ' ' :
               row?.status === 'shipped' ? ' text-yellow-800' :
                 'text-gray-800'
             }`}>
@@ -686,7 +686,7 @@ const AdminTransactions = () => {
           )}
 
           {transaction.sellerPayout?.isPaidToSeller && (
-            <span className="text-xs text-green-600 flex items-center space-x-1">
+            <span className="text-xs  flex items-center space-x-1">
               <MdInfo className="w-3 h-3" />
               <span>Completed</span>
             </span>
@@ -741,22 +741,22 @@ const AdminTransactions = () => {
 
         return (
           <div className="flex flex-col space-y-1">
-            <div className="flex justify-between">
+            <div className="flex gap-2 md:justify-start justify-end items-center">
               <span className="text-xs text-gray-500">Amount:</span>
               <span className="text-sm font-medium">฿{amount.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between">
+            <div className="flex gap-2 md:justify-start justify-end items-center">
               <span className="text-xs text-gray-500">Fee:</span>
-              <span className="text-sm text-red-600">
+              <span className="text-sm ">
                 -฿{calculatedFee.toFixed(2)}
                 {feeType === 'PERCENTAGE' && (
                   <span className="text-xs ml-1">({feeValue}%)</span>
                 )}
               </span>
             </div>
-            <div className="flex justify-between">
+            <div className="flex gap-2 md:justify-start justify-end items-center">
               <span className="text-xs text-gray-500">Net:</span>
-              <span className="text-sm font-bold text-green-600">
+              <span className="text-sm ">
                 ฿{netAmount.toFixed(2)}
               </span>
             </div>
@@ -776,7 +776,7 @@ const AdminTransactions = () => {
         if (isPromptPay) {
           return (
             <div className="flex flex-col md:justify-start justify-end">
-              <span className="font-medium text-sm text-blue-600 flex items-center">
+              <span className="font-medium text-sm  flex items-center">
                 <span className="mr-1">{getPromptPayIdType(method.PromptPay).icon}</span>
                 {getPromptPayIdType(method.PromptPay).type}
               </span>
@@ -790,7 +790,7 @@ const AdminTransactions = () => {
             <div className="flex flex-col items-end md:items-start md:justify-start justify-end">
 
 
-              <span className="font-medium text-sm text-green-600 flex items-center">
+              <span className="font-medium text-sm  flex items-center">
                 <span className="mr-1">🏦</span>
                 {method.bankName || 'Bank Transfer'}
               </span>
@@ -851,7 +851,7 @@ const AdminTransactions = () => {
                 variant="outline"
                 size="sm"
                 onClick={() => confirmWithdrawalAction(request, 'Approved')}
-                className="flex items-center space-x-1 mb-1 border-green-300 text-green-600 hover:bg-green-50"
+                className="flex items-center space-x-1 mb-1 border-green-300  hover:bg-green-50"
               >
                 <FaCheck className="w-3 h-3" />
                 <span>Approve</span>
@@ -861,7 +861,7 @@ const AdminTransactions = () => {
                 variant="outline"
                 size="sm"
                 onClick={() => confirmWithdrawalAction(request, 'Rejected')}
-                className="flex items-center space-x-1 mb-1 border-red-300 text-red-600 hover:bg-red-50"
+                className="flex items-center space-x-1 mb-1 border-red-300  hover:bg-red-50"
               >
                 <FaTimes className="w-3 h-3" />
                 <span>Reject</span>
@@ -941,7 +941,7 @@ const AdminTransactions = () => {
           <button
             onClick={() => setActiveTab('transactions')}
             className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'transactions'
-              ? 'border-blue-500 text-blue-600 bg-blue-50'
+              ? 'border-blue-500  bg-blue-50'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
               }`}
           >
@@ -956,7 +956,7 @@ const AdminTransactions = () => {
           <button
             onClick={() => setActiveTab('withdrawals')}
             className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'withdrawals'
-              ? 'border-blue-500 text-blue-600 bg-blue-50'
+              ? 'border-blue-500  bg-blue-50'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
               }`}
           >
@@ -1327,7 +1327,7 @@ const AdminTransactions = () => {
 
                 {/* Dispute Information (if any) */}
                 {calculationModal.data.disputeInfo && (
-                  <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
+                  <div className="p-4 border-orange-500 border my-2 rounded-lg">
                     <h3 className="font-semibold text-orange-800 mb-2 flex items-center">
                       <FaExclamationTriangle className="w-4 h-4 mr-2" />
                       Dispute Information
@@ -1362,13 +1362,13 @@ const AdminTransactions = () => {
                       {calculationModal.data.disputeInfo.hasResolution && (
                         <>
                           <hr className="border-orange-200 my-2" />
-                          <div className="bg-orange-100 p-3 rounded">
+                          <div className=" p-3 rounded">
                             <h4 className="font-semibold text-orange-900 mb-2">Resolution Details</h4>
                             <div className="space-y-1">
                               <div className="flex justify-between">
                                 <span>Decision:</span>
                                 <span className={`font-medium px-2 py-1 rounded text-xs ${calculationModal.data.disputeInfo.decision === 'SELLER'
-                                  ? 'bg-blue-100 text-blue-800'
+                                  ? 'bg-blue-100 '
                                   : 'bg-purple-100 text-purple-800'
                                   }`}>
                                   {calculationModal.data.disputeInfo.decision} FAVOR
@@ -1402,10 +1402,10 @@ const AdminTransactions = () => {
 
                 {/* Dispute Adjustment Details */}
                 {calculationModal.data.disputeAdjustment && (
-                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <h3 className="font-semibold text-blue-800 mb-2">Payment Adjustment Due to Dispute</h3>
+                  <div className="p-4 bg-blue-50 my-2 border border-blue-200 rounded-lg">
+                    <h3 className="font-semibold  mb-2">Payment Adjustment Due to Dispute</h3>
                     <div className="space-y-2 text-sm">
-                      <p className="text-blue-700">{calculationModal.data.disputeAdjustment.description}</p>
+                      <p className="">{calculationModal.data.disputeAdjustment.description}</p>
                       <div className="grid grid-cols-2 gap-4 mt-3">
                         <div className="space-y-1">
                           <div className="flex justify-between">
@@ -1420,11 +1420,11 @@ const AdminTransactions = () => {
                         <div className="space-y-1">
                           <div className="flex justify-between">
                             <span>Seller Receives:</span>
-                            <span className="font-medium text-green-600">{calculationModal.data.disputeAdjustment.sellerReceivePercent}%</span>
+                            <span className="font-medium ">{calculationModal.data.disputeAdjustment.sellerReceivePercent}%</span>
                           </div>
                           <div className="flex justify-between">
                             <span>Buyer Refund:</span>
-                            <span className="font-medium text-blue-600">{calculationModal.data.disputeAdjustment.buyerRefundPercent}%</span>
+                            <span className="font-medium ">{calculationModal.data.disputeAdjustment.buyerRefundPercent}%</span>
                           </div>
                         </div>
                       </div>
@@ -1432,7 +1432,7 @@ const AdminTransactions = () => {
                         <div className="mt-2 p-2 bg-blue-100 rounded">
                           <div className="flex justify-between">
                             <span className="font-medium">Refund Amount:</span>
-                            <span className="font-bold text-blue-800">฿{calculationModal.data.disputeAdjustment.adjustmentAmount.toFixed(2)}</span>
+                            <span className="font-bold ">฿{calculationModal.data.disputeAdjustment.adjustmentAmount.toFixed(2)}</span>
                           </div>
                         </div>
                       )}
@@ -1467,7 +1467,7 @@ const AdminTransactions = () => {
                           </div>
                           <div className="flex justify-between items-center">
                             <span>Amount After Dispute Adjustment:</span>
-                            <span className="font-medium text-blue-600">฿{calculationModal.data.payoutCalculation?.productCost?.toFixed(2)}</span>
+                            <span className="font-medium ">฿{calculationModal.data.payoutCalculation?.productCost?.toFixed(2)}</span>
                           </div>
                         </>
                       )}
@@ -1481,12 +1481,12 @@ const AdminTransactions = () => {
 
                       <hr className="border-gray-200" />
 
-                      <div className="flex justify-between items-center text-red-600">
+                      <div className="flex justify-between items-center ">
                         <span>Service Charge ({calculationModal.data.payoutCalculation?.serviceChargeType}):</span>
                         <span>-฿{calculationModal.data.payoutCalculation?.serviceCharge?.toFixed(2)}</span>
                       </div>
 
-                      <div className="flex justify-between items-center text-red-600">
+                      <div className="flex justify-between items-center ">
                         <span>Tax Charge ({calculationModal.data.payoutCalculation?.taxChargeType}):</span>
                         <span>-฿{calculationModal.data.payoutCalculation?.taxCharge?.toFixed(2)}</span>
                       </div>
@@ -1495,17 +1495,17 @@ const AdminTransactions = () => {
 
                       <div className="flex justify-between items-center font-medium text-lg">
                         <span>Net Amount (Before Withdrawal):</span>
-                        <span className="text-blue-600">฿{calculationModal.data.payoutCalculation?.netAmount?.toFixed(2)}</span>
+                        <span className="">฿{calculationModal.data.payoutCalculation?.netAmount?.toFixed(2)}</span>
                       </div>
 
-                      <div className="flex justify-between items-center text-red-600">
+                      <div className="flex justify-between items-center ">
                         <span>Withdrawal Fee ({calculationModal.data.payoutCalculation?.withdrawalFeeType}):</span>
                         <span>-฿{calculationModal.data.payoutCalculation?.withdrawalFee?.toFixed(2)}</span>
                       </div>
 
                       <hr className="border-gray-400" />
 
-                      <div className="flex justify-between items-center font-bold text-xl text-green-600">
+                      <div className="flex justify-between items-center font-bold text-xl ">
                         <span>Final Payout Amount:</span>
                         <span>฿{calculationModal.data.payoutCalculation?.netAmountAfterWithdrawalFee?.toFixed(2)}</span>
                       </div>
@@ -1536,7 +1536,9 @@ const AdminTransactions = () => {
                 </div>
 
                 {/* Additional Information */}
-                <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+
+
+                {/* <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
                   <div className="space-y-2">
                     <p><strong>Note:</strong> The final payout amount is what the seller will receive after all platform fees and charges.</p>
 
@@ -1547,7 +1549,7 @@ const AdminTransactions = () => {
                     )}
 
                     {!calculationModal.data.payoutCalculation?.isEstimated && (
-                      <p className="text-green-700">
+                      <p className="">
                         <strong>Processed Payment:</strong> These amounts reflect the actual processed payment transaction.
                       </p>
                     )}
@@ -1565,7 +1567,8 @@ const AdminTransactions = () => {
                       </p>
                     )}
                   </div>
-                </div>
+                </div> */}
+
               </div>
             )}
           </div>
@@ -1601,7 +1604,7 @@ const AdminTransactions = () => {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Payout Amount:</span>
-                      <span className="font-medium text-green-600">
+                      <span className="font-medium ">
                         ฿{payoutModal.data.sellerPayout?.payoutAmount?.toFixed(2)}
                       </span>
                     </div>
@@ -1773,18 +1776,18 @@ const AdminTransactions = () => {
 
                 {/* Seller Information */}
                 <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <h3 className="font-semibold text-blue-800 mb-2">Seller Information</h3>
+                  <h3 className="font-semibold  mb-2">Seller Information</h3>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <span className="text-blue-700">Name:</span>
+                      <span className="">Name:</span>
                       <span className="font-medium ml-2">{withdrawalDetailModal.data.userId?.userName || withdrawalDetailModal.data.userId?.name || 'N/A'}</span>
                     </div>
                     <div>
-                      <span className="text-blue-700">Email:</span>
+                      <span className="">Email:</span>
                       <span className="font-medium ml-2">{withdrawalDetailModal.data.userId?.email || 'N/A'}</span>
                     </div>
                     <div>
-                      <span className="text-blue-700">User ID:</span>
+                      <span className="">User ID:</span>
                       <span className="font-medium ml-2">{withdrawalDetailModal.data.userId?._id || 'N/A'}</span>
                     </div>
                   </div>
@@ -1811,7 +1814,7 @@ const AdminTransactions = () => {
                     <div className="space-y-3">
                       <div className="flex justify-between items-center">
                         <span>Withdrawal Amount:</span>
-                        <span className="font-medium text-green-600">฿{withdrawalDetailModal.data.amount?.toFixed(2) || '0.00'}</span>
+                        <span className="font-medium ">฿{withdrawalDetailModal.data.amount?.toFixed(2) || '0.00'}</span>
                       </div>
 
                       {(() => {
@@ -1821,7 +1824,7 @@ const AdminTransactions = () => {
                         const calculatedFee = calculateWithdrawalFee(amount, feeValue, feeType);
 
                         return (
-                          <div className="flex justify-between items-center text-red-600">
+                          <div className="flex justify-between items-center ">
                             <span className="flex flex-col">
                               <span>Withdrawal Fee ({feeType}):</span>
                               {feeType === 'PERCENTAGE' && (
@@ -1850,7 +1853,7 @@ const AdminTransactions = () => {
                         const netAmount = amount - calculatedFee;
 
                         return (
-                          <div className="flex justify-between items-center font-bold text-lg text-blue-600">
+                          <div className="flex justify-between items-center font-bold text-lg ">
                             <span>Net Amount to Transfer:</span>
                             <span>฿{netAmount.toFixed(2)}</span>
                           </div>
@@ -1869,17 +1872,17 @@ const AdminTransactions = () => {
                   if (isPromptPay) {
                     return (
                       <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                        <h3 className="font-semibold text-blue-800 mb-2 flex items-center">
+                        <h3 className="font-semibold  mb-2 flex items-center">
                           <span className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs mr-2">P</span>
                           PromptPay Method
                         </h3>
                         <div className="space-y-2 text-sm">
                           <div>
-                            <span className="text-blue-700">PromptPay ID:</span>
+                            <span className="">PromptPay ID:</span>
                             <span className="font-medium ml-2">{method.PromptPay}</span>
                           </div>
                           <div>
-                            <span className="text-blue-700">ID Type:</span>
+                            <span className="">ID Type:</span>
                             <span className="font-medium ml-2 flex items-center">
                               <span className="mr-1">{getPromptPayIdType(method.PromptPay).icon}</span>
                               {getPromptPayIdType(method.PromptPay).type}
@@ -1887,7 +1890,7 @@ const AdminTransactions = () => {
                           </div>
                           {method.accountHolderName && (
                             <div>
-                              <span className="text-blue-700">Account Holder:</span>
+                              <span className="">Account Holder:</span>
                               <span className="font-medium ml-2">{method.accountHolderName}</span>
                             </div>
                           )}
@@ -1897,21 +1900,21 @@ const AdminTransactions = () => {
                   } else if (isBank) {
                     return (
                       <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                        <h3 className="font-semibold text-green-800 mb-2 flex items-center">
-                          <span className="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-xs mr-2">B</span>
+                        <h3 className="font-semibold  mb-2 flex items-center">
+                          {/* <span className="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-xs mr-2">B</span> */}
                           Bank Transfer Method
                         </h3>
                         <div className="space-y-2 text-sm">
                           <div>
-                            <span className="text-green-700">Bank Name:</span>
+                            <span className="">Bank Name:</span>
                             <span className="font-medium ml-2">{method.bankName}</span>
                           </div>
                           <div>
-                            <span className="text-green-700">Account Number:</span>
+                            <span className="">Account Number:</span>
                             <span className="font-medium ml-2">{method.accountNumber}</span>
                           </div>
                           <div>
-                            <span className="text-green-700">Account Holder:</span>
+                            <span className="">Account Holder:</span>
                             <span className="font-medium ml-2">{method.accountHolderName || 'N/A'}</span>
                           </div>
                         </div>
@@ -1944,7 +1947,7 @@ const AdminTransactions = () => {
                         setWithdrawalDetailModal({ show: false, data: null });
                         confirmWithdrawalAction(withdrawalDetailModal.data, 'Approved');
                       }}
-                      className="flex-1 border-green-300 text-green-600 hover:bg-green-50"
+                      className="flex-1 border-green-300  hover:bg-green-50"
                     >
                       Approve Request
                     </Button>
@@ -1954,7 +1957,7 @@ const AdminTransactions = () => {
                         setWithdrawalDetailModal({ show: false, data: null });
                         confirmWithdrawalAction(withdrawalDetailModal.data, 'Rejected');
                       }}
-                      className="flex-1 border-red-300 text-red-600 hover:bg-red-50"
+                      className="flex-1 border-red-300  hover:bg-red-50"
                     >
                       Reject Request
                     </Button>
@@ -2002,7 +2005,7 @@ const AdminTransactions = () => {
                       </div>
                       <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
                         <span className="text-sm text-gray-600">Amount:</span>
-                        <span className="font-medium text-green-600">
+                        <span className="font-medium ">
                           ฿{withdrawalActionModal.data.amount?.toFixed(2) || '0.00'}
                         </span>
                       </div>
@@ -2023,13 +2026,13 @@ const AdminTransactions = () => {
                                   </span>
                                 )}
                               </span>
-                              <span className="font-medium text-red-600">
+                              <span className="font-medium ">
                                 -฿{calculatedFee.toFixed(2)}
                               </span>
                             </div>
                             <div className="flex flex-col sm:flex-row sm:justify-between border-t pt-2 gap-1 sm:gap-0">
                               <span className="text-sm text-gray-600 font-medium">Net Transfer:</span>
-                              <span className="font-medium text-blue-600">
+                              <span className="font-medium ">
                                 ฿{(amount - calculatedFee).toFixed(2)}
                               </span>
                             </div>
@@ -2100,7 +2103,7 @@ const AdminTransactions = () => {
                           <div className="flex text-sm text-gray-600">
                             <label
                               htmlFor="withdrawal-file-upload"
-                              className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
+                              className="relative cursor-pointer bg-white rounded-md font-medium  hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
                             >
                               <span>Upload a file</span>
                               <input
@@ -2144,7 +2147,7 @@ const AdminTransactions = () => {
                                   setImagePreview(null);
                                 }
                               }}
-                              className="text-red-600 hover:text-red-800 text-lg flex-shrink-0 ml-2"
+                              className=" hover:text-red-800 text-lg flex-shrink-0 ml-2"
                               title="Remove file"
                             >
                               ✕
@@ -2191,7 +2194,7 @@ const AdminTransactions = () => {
                         withdrawalActionModal.image
                       )}
                       disabled={withdrawalLoading}
-                      className={`flex-1 ${withdrawalActionModal.action === 'Rejected' ? 'border-red-300 text-red-600 hover:bg-red-50' : ''}`}
+                      className={`flex-1 ${withdrawalActionModal.action === 'Rejected' ? 'border-red-300  hover:bg-red-50' : ''}`}
                     >
                       {withdrawalLoading ? 'Processing...' : `Confirm ${withdrawalActionModal.action}`}
                     </Button>
