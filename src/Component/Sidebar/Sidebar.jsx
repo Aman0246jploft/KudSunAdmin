@@ -228,11 +228,15 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
                       className={clsx(
                         "group flex items-center px-3 py-2 ml-6 rounded-lg transition-all duration-200 relative"
                       )}
+                      // style={{
+                      //   backgroundColor: isChildActiveItem
+                      //     ? theme.colors.sidebarActive
+                      //     : undefined,
+                      //   color: theme.colors.textPrimary,
+                      // }}
                       style={{
-                        backgroundColor: isChildActiveItem
-                          ? theme.colors.sidebarActive
-                          : undefined,
-                        color: theme.colors.textPrimary,
+                        backgroundColor: isChildActiveItem ? theme.colors.sidebarActive : undefined,
+                        color: isChildActiveItem ? "#FFFFFF" : theme.colors.textPrimary, // 👈 force white text
                       }}
                       onMouseEnter={(e) => {
                         if (!isChildActiveItem)
@@ -276,8 +280,9 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
           )}
           style={{
             backgroundColor: isActive ? theme.colors.sidebarActive : undefined,
-            color: theme.colors.textPrimary,
+            color: isActive ? "#FFFFFF" : theme.colors.textPrimary, // 👈 force white text
           }}
+
           onMouseEnter={(e) => {
             if (!isActive)
               e.currentTarget.style.backgroundColor = theme.colors.sidebarHover;
