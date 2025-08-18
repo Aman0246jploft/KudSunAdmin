@@ -236,7 +236,7 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
                       // }}
                       style={{
                         backgroundColor: isChildActiveItem ? theme.colors.sidebarActive : undefined,
-                        color: isChildActiveItem ? "#FFFFFF" : theme.colors.textPrimary, // 👈 force white text
+                        color: isChildActiveItem ? "#FFFFFF" : theme.colors.textPrimary, 
                       }}
                       onMouseEnter={(e) => {
                         if (!isChildActiveItem)
@@ -280,7 +280,7 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
           )}
           style={{
             backgroundColor: isActive ? theme.colors.sidebarActive : undefined,
-            color: isActive ? "#FFFFFF" : theme.colors.textPrimary, // 👈 force white text
+            color: isActive ? "#FFFFFF" : theme.colors.textPrimary, 
           }}
 
           onMouseEnter={(e) => {

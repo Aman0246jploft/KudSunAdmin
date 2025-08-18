@@ -270,27 +270,27 @@ export default function ThreadDetail() {
                 <div className="mt-6 bg-white rounded-lg shadow-sm p-4">
                     <h3 className="text-lg font-semibold mb-3">Thread Statistics</h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div className="flex justify-between py-1">
-                            <span className="text-gray-600 text-sm">Created Date</span>
+                        <div className="flex gap-1 py-1">
+                            <span className="text-gray-600 text-sm">Created Date :</span>
                             <span className="font-medium text-sm">
                                 {new Date(thread.createdAt).toLocaleDateString()}
                             </span>
                         </div>
-                        <div className="flex justify-between py-1">
-                            <span className="text-gray-600 text-sm">Last Updated</span>
+                        <div className="flex gap-1 py-1">
+                            <span className="text-gray-600 text-sm">Last Updated:</span>
                             <span className="font-medium text-sm">
                                 {new Date(thread.updatedAt).toLocaleDateString()}
                             </span>
                         </div>
-                        <div className="flex justify-between py-1">
-                            <span className="text-gray-600 text-sm">Thread Status</span>
+                        <div className="flex gap-1 py-1">
+                            <span className="text-gray-600 text-sm">Thread Status:</span>
                             <span className={`text-sm font-medium ${thread.isClosed ? 'text-red-600' : 'text-green-600'
                                 }`}>
                                 {thread.isClosed ? 'Closed' : 'Active'}
                             </span>
                         </div>
-                        <div className="flex justify-between py-1">
-                            <span className="text-gray-600 text-sm">Budget Type</span>
+                        <div className="flex gap-1 py-1">
+                            <span className="text-gray-600 text-sm">Budget Type:</span>
                             <span className="text-sm font-medium">
                                 {thread.budgetFlexible ? 'Flexible' : 'Fixed Range'}
                             </span>

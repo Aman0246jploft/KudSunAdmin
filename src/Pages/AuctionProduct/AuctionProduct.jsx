@@ -179,7 +179,16 @@ export default function AuctionProduct() {
         return `${row?.highestBidAmount}`;
       },
     },
-
+    //{
+    //   key: "isSold",
+    //   label: "Remark",
+    //   width: "25%",
+    //   render: (_, row) => (
+    //     <div style={{ color: row.isSold ? '#bc2f25' : '#526d45', fontWeight: 'bold' }}>
+    //       {row.isSold ? "Sold" : "unSold"}  
+    //     </div>
+    //   ),
+    // }, 
     {
       key: "status",
       label: "Status",
