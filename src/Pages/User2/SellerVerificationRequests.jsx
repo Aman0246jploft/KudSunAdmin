@@ -148,7 +148,7 @@ export default function SellerVerificationRequests() {
                 Approve
               </button>
               <button
-                className="px-2 py-1 bg-red-500 text-white rounded text-red-500 hover:bg-red-600"
+                className="px-2 py-1 bg-red-500 text-white rounded  hover:bg-red-600"
                 onClick={() => handleStatusChange(row, "Rejected")}
               >
                 Reject
