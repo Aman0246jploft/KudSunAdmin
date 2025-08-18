@@ -14,14 +14,16 @@ import {
   AiOutlineQuestionCircle,
 } from "react-icons/ai";
 import { MdOutlineCategory } from "react-icons/md";
+import { BiCategory } from "react-icons/bi";
 import { IoChatboxEllipsesOutline } from "react-icons/io5";
 import { VscPreview } from "react-icons/vsc";
 import { GrTransaction } from "react-icons/gr";
-import { MdRateReview } from "react-icons/md";
+import { MdOutlineRateReview } from "react-icons/md";
 import { RiAuctionLine } from "react-icons/ri";
 import { BsBoxSeam } from "react-icons/bs";
 import { CiViewList } from "react-icons/ci";
-import { MdOutlineIndeterminateCheckBox } from "react-icons/md";
+import { TbPresentationAnalytics } from "react-icons/tb";
+import { FaRegUser } from "react-icons/fa";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
 import clsx from "clsx";
 import logo from './logo.png'
@@ -36,7 +38,7 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
 
     {
       name: "Users",
-      icon: BsBoxSeam,
+      icon: FaRegUser,
       isParent: true,
       children: [
         { name: "Account List", href: "/user", icon: AiOutlineTeam },
@@ -105,12 +107,12 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
       ],
     },
 
-    { name: "Category", href: "/category", icon: MdOutlineCategory },
+    { name: "Category", href: "/category", icon: BiCategory },
     // { name: "Chat", href: "/chat", icon: IoChatboxEllipsesOutline },
     { name: "Disputes", href: "/disputeManagement", icon: VscPreview },
     { name: "Transactions", href: "/admin/transactions", icon: GrTransaction },
-    { name: "Financial Analytics", href: "/admin/financial-dashboard", icon: AiOutlineDashboard },
-    { name: "Review Management", href: "/admin/review-management", icon: MdRateReview },
+    { name: "Financial Analytics", href: "/admin/financial-dashboard", icon: TbPresentationAnalytics },
+    { name: "Review Management", href: "/admin/review-management", icon: MdOutlineRateReview },
 
 
 
