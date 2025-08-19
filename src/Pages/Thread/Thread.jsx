@@ -2,13 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchThreads, deleteThread, toggleThreadStatus, exportThreads } from "../../features/slices/threadSlice";
 import { mainCategory, subCategory } from "../../features/slices/categorySlice";
-import DataTable from "../../Component/Table/DataTable";
-import Button from "../../Component/Atoms/Button/Button";
-import InputField from "../../Component/Atoms/InputFields/Inputfield";
+import DataTable from "../../Component/Table/DataTable"; 
 import { useNavigate } from "react-router-dom";
 import { FaEye } from "react-icons/fa6";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
-import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 import { useTheme } from "../../contexts/theme/hook/useTheme";
 import Pagination from "../../Component/Atoms/Pagination/Pagination";
@@ -45,7 +42,7 @@ export default function Thread() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
   const [subCategories, setSubCategories] = useState([]);
-  const [tags, setTags] = useState([]);
+  // const [tags, setTags] = useState([]);
   const [exportLoading, setExportLoading] = useState(false);
 
   // Fetch categories on mount
@@ -94,22 +91,6 @@ export default function Thread() {
       // Reset to first page when filters change (except for page changes)
       pageNo: name === 'pageNo' ? value : 1
     }));
-  };
-
-  const handleTagsChange = (e) => {
-    const value = e.target.value;
-    if (e.key === 'Enter' && value.trim()) {
-      const newTags = [...tags, value.trim()];
-      setTags(newTags);
-      handleFilterChange('tags', newTags);
-      e.target.value = '';
-    }
-  };
-
-  const removeTag = (tagToRemove) => {
-    const newTags = tags.filter(tag => tag !== tagToRemove);
-    setTags(newTags);
-    handleFilterChange('tags', newTags);
   };
 
   // const handleDelete = (threadId) => {
@@ -167,7 +148,7 @@ export default function Thread() {
 
   const handleSort = (sortKey) => {
     handleFilterChange('sortBy', sortKey);
-    handleFilterChange('sortOrder', filters.sortOrder === 'asc' ? 'desc' : 'asc');
+    handleFilterChange('sortOrder', filters?.sortOrder === 'asc' ? 'desc' : 'asc');
   };
 
   const resetAllFilters = () => {
@@ -185,7 +166,7 @@ export default function Thread() {
     });
     setSelectedCategory("");
     setSelectedSubCategory("");
-    setTags([]);
+    // setTags([]);
   };
 
   // Export handlers
@@ -239,14 +220,14 @@ export default function Thread() {
     }
   };
 
-  // Table columns configuration
+  // Table columns configuration 
   const columns = [
     {
       key: "serial",
       label: "S.No",
       width: "10%",
       render: (_, __, rowIndex) =>
-        (filters.pageNo - 1) * filters.size + rowIndex + 1,
+        (filters?.pageNo - 1) * filters?.size + rowIndex + 1,
     },
     {
       key: "title",
@@ -334,7 +315,7 @@ export default function Thread() {
 
   const rowHeight = 40;
   const headerHeight = 56;
-  const fixedRows = filters.size;
+  const fixedRows = filters?.size;
   const minTableHeight = headerHeight + rowHeight * fixedRows;
 
   return (
@@ -387,7 +368,7 @@ export default function Thread() {
                   type="number"
                   min="0"
                   placeholder="Min Budget"
-                  value={filters.minBudget}
+                  value={filters?.minBudget}
                   onChange={(e) => handleFilterChange("minBudget", e.target.value)}
                   className="px-2 py-1 border rounded w-20 sm:w-24 text-sm"
                 />
@@ -396,7 +377,7 @@ export default function Thread() {
                   type="number"
                   min="0"
                   placeholder="Max Budget"
-                  value={filters.maxBudget}
+                  value={filters?.maxBudget}
                   onChange={(e) => handleFilterChange("maxBudget", e.target.value)}
                   className="px-2 py-1 border rounded w-20 sm:w-24 text-sm"
                 />
@@ -446,7 +427,7 @@ export default function Thread() {
               className="p-2 outline-none border rounded text-sm w-full sm:w-auto min-w-0"
               type="text"
               placeholder="Search thread"
-              value={filters.keyWord}
+              value={filters?.keyWord}
               onChange={(e) => handleFilterChange("keyWord", e.target.value)}
             />
 
@@ -516,8 +497,8 @@ export default function Thread() {
         >
           <div className="flex justify-end">
             <Pagination
-              pageNo={filters.pageNo}
-              size={filters.size}
+              pageNo={filters?.pageNo}
+              size={filters?.size}
               total={totalRecords}
               onChange={(page) => handleFilterChange("pageNo", page)}
               theme={theme}

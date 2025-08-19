@@ -319,7 +319,7 @@ const AdminReviewManagement = () => {
       render: (_, row) => {
 
         return (
-          <div className="space-y-1 md:justify-start justify-end flex" >
+          <div className="space-y-1 md:justify-start justify-end flex flex-col" >
             <div className="flex items-center space-x-2">
               <RatingDisplay rating={row?.rating} />
               <span className="text-sm font-medium">{row?.rating}/5</span>

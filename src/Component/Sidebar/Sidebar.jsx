@@ -3,19 +3,15 @@ import { NavLink, useLocation } from "react-router-dom";
 import {
   AiOutlineDashboard,
   AiOutlineTeam,
-  AiOutlineBell,
   AiOutlineSetting,
   AiOutlineLeft,
   AiOutlineRight,
   AiOutlineDown,
-  AiOutlineUp,
+ 
   AiOutlineShop,
   AiOutlineTag,
-  AiOutlineQuestionCircle,
 } from "react-icons/ai";
-import { MdOutlineCategory } from "react-icons/md";
 import { BiCategory } from "react-icons/bi";
-import { IoChatboxEllipsesOutline } from "react-icons/io5";
 import { VscPreview } from "react-icons/vsc";
 import { GrTransaction } from "react-icons/gr";
 import { MdOutlineRateReview } from "react-icons/md";
@@ -113,9 +109,6 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
     { name: "Transactions", href: "/admin/transactions", icon: GrTransaction },
     { name: "Financial Analytics", href: "/admin/financial-dashboard", icon: TbPresentationAnalytics },
     { name: "Review Management", href: "/admin/review-management", icon: MdOutlineRateReview },
-
-
-
   ];
 
   const toggleExpanded = (itemName) => {
