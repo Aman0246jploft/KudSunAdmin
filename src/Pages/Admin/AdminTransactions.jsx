@@ -2085,7 +2085,7 @@ const AdminTransactions = () => {
                         Supporting Document (Optional)
                       </label>
                       <div className="mt-1 flex justify-center px-4 sm:px-6 pt-4 sm:pt-5 pb-4 sm:pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                        <div className="space-y-1 text-center">
+                        <div className="space-y-1  flex flex-col justify-center items-center text-center">
                           <svg
                             className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-gray-400"
                             stroke="currentColor"
@@ -2105,7 +2105,7 @@ const AdminTransactions = () => {
                               htmlFor="withdrawal-file-upload"
                               className="relative cursor-pointer bg-white rounded-md font-medium  hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
                             >
-                              <span>Upload a file</span>
+                              <div className='text-blue-500 w-full '>Upload a file</div>
                               <input
                                 id="withdrawal-file-upload"
                                 name="withdrawal-file-upload"
@@ -2127,7 +2127,7 @@ const AdminTransactions = () => {
                                 }}
                               />
                             </label>
-                            <p className="pl-1 hidden sm:inline">or drag and drop</p>
+                            {/* <p className="pl-1 hidden sm:inline">or drag and drop</p> */}
                           </div>
                           <p className="text-xs text-gray-500">
                             PNG, JPG, PDF up to 5MB
