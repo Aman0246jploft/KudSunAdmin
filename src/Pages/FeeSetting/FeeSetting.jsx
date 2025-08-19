@@ -68,6 +68,12 @@ export default function FeeSetting() {
 
   const saveEdit = async (row) => {
     try {
+      const feeValue = Number(editingValues.value);
+
+      if (isNaN(feeValue) || feeValue <= 0) {
+        toast.error("Fee % must be greater than 0");
+        return;
+      }
       await dispatch(updateFee({ id: row._id, type: editingValues.type, value: editingValues.value })).unwrap();
       // Refresh list
       const faqResult = await dispatch(feeSettingList(pagination)).unwrap();
@@ -131,7 +137,7 @@ export default function FeeSetting() {
       render: (_, row) =>
         editingRowId === row._id ? (
           <div className="flex items-center gap-1">
-             <input
+            <input
               type="number"
               name="value"
               value={editingValues.value}
