@@ -52,7 +52,7 @@ export default function FeeSetting() {
       setFaqs(faqResult.data || []);
     } catch (err) {
       console.error("Failed to toggle read status", err);
-      toast.error("Failed to update status");
+      toast.error("Failed to update status"); 
     }
   };
 
