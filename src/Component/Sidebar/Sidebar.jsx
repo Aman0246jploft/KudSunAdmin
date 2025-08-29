@@ -12,6 +12,7 @@ import {
 } from "react-icons/ai";
 import { BiCategory } from "react-icons/bi";
 // import { VscPreview } from "react-icons/vsc";
+import { MdOutlineIndeterminateCheckBox } from "react-icons/md";
 import { GrTransaction } from "react-icons/gr";
 import { MdOutlineRateReview } from "react-icons/md";
 import { RiAuctionLine } from "react-icons/ri";
@@ -126,7 +127,11 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
 
     { name: "Category", href: "/category", icon: BiCategory },
     // { name: "Chat", href: "/chat", icon: IoChatboxEllipsesOutline },
-    // { name: "Disputes", href: "/disputeManagement", icon: VscPreview },
+    {
+      name: "Disputes",
+      href: "/disputeManagement",
+      icon: MdOutlineIndeterminateCheckBox,
+    },
     { name: "Transactions", href: "/admin/transactions", icon: GrTransaction },
     {
       name: "Financial Analytics",
