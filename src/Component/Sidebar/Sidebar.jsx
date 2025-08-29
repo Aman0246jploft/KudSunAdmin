@@ -7,12 +7,11 @@ import {
   AiOutlineLeft,
   AiOutlineRight,
   AiOutlineDown,
- 
   AiOutlineShop,
   AiOutlineTag,
 } from "react-icons/ai";
 import { BiCategory } from "react-icons/bi";
-import { VscPreview } from "react-icons/vsc";
+// import { VscPreview } from "react-icons/vsc";
 import { GrTransaction } from "react-icons/gr";
 import { MdOutlineRateReview } from "react-icons/md";
 import { RiAuctionLine } from "react-icons/ri";
@@ -22,7 +21,7 @@ import { TbPresentationAnalytics } from "react-icons/tb";
 import { FaRegUser } from "react-icons/fa";
 import { useTheme } from "../../contexts/theme/hook/useTheme";
 import clsx from "clsx";
-import logo from './logo.png'
+import logo from "./logo.png";
 
 const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
   const { theme } = useTheme();
@@ -38,10 +37,13 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
       isParent: true,
       children: [
         { name: "Account List", href: "/user", icon: AiOutlineTeam },
-        { name: "Seller Verification", href: "/seller-verification-requests", icon: RiAuctionLine },
+        {
+          name: "Seller Verification",
+          href: "/seller-verification-requests",
+          icon: RiAuctionLine,
+        },
       ],
     },
-
 
     {
       name: "Products",
@@ -51,7 +53,6 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
         { name: "Items", href: "/sellProduct", icon: AiOutlineTag },
         { name: "Auctions", href: "/auctionProduct", icon: RiAuctionLine },
         { name: "Thread", href: "/thread", icon: CiViewList },
-
       ],
     },
 
@@ -61,8 +62,16 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
       isParent: true,
       children: [
         { name: "Video Section", href: "/video-section", icon: AiOutlineShop },
-        { name: "Terms of Service", href: "/terms-of-service", icon: AiOutlineShop },
-        { name: "Privacy Policy", href: "/privacy-policy", icon: AiOutlineShop },
+        {
+          name: "Terms of Service",
+          href: "/terms-of-service",
+          icon: AiOutlineShop,
+        },
+        {
+          name: "Privacy Policy",
+          href: "/privacy-policy",
+          icon: AiOutlineShop,
+        },
         { name: "Auction Rules", href: "/auction-rules", icon: AiOutlineShop },
         { name: "FAQs", href: "/faq", icon: AiOutlineShop },
         { name: "ContactUs", href: "/contact_us", icon: AiOutlineShop },
@@ -76,39 +85,59 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
       children: [
         { name: "FeeSettings", href: "/feeSetting", icon: AiOutlineSetting },
         { name: "Bank", href: "/bank", icon: AiOutlineSetting },
-        { name: "Withdrawal Management", href: "/wSetting", icon: AiOutlineSetting },
+        {
+          name: "Withdrawal Management",
+          href: "/wSetting",
+          icon: AiOutlineSetting,
+        },
 
-        { name: "Location Management", href: "/location", icon: AiOutlineSetting },
-        { name: "Carrier Management", href: "/carrier", icon: AiOutlineSetting },
         {
-          name: 'Report Types',
-          href: '/report-type-management',
-          icon: AiOutlineSetting
+          name: "Location Management",
+          href: "/location",
+          icon: AiOutlineSetting,
         },
         {
-          name: 'Dispute Types',
-          href: '/dispute-type-management',
-          icon: AiOutlineSetting
+          name: "Carrier Management",
+          href: "/carrier",
+          icon: AiOutlineSetting,
         },
         {
-          name: 'Cancel Types',
-          href: '/dispute-cancel-management',
-          icon: AiOutlineSetting
+          name: "Report Types",
+          href: "/report-type-management",
+          icon: AiOutlineSetting,
+        },
+        {
+          name: "Dispute Types",
+          href: "/dispute-type-management",
+          icon: AiOutlineSetting,
+        },
+        {
+          name: "Cancel Types",
+          href: "/dispute-cancel-management",
+          icon: AiOutlineSetting,
         },
         {
           name: "Update Password",
           href: "/passwordManagement",
-          icon: AiOutlineSetting
+          icon: AiOutlineSetting,
         },
       ],
     },
 
     { name: "Category", href: "/category", icon: BiCategory },
     // { name: "Chat", href: "/chat", icon: IoChatboxEllipsesOutline },
-    { name: "Disputes", href: "/disputeManagement", icon: VscPreview },
+    // { name: "Disputes", href: "/disputeManagement", icon: VscPreview },
     { name: "Transactions", href: "/admin/transactions", icon: GrTransaction },
-    { name: "Financial Analytics", href: "/admin/financial-dashboard", icon: TbPresentationAnalytics },
-    { name: "Review Management", href: "/admin/review-management", icon: MdOutlineRateReview },
+    {
+      name: "Financial Analytics",
+      href: "/admin/financial-dashboard",
+      icon: TbPresentationAnalytics,
+    },
+    {
+      name: "Review Management",
+      href: "/admin/review-management",
+      icon: MdOutlineRateReview,
+    },
   ];
 
   const toggleExpanded = (itemName) => {
@@ -230,8 +259,12 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
                       //   color: theme.colors.textPrimary,
                       // }}
                       style={{
-                        backgroundColor: isChildActiveItem ? theme.colors.sidebarActive : undefined,
-                        color: isChildActiveItem ? "#FFFFFF" : theme.colors.textPrimary, 
+                        backgroundColor: isChildActiveItem
+                          ? theme.colors.sidebarActive
+                          : undefined,
+                        color: isChildActiveItem
+                          ? "#FFFFFF"
+                          : theme.colors.textPrimary,
                       }}
                       onMouseEnter={(e) => {
                         if (!isChildActiveItem)
@@ -275,9 +308,8 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
           )}
           style={{
             backgroundColor: isActive ? theme.colors.sidebarActive : undefined,
-            color: isActive ? "#FFFFFF" : theme.colors.textPrimary, 
+            color: isActive ? "#FFFFFF" : theme.colors.textPrimary,
           }}
-
           onMouseEnter={(e) => {
             if (!isActive)
               e.currentTarget.style.backgroundColor = theme.colors.sidebarHover;
@@ -332,14 +364,13 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
         className={clsx(
           "fixed left-0 top-0 h-full border-r z-40 transition-all duration-300 ease-in-out flex flex-col",
           // Mobile behavior
-          isMobile ? [
-            "w-64",
-            isOpen ? "translate-x-0" : "-translate-x-full"
-          ] : [
-            // Desktop behavior
-            "translate-x-0",
-            isOpen ? "w-64" : "w-16"
-          ]
+          isMobile
+            ? ["w-64", isOpen ? "translate-x-0" : "-translate-x-full"]
+            : [
+                // Desktop behavior
+                "translate-x-0",
+                isOpen ? "w-64" : "w-16",
+              ]
         )}
       >
         {/* Toggle Button - Show on desktop, hide on mobile when closed */}
@@ -407,11 +438,13 @@ const Sidebar = ({ isOpen, toggleSidebar, isMobile }) => {
         <nav
           className="flex-1 py-6 overflow-y-auto min-h-0 scrollbar-thin sidebar-scroll"
           style={{
-            scrollbarWidth: 'thin',
+            scrollbarWidth: "thin",
             scrollbarColor: `${theme.colors.border} transparent`,
           }}
         >
-          <ul className="space-y-2 px-3 pb-4">{menuItems.map(renderMenuItem)}</ul>
+          <ul className="space-y-2 px-3 pb-4">
+            {menuItems.map(renderMenuItem)}
+          </ul>
         </nav>
       </div>
     </>

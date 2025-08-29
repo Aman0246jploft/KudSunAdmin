@@ -1,10 +1,16 @@
-import React, { useState } from 'react';
-import { ShieldCheck, User, FileText, CircleDollarSign, Clock } from 'lucide-react';
-import Button from '../../Component/Atoms/Button/Button';
+import React, { useState } from "react";
+import {
+  ShieldCheck,
+  User,
+  FileText,
+  CircleDollarSign,
+  Clock,
+} from "lucide-react";
+import Button from "../../Component/Atoms/Button/Button";
 
-import authAxiosClient from '../../api/authAxiosClient';
-import { toast } from 'react-toastify';
-import Modal from './Model';
+import authAxiosClient from "../../api/authAxiosClient";
+import { toast } from "react-toastify";
+import Modal from "./Model";
 
 /**
  * Re‑styled DisputeModal with improved hierarchy, spacing, and dark‑mode support.
@@ -19,12 +25,12 @@ const InfoRow = ({ label, value }) => (
       {label}
     </span>
     <span className="text-sm font-semibold text-right break-words text-gray-900  max-w-[65%]">
-      {value || '—'}
+      {value || "—"}
     </span>
   </div>
 );
 
-const FileLinks = ({ files = [], label = 'View' }) =>
+const FileLinks = ({ files = [], label = "View" }) =>
   files.length ? (
     <div className="flex flex-wrap gap-2 mt-1">
       {files.map((url, idx) => (
@@ -43,30 +49,30 @@ const FileLinks = ({ files = [], label = 'View' }) =>
 
 const DisputeModal = ({ dispute, onClose, onUpdate }) => {
   const [loading, setLoading] = useState(false);
-  const [adminDecision, setAdminDecision] = useState({ 
-    decision: '', 
-    decisionNote: '', 
-    disputeAmountPercent: 0 
+  const [adminDecision, setAdminDecision] = useState({
+    decision: "",
+    decisionNote: "",
+    disputeAmountPercent: 0,
   });
 
   /* ------------------------------ API handlers ----------------------------- */
   const handleAdminDecision = async (e) => {
     e.preventDefault();
     if (!adminDecision.decision || !adminDecision.decisionNote) {
-      toast.error('Please provide both decision and note');
+      toast.error("Please provide both decision and note");
       return;
     }
     try {
       setLoading(true);
-      await authAxiosClient.post('/dispute/adminDecision', {
+      await authAxiosClient.post("/dispute/adminDecision", {
         disputeId: dispute._id,
         ...adminDecision,
       });
-      toast.success('Decision submitted successfully');
+      toast.success("Decision submitted successfully");
       onUpdate();
       onClose();
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to submit decision');
+      toast.error(error.response?.data?.message || "Failed to submit decision");
     } finally {
       setLoading(false);
     }
@@ -75,15 +81,15 @@ const DisputeModal = ({ dispute, onClose, onUpdate }) => {
   const handleStatusUpdate = async (newStatus) => {
     try {
       setLoading(true);
-      await authAxiosClient.post('/dispute/updateStatus', {
+      await authAxiosClient.post("/dispute/updateStatus", {
         disputeId: dispute._id,
         status: newStatus,
       });
-      toast.success('Status updated successfully');
+      toast.success("Status updated successfully");
       onUpdate();
       onClose();
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to update status');
+      toast.error(error.response?.data?.message || "Failed to update status");
     } finally {
       setLoading(false);
     }
@@ -91,9 +97,9 @@ const DisputeModal = ({ dispute, onClose, onUpdate }) => {
 
   /* -------------------------------- Render -------------------------------- */
   return (
-    <Modal isOpen onClose={onClose} title={`Dispute – ${dispute.disputeId}`}>      
+    <Modal isOpen onClose={onClose} title={`Dispute – ${dispute.disputeId}`}>
       <div className="relative flex flex-col max-h-[80vh]  p-3 md:max-h-[75vh] w-full overflow-hidden">
-        <h1 className='text-xl border-b-2 p-2'>Dispute Info</h1>
+        <h1 className="text-xl border-b-2 p-2">Dispute Info</h1>
         {/* ─────────────────── Scrollable body ─────────────────── */}
         <div className="overflow-y-auto pr-1 flex-1 space-y-8 pb-8">
           {/* Order Info */}
@@ -108,9 +114,9 @@ const DisputeModal = ({ dispute, onClose, onUpdate }) => {
               <InfoRow
                 label="Total Amount"
                 value={
-                  dispute.orderId?.grandTotal ?
-                    `$${dispute.orderId.grandTotal.toFixed(2)}` :
-                    undefined
+                  dispute.orderId?.grandTotal
+                    ? `$${dispute.orderId.grandTotal.toFixed(2)}`
+                    : undefined
                 }
               />
               <InfoRow
@@ -128,9 +134,14 @@ const DisputeModal = ({ dispute, onClose, onUpdate }) => {
             </header>
             <div className="bg-gray-50  p-4 rounded-lg space-y-2">
               <InfoRow label="Email" value={dispute.raisedBy?.email} />
-              <InfoRow label="Dispute Type" value={dispute.disputeType?.toLowerCase().replace(/_/g, ' ')} />
+              <InfoRow
+                label="Dispute Type"
+                value={dispute.disputeType?.toLowerCase().replace(/_/g, " ")}
+              />
               <div>
-                <p className="text-xs font-medium text-gray-500  mb-[2px]">Description</p>
+                <p className="text-xs font-medium text-gray-500  mb-[2px]">
+                  Description
+                </p>
                 <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-900 ">
                   {dispute.description}
                 </p>
@@ -154,20 +165,33 @@ const DisputeModal = ({ dispute, onClose, onUpdate }) => {
               <InfoRow label="Email" value={dispute.sellerId?.email} />
               {dispute.sellerResponse && (
                 <>
-                  <InfoRow label="Response Type" value={dispute.sellerResponse.responseType} />
+                  <InfoRow
+                    label="Response Type"
+                    value={dispute.sellerResponse.responseType}
+                  />
                   <div>
-                    <p className="text-xs font-medium text-gray-500  mb-[2px]">Response</p>
+                    <p className="text-xs font-medium text-gray-500  mb-[2px]">
+                      Response
+                    </p>
                     <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-900 ">
                       {dispute.sellerResponse.description}
                     </p>
                   </div>
                   <p className="text-xs text-gray-400 ">
-                    Responded on: {new Date(dispute.sellerResponse.respondedAt).toLocaleString()}
+                    Responded on:{" "}
+                    {new Date(
+                      dispute.sellerResponse.respondedAt
+                    ).toLocaleString()}
                   </p>
                   {dispute.sellerResponse.attachments?.length > 0 && (
                     <div>
-                      <p className="text-xs font-medium text-gray-500 ">Attachments</p>
-                      <FileLinks files={dispute.sellerResponse.attachments} label="Attachment" />
+                      <p className="text-xs font-medium text-gray-500 ">
+                        Attachments
+                      </p>
+                      <FileLinks
+                        files={dispute.sellerResponse.attachments}
+                        label="Attachment"
+                      />
                     </div>
                   )}
                 </>
@@ -183,47 +207,66 @@ const DisputeModal = ({ dispute, onClose, onUpdate }) => {
                 <h3 className="font-semibold text-lg">Admin Decision</h3>
               </header>
               <div className="bg-gray-50  p-4 rounded-lg space-y-2">
-                <InfoRow label="Decision" value={`In favor of ${dispute.adminReview.decision}`} />
-                {dispute.adminReview.decision === 'BUYER' && dispute.adminReview.disputeAmountPercent > 0 && (
-                  <InfoRow 
-                    label="Refund Amount" 
-                    value={`${dispute.adminReview.disputeAmountPercent}% of order total`} 
-                  />
-                )}
+                <InfoRow
+                  label="Decision"
+                  value={`In favour of ${dispute.adminReview.decision}`}
+                />
+                {dispute.adminReview.decision === "BUYER" &&
+                  dispute.adminReview.disputeAmountPercent > 0 && (
+                    <InfoRow
+                      label="Refund Amount"
+                      value={`${dispute.adminReview.disputeAmountPercent}% of order total`}
+                    />
+                  )}
                 <div>
-                  <p className="text-xs font-medium text-gray-500  mb-[2px]">Decision Note</p>
+                  <p className="text-xs font-medium text-gray-500  mb-[2px]">
+                    Decision Note
+                  </p>
                   <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-900 ">
                     {dispute.adminReview.decisionNote}
                   </p>
                 </div>
                 <p className="text-xs text-gray-400 ">
-                  Resolved on: {new Date(dispute.adminReview.resolvedAt).toLocaleString()}
+                  Resolved on:{" "}
+                  {new Date(dispute.adminReview.resolvedAt).toLocaleString()}
                 </p>
               </div>
             </section>
           )}
         </div>
         {/* ─────────────────── Footer / Admin Actions ─────────────────── */}
-        {dispute.status !== 'RESOLVED' && (
-          <form onSubmit={handleAdminDecision} className="border-t border-gray-200  pt-4 mt-4 space-y-4">
-            <h3 className="font-semibold text-lg text-gray-700 ">Make Decision</h3>
+        {dispute.status !== "RESOLVED" && (
+          <form
+            onSubmit={handleAdminDecision}
+            className="border-t border-gray-200  pt-4 mt-4 space-y-4"
+          >
+            <h3 className="font-semibold text-lg text-gray-700 ">
+              Make Decision
+            </h3>
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-medium text-gray-500  mb-1">Decision</label>
+                <label className="block text-xs font-medium text-gray-500  mb-1">
+                  Decision
+                </label>
                 <select
                   value={adminDecision.decision}
-                  onChange={(e) => setAdminDecision((p) => ({ ...p, decision: e.target.value }))}
+                  onChange={(e) =>
+                    setAdminDecision((p) => ({
+                      ...p,
+                      decision: e.target.value,
+                    }))
+                  }
                   className="w-full border rounded-md px-3 py-2 bg-white   focus:outline-none  focus:ring-primary-500"
                   required
                 >
                   <option value="">Select Decision</option>
-                  <option value="BUYER">In Favor of Buyer</option>
-                  <option value="SELLER">In Favor of Seller</option>
+                  <option value="BUYER">In favour of Buyer</option>
+                  <option value="SELLER">In favour of Seller</option>
                 </select>
               </div>
-              
-              {/* Show refund percentage field only when decision is in favor of buyer */}
-              {adminDecision.decision === 'BUYER' && (
+
+              {/* Show refund percentage field only when decision is in favour of buyer */}
+              {adminDecision.decision === "BUYER" && (
                 <div>
                   <label className="block text-xs font-medium text-gray-500  mb-1">
                     Refund Percentage (%)
@@ -233,46 +276,60 @@ const DisputeModal = ({ dispute, onClose, onUpdate }) => {
                     min="0"
                     max="100"
                     value={adminDecision.disputeAmountPercent}
-                    onChange={(e) => setAdminDecision((p) => ({ 
-                      ...p, 
-                      disputeAmountPercent: Math.min(100, Math.max(0, parseInt(e.target.value) || 0))
-                    }))}
+                    onChange={(e) =>
+                      setAdminDecision((p) => ({
+                        ...p,
+                        disputeAmountPercent: Math.min(
+                          100,
+                          Math.max(0, parseInt(e.target.value) || 0)
+                        ),
+                      }))
+                    }
                     className="w-full border rounded-md px-3 py-2 bg-white   focus:outline-none  focus:ring-primary-500"
                     placeholder="Enter percentage (0-100)"
                   />
-                  
+
                   {/* Quick percentage buttons */}
                   <div className="flex gap-2 mt-2">
                     {[25, 50, 75, 100].map((percentage) => (
                       <button
                         key={percentage}
                         type="button"
-                        onClick={() => setAdminDecision((p) => ({ 
-                          ...p, 
-                          disputeAmountPercent: percentage 
-                        }))}
+                        onClick={() =>
+                          setAdminDecision((p) => ({
+                            ...p,
+                            disputeAmountPercent: percentage,
+                          }))
+                        }
                         className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
                           adminDecision.disputeAmountPercent === percentage
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                         }`}
                       >
                         {percentage}%
                       </button>
                     ))}
                   </div>
-                  
+
                   <p className="text-xs text-gray-500 mt-1">
                     Percentage of order total to refund to buyer
                   </p>
                 </div>
               )}
-              
+
               <div className="sm:col-span-2">
-                <label className="block text-xs font-medium text-gray-500  mb-1">Decision Note</label>
+                <label className="block text-xs font-medium text-gray-500  mb-1">
+                  Decision Note
+                </label>
                 <textarea
                   value={adminDecision.decisionNote}
-                  onChange={(e) => setAdminDecision((p) => ({ ...p, decisionNote: e.target.value }))}
+                  onChange={(e) =>
+                    setAdminDecision((p) => ({
+                      ...p,
+                      decisionNote: e.target.value,
+                    }))
+                  }
                   className="w-full border rounded-md px-3 py-2 h-24 bg-white   focus:outline-none  focus:ring-primary-500"
                   placeholder="Provide reasoning for your decision..."
                   required
@@ -280,7 +337,12 @@ const DisputeModal = ({ dispute, onClose, onUpdate }) => {
               </div>
             </div>
             <div className="flex justify-end gap-2">
-              <Button type="button" variant="secondary" onClick={onClose} disabled={loading}>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={onClose}
+                disabled={loading}
+              >
                 Cancel
               </Button>
               <Button type="submit" variant="primary" loading={loading}>
